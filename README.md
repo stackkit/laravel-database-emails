@@ -16,13 +16,13 @@ $ composer require buildcode/laravel-database-emails
 If you're running Laravel 5.5 or later you may skip this step. Add the service provider to your application.
 
 ```php
-Buildcode\LaravelGhost\LaravelDatabaseEmailsServiceProvider::class,
+Buildcode\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
 ```
 
 Publish the configuration file.
 
 ```bash
-$ php artisan vendor:publish --provider=Buildcode\\LaravelGhost\\LaravelDatabaseEmailsServiceProvider
+$ php artisan vendor:publish --provider=Buildcode\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider
 ```
 
 Create the e-mails database table migration.

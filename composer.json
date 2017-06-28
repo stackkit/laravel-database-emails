@@ -2,7 +2,6 @@
     "name": "buildcode/laravel-database-emails",
     "description": "Store and send e-mails using the database",
     "license": "MIT",
-    "version": "1.0.0",
     "authors": [
         {
             "name": "Marick van Tuil",
@@ -10,9 +9,9 @@
         }
     ],
     "require": {
-        "illuminate/database": "^5.4",
-        "illuminate/console": "^5.4",
-        "illuminate/validation": "^5.4"
+        "illuminate/database": "^5.2",
+        "illuminate/console": "^5.2",
+        "illuminate/validation": "^5.2"
     },
     "autoload": {
         "psr-4": {
