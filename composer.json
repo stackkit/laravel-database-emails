@@ -1,0 +1,29 @@
+{
+    "name": "buildcode/laravel-database-emails",
+    "description": "Store and send e-mails using the database",
+    "license": "MIT",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Marick van Tuil",
+            "email": "info@marickvantuil.nl"
+        }
+    ],
+    "require": {
+        "illuminate/database": "^5.4",
+        "illuminate/console": "^5.4",
+        "illuminate/validation": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Buildcode\\LaravelDatabaseEmails\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Buildcode\\LaravelGhost\\LaravelDatabaseEmailsServiceProvider"
+            ]
+        }
+    }
+}
