@@ -16,7 +16,9 @@ class PrepareEmail implements EmailDecorator
 
         $email->variables = json_encode($email->getVariables());
 
-        $email->scheduled_at = $email->getScheduledDateAsCarbon()->toDateTimeString();
+        if ($email->hasScheduledDate()) {
+            $email->scheduled_at = $email->getScheduledDateAsCarbon()->toDateTimeString();
+        }
 
         $this->email->encrypted = config('laravel-database-emails.encrypt', false);
 

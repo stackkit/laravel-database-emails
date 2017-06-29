@@ -175,6 +175,16 @@ class Email extends Model
     }
 
     /**
+     * Determine if a scheduled date has been set.
+     *
+     * @return bool
+     */
+    public function hasScheduledDate()
+    {
+        return !is_null($this->getScheduledDate());
+    }
+
+    /**
      * Get the scheduled date as a Carbon instance.
      *
      * @return Carbon
