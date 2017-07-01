@@ -1,6 +1,11 @@
 <p align="center">
   <img src="/logo.png">
 </p>
+<p align="center">
+<a href="https://travis-ci.org/stackkit/laravel-database-emails"><img src="https://travis-ci.org/stackkit/laravel-database-emails.svg?branch=master" alt="Build Status"></a>
+<a href="https://packagist.org/packages/buildcode/laravel-database-emails"><img src="https://poser.pugx.org/buildcode/laravel-database-emails/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/buildcode/laravel-database-emails"><img src="https://poser.pugx.org/buildcode/laravel-database-emails/license.svg" alt="License"></a>
+</p>
 
 ## Introduction
 
@@ -89,19 +94,21 @@ $ php artisan email:send
 
 ### Failed E-mails
 
-By default, we will attempt to send an e-mail 3 times if it somehow fails.
+By default, we will attempt to send an e-mail 3 times if it fails. If it still fails the 3rd time, it will permanently be marked as failed. You can change the number of times an e-mail should be attempted to be sent using the `retry.attempts` configuration.
 
 ### Retry sending failed e-mails
 
-If you wish to reset failed e-mails and attempt to send them again, you may call the `email:failed` command. The command will grab any failed e-mail and push it onto the queue.
+If you wish to retry sending failed e-mails, you may call the `email:retry` command. The command will grab any failed e-mail and push it onto the queue. You may also provide the id of a specific e-mail.
 
 ```bash
-$ php artisan email:failed
+$ php artisan email:retry
+# or...
+$ php artisan email:retry 1
 ```
 
 ### Encryption
 
-If you wish to encrypt your e-mails, please enable the `encrypt` option in the configuration file. This is disabled by default. Encryption and decryption will be handled by Laravel's built-in encryption mechanism.
+If you wish to encrypt your e-mails, please enable the `encrypt` option in the configuration file. This is disabled by default. Encryption and decryption will be handled by Laravel's built-in encryption mechanism. Please note that encrypting the e-mail body takes a lot of disk space.
 
 ### Testing Address
 
@@ -111,5 +118,5 @@ During the creation of an e-mail, the recipient will be replaced by the test e-m
 
 ## Todo
 
-- Add support attachments
+- Add support for attachments
 - Add support for Mailables
