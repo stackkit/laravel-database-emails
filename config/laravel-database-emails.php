@@ -53,4 +53,16 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cronjob Limit
+    |--------------------------------------------------------------------------
+    |
+    | Limit the number of e-mails the cronjob may send at a time. This is useful
+    | if you want to prevent overlapping cronjobs. Keep in mind we already
+    | handle overlapping gracefully, however setting a limit is adviced.
+    |
+    */
+
+    'limit' => 20
 ];

@@ -3,8 +3,8 @@
 namespace Buildcode\LaravelDatabaseEmails;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 class SendEmailsCommand extends Command
 {
@@ -20,56 +20,77 @@ class SendEmailsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Send e-mails in the system';
+    protected $description = 'Send all queued e-mails';
+
+    /**
+     * The e-mail repository.
+     *
+     * @var Store
+     */
+    protected $store;
+
+    /**
+     * Create a new SendEmailsCommand instance.
+     *
+     * @param Store $store
+     */
+    public function __construct(Store $store)
+    {
+        parent::__construct();
+
+        $this->store = $store;
+    }
 
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
-        $emails = Email::queued()->get();
+        $emails = $this->store->getQueue();
 
         if ($emails->isEmpty()) {
-            return $this->info('No e-mails to be sent.');
+            $this->line('There is nothing to send.');
+            return;
         }
 
-        $bar = $this->output->createProgressBar($emails->count());
+        $progress = $this->output->createProgressBar($emails->count());
 
-        $table = [
-            'headers' => ['ID', 'Recipient', 'Subject', 'Status'],
-            'rows'    => [],
-        ];
-
-        $emails->each(function (Email $email) use (&$bar, &$table) {
-            $bar->advance();
-
-            $email->markAsSending();
+        foreach ($emails as $email) {
+            $progress->advance();
 
             try {
-                Mail::send([], [], function ($message) use ($email) {
-                    $message->to($email->getRecipient())
-                        ->subject($email->getSubject())
-                        ->from(config('mail.from.address'), config('mail.from.name'))
-                        ->setBody($email->getBody(), 'text/html');
-                });
-
-                $email->markAsSent();
+                $email->send();
             } catch (Exception $e) {
-                if ($email->getAttempts() >= config('laravel-database-emails.retry.attempts', 3)) {
-                    $email->markAsFailed($e->getMessage());
-                }
+                $email->markAsFailed($e);
             }
+        }
 
-            $table['rows'][] = $email->getTableRow();
-        });
+        $progress->finish();
 
-        $bar->finish();
+        $this->result($emails);
+    }
 
-        $this->line('');
-        $this->line('');
+    /**
+     * Output a table with the cronjob result.
+     *
+     * @param Collection $emails
+     * @return void
+     */
+    protected function result($emails)
+    {
+        $headers = ['ID', 'Recipient', 'Subject', 'Status'];
 
-        $this->table($table['headers'], $table['rows']);
+        $this->line("\n");
+
+        $this->table($headers, $emails->map(function ($email) {
+            return [
+                $email->getId(),
+                $email->getRecipient(),
+                $email->getSubject(),
+                $email->hasFailed() ? 'Failed' : 'OK',
+            ];
+        }));
     }
 }

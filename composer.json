@@ -18,11 +18,21 @@
             "Buildcode\\LaravelDatabaseEmails\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "Buildcode\\LaravelGhost\\LaravelDatabaseEmailsServiceProvider"
             ]
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.4",
+        "phpunit/phpunit": "^6.2",
+        "orchestra/database": "~3.4"
     }
 }

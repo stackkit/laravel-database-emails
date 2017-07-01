@@ -111,6 +111,5 @@ During the creation of an e-mail, the recipient will be replaced by the test e-m
 
 ## Todo
 
-- Add support for CC, BCC and attachments
+- Add support attachments
 - Add support for Mailables
-- Add tests

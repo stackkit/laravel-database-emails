@@ -16,6 +16,14 @@ class EncryptEmail implements EmailDecorator
             'variables' => encrypt(json_encode($this->email->getVariables())),
             'body'      => encrypt(view($this->email->getView(), $this->email->getVariables())->render()),
         ]);
+
+        if ($this->email->hasCc()) {
+            $this->email->cc = encrypt($this->email->getCc());
+        }
+
+        if ($this->email->hasBcc()) {
+            $this->email->bcc = encrypt($this->email->getBcc());
+        }
     }
 
     public function getEmail()

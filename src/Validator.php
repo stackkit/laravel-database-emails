@@ -21,6 +21,7 @@ class Validator
         self::$email = $email;
 
         self::validateRecipient();
+        self::validateCcAndBcc();
         self::validateSubject();
         self::validateView();
         self::validateVariables();
@@ -40,6 +41,33 @@ class Validator
 
         if (!filter_var(self::$email->getRecipient(), FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException('No valid e-mail specified');
+        }
+    }
+
+    /**
+     * Validate the CC and BCC e-mail addresses.
+     *
+     * @throws InvalidArgumentException
+     */
+    private static function validateCcAndBcc()
+    {
+        $cc = self::$email->getCc();
+        $bcc = self::$email->getBcc();
+
+        foreach ([$cc, $bcc] as $source) {
+            if (is_null($source)) {
+                continue;
+            }
+
+            if (!is_array($source)) {
+                $source = [$source];
+            }
+
+            foreach ($source as $email) {
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    throw new InvalidArgumentException('Not a valid e-mail: [' . $email . ']');
+                }
+            }
         }
     }
 
@@ -78,6 +106,10 @@ class Validator
      */
     private static function validateVariables()
     {
+        if (!self::$email->hasVariables()) {
+            return;
+        }
+
         if (!is_array(self::$email->getVariables())) {
             throw new InvalidArgumentException('Variables must be an array');
         }

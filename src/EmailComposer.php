@@ -10,7 +10,6 @@ use Psr\Log\InvalidArgumentException;
 class EmailComposer
 {
     private $email;
-    private $label, $recipient, $subject, $view, $variables, $scheduled_at;
 
     public function __construct(Email $email)
     {
@@ -39,6 +38,32 @@ class EmailComposer
     public function recipient($recipient)
     {
         $this->email->recipient = $recipient;
+
+        return $this;
+    }
+
+    /**
+     * Send a copy of this e-mail to the given addresses.
+     *
+     * @param array $cc
+     * @return static
+     */
+    public function cc($cc)
+    {
+        $this->email->cc = $cc;
+
+        return $this;
+    }
+
+    /**
+     * Send a blind copy to the given addresses.
+     *
+     * @param array $bcc
+     * @return static
+     */
+    public function bcc($bcc)
+    {
+        $this->email->bcc = $bcc;
 
         return $this;
     }
@@ -75,7 +100,7 @@ class EmailComposer
      * @param array $variables
      * @return static
      */
-    public function variables(array $variables = [])
+    public function variables($variables)
     {
         $this->email->variables = $variables;
 
@@ -86,32 +111,32 @@ class EmailComposer
      * Schedule the e-mail.
      *
      * @param mixed $scheduledFor
-     * @return void
+     * @return Email
      */
     public function schedule($scheduledFor)
     {
         $this->email->scheduled_at = $scheduledFor;
 
-        $this->send();
+        return $this->send();
     }
 
     /**
      * Send the e-mail.
      *
-     * @return void
+     * @return Email
      */
     public function send()
     {
         Validator::validate($this->email);
 
-        $encrypt = config('laravel-database-emails.encrypt', false);
-
-        if ($encrypt) {
+        if (Config::encryptEmails()) {
             $email = (new EncryptEmail(new PrepareEmail($this->email)))->getEmail();
         } else {
             $email = (new PrepareEmail($this->email))->getEmail();
         }
 
         $email->save();
+
+        return $email;
     }
 }

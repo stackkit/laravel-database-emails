@@ -2,10 +2,12 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
+use Exception;
 
 class Email extends Model
 {
@@ -22,42 +24,6 @@ class Email extends Model
      * @var array
      */
     protected $guarded = [];
-
-    /**
-     * Get all e-mails that are queued.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeQueued(Builder $query)
-    {
-        $maxAttempts = max(config('laravel-database-emails.retry.attempts', 1), 1);
-
-        return $query
-            ->whereNull('deleted_at')
-            ->whereNull('sent_at')
-            ->where(function ($query) {
-                $query->whereNull('scheduled_at')
-                    ->orWhere('scheduled_at', '<=', Carbon::now()->toDateTimeString());
-            })
-            ->where('failed', '=', 0)
-            ->where('sending', '=', 0)
-            ->where('attempts', '<', $maxAttempts);
-    }
-
-    /**
-     * Get all e-mails that failed to be sent.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeFailed(Builder $query)
-    {
-        return $query
-            ->where('failed', '=', 1)
-            ->whereNull('sent_at')
-            ->whereNull('deleted_at');
-    }
 
     /**
      * Compose a new e-mail.
@@ -100,6 +66,38 @@ class Email extends Model
     }
 
     /**
+     * Get the e-mail CC addresses.
+     *
+     * @return array|string
+     */
+    public function getCc()
+    {
+        if ($this->exists) {
+            $cc = $this->getEmailProperty('cc');
+
+            return json_decode($cc, 1);
+        }
+
+        return $this->cc;
+    }
+
+    /**
+     * Get the e-mail BCC addresses.
+     *
+     * @return array|string
+     */
+    public function getBcc()
+    {
+        if ($this->exists) {
+            $bcc = $this->getEmailProperty('bcc');
+
+            return json_decode($bcc, 1);
+        }
+
+        return $this->bcc;
+    }
+
+    /**
      * Get the e-mail subject.
      *
      * @return string
@@ -129,19 +127,15 @@ class Email extends Model
     {
         if ($this->exists) {
             $var = $this->getEmailProperty('variables');
-        } else {
-            $var = $this->variables;
-        }
 
-        if (is_array($var)) {
-            return $var;
-        }
-
-        if (is_string($var)) {
             return json_decode($var, 1);
         }
 
-        return [];
+        if (is_string($this->variables)) {
+            return json_decode($this->variables, 1);
+        }
+
+        return $this->variables;
     }
 
     /**
@@ -155,6 +149,17 @@ class Email extends Model
     }
 
     /**
+     * Get the number of times this e-mail was attempted to send.
+     *
+     * @return int
+     */
+    public function getAttempts()
+    {
+        return $this->attempts;
+    }
+
+
+    /**
      * Get the scheduled date.
      *
      * @return mixed
@@ -165,23 +170,13 @@ class Email extends Model
     }
 
     /**
-     * Get the number of times this e-mail was attempted to send.
-     *
-     * @return int
-     */
-    public function getAttempts()
-    {
-        return $this->attempts;
-    }
-
-    /**
-     * Determine if a scheduled date has been set.
+     * Determine if the e-mail has variables defined.
      *
      * @return bool
      */
-    public function hasScheduledDate()
+    public function hasVariables()
     {
-        return !is_null($this->getScheduledDate());
+        return !is_null($this->variables);
     }
 
     /**
@@ -199,14 +194,55 @@ class Email extends Model
     }
 
     /**
-     * Get the date when this e-mail was sent.
+     * Get the send date for this e-mail.
      *
      * @return string
      */
-    public function getSentAt()
+    public function getSendDate()
     {
         return $this->sent_at;
     }
+
+    /**
+     * Get the send error.
+     *
+     * @return string
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * Determine if the e-mail should be sent as a carbon copy.
+     *
+     * @return bool
+     */
+    public function hasCc()
+    {
+        return !is_null($this->cc);
+    }
+
+    /**
+     * Determine if the e-mail should be sent as a blind carbon copy.
+     *
+     * @return bool
+     */
+    public function hasBcc()
+    {
+        return !is_null($this->bcc);
+    }
+
+    /**
+     * Determine if the e-mail is scheduled to be sent later.
+     *
+     * @return bool
+     */
+    public function isScheduled()
+    {
+        return !is_null($this->getScheduledDate());
+    }
+
 
     /**
      * Determine if the e-mail is encrypted.
@@ -219,7 +255,27 @@ class Email extends Model
     }
 
     /**
-     * Get the decrypted property for the e-mail.
+     * Determine if the e-mail is sent.
+     *
+     * @return bool
+     */
+    public function isSent()
+    {
+        return !is_null($this->sent_at);
+    }
+
+    /**
+     * Determine if the e-mail failed to be sent.
+     *
+     * @return bool
+     */
+    public function hasFailed()
+    {
+        return $this->failed == 1;
+    }
+
+    /**
+     * Get a decrypted property.
      *
      * @param string $property
      * @return mixed
@@ -238,25 +294,16 @@ class Email extends Model
     }
 
     /**
-     * Increment the number of times this e-mail was attempted to be sent.
-     *
-     * @return void
-     */
-    public function incrementAttempts()
-    {
-        $this->increment('attempts');
-    }
-
-    /**
      * Mark the e-mail as sending.
      *
      * @return void
      */
     public function markAsSending()
     {
-        $this->incrementAttempts();
-
-        $this->update(['sending' => 1]);
+        $this->update([
+            'attempts' => $this->attempts + 1,
+            'sending'  => 1,
+        ]);
     }
 
     /**
@@ -266,58 +313,62 @@ class Email extends Model
      */
     public function markAsSent()
     {
+        $now = Carbon::now()->toDateTimeString();
+
         $this->update([
             'sending' => 0,
-            'sent_at' => Carbon::now()->toDateTimeString()
+            'sent_at' => $now,
         ]);
     }
 
     /**
      * Mark the e-mail as failed.
      *
-     * @param string $error
+     * @param Exception $exception
      * @return void
      */
-    public function markAsFailed($error = '')
+    public function markAsFailed(Exception $exception)
     {
         $this->update([
             'sending' => 0,
             'failed'  => 1,
-            'error'   => $error,
+            'error'   => $exception->getMessage(),
         ]);
     }
 
     /**
-     * Mark the e-mail as deleted.
+     * Send the e-mail.
      *
      * @return void
      */
-    public function markAsDeleted()
+    public function send()
     {
-        $this->update(['deleted_at' => Carbon::now()->toDateTimeString()]);
+        if ($this->isSent()) {
+            return;
+        }
+
+        $this->markAsSending();
+
+        Event::dispatch('before.send');
+
+        Mail::send([], [], function ($message) {
+            $message->to($this->getRecipient())
+                ->cc($this->hasCc() ? $this->getCc() : [])
+                ->bcc($this->hasBcc() ? $this->getBcc() : [])
+                ->subject($this->getSubject())
+                ->from(config('mail.from.address'), config('mail.from.name'))
+                ->setBody($this->getBody(), 'text/html');
+        });
+
+        $this->markAsSent();
     }
 
     /**
-     * Get the output command e-mail row.
-     *
-     * @return array
-     */
-    public function getTableRow()
-    {
-        return [
-            $this->getId(),
-            $this->getRecipient(),
-            $this->getSubject(),
-            is_null($this->getSentAt()) ? 'Failed' : 'OK',
-        ];
-    }
-
-    /**
-     * Reset the failed e-mail and attempt to re-send it.
+     * Retry sending the e-mail.
      *
      * @return void
      */
-    public function reset()
+    public function retry()
     {
         $retry = new static;
 
