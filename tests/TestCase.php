@@ -21,8 +21,9 @@ class Testcase extends \Orchestra\Testbench\TestCase
             1.0,
             'test',
             new \stdClass(),
-            (object) [],
-            function () {},
+            (object)[],
+            function () {
+            },
         ];
 
         $this->createSchema();
@@ -86,7 +87,7 @@ class Testcase extends \Orchestra\Testbench\TestCase
      * In a normal app environment these would be added to the 'providers' array in
      * the config/app.php file.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Foundation\Application $app
      *
      * @return array
      */
@@ -101,7 +102,7 @@ class Testcase extends \Orchestra\Testbench\TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Foundation\Application $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -111,14 +112,24 @@ class Testcase extends \Orchestra\Testbench\TestCase
 
     public function createEmail($overwrite = [])
     {
+        $params = array_merge([
+            'label'     => 'welcome',
+            'recipient' => 'john@doe.com',
+            'cc'        => null,
+            'bcc'       => null,
+            'subject'   => 'test',
+            'view'      => 'tests::dummy',
+            'variables' => ['name' => 'John Doe'],
+        ], $overwrite);
+
         return Email::compose()
-            ->label($overwrite['label'] ?? 'welcome')
-            ->recipient($overwrite['recipient'] ?? 'john@doe.com')
-            ->cc($overwrite['cc'] ?? null)
-            ->bcc($overwrite['bcc'] ?? null)
-            ->subject($overwrite['subject'] ?? 'test')
-            ->view($overwrite['view'] ?? 'tests::dummy')
-            ->variables($overwrite['variables'] ?? ['name' => 'John Doe']);
+            ->label($params['label'])
+            ->recipient($params['recipient'])
+            ->cc($params['cc'])
+            ->bcc($params['bcc'])
+            ->subject($params['subject'])
+            ->view($params['view'])
+            ->variables($params['variables']);
     }
 
     public function sendEmail($overwrite = [])

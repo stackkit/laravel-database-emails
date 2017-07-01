@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "~3.4",
-        "phpunit/phpunit": "^6.2",
+        "phpunit/phpunit": "^5.7",
         "orchestra/database": "~3.4"
     }
 }
