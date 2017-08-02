@@ -349,8 +349,10 @@ class Email extends Model
 
         $this->markAsSending();
 
-        Event::dispatch('before.send');
-
+        if (app()->runningUnitTests()) {
+            Event::dispatch('before.send');
+        }
+        
         Mail::send([], [], function ($message) {
             $message->to($this->getRecipient())
                 ->cc($this->hasCc() ? $this->getCc() : [])
