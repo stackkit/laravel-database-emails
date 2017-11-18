@@ -26,7 +26,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Buildcode\\LaravelGhost\\LaravelDatabaseEmailsServiceProvider"
+                "Buildcode\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider"
             ]
         }
     },
