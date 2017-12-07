@@ -55,7 +55,7 @@ class CreateEmailTableCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $table = 'emails';
 
@@ -66,6 +66,16 @@ class CreateEmailTableCommand extends Command
         $this->info('Migration created successfully!');
 
         $this->composer->dumpAutoloads();
+    }
+
+    /**
+     * Execute the console command (backwards compatibility for Laravel 5.4 and below).
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $this->handle();
     }
 
     /**

@@ -42,7 +42,7 @@ class RetryFailedEmailsCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
@@ -60,5 +60,15 @@ class RetryFailedEmailsCommand extends Command
         }
 
         $this->info('Reset ' . $emails->count() . ' ' . ngettext('e-mail', 'e-mails', $emails->count()) . '!');
+    }
+
+    /**
+     * Execute the console command (backwards compatibility for Laravel 5.4 and below).
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $this->handle();
     }
 }

@@ -73,6 +73,16 @@ class SendEmailsCommand extends Command
     }
 
     /**
+     * Execute the console command (backwards compatibility for Laravel 5.4 and below).
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $this->handle();
+    }
+
+    /**
      * Output a table with the cronjob result.
      *
      * @param Collection $emails
