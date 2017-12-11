@@ -72,7 +72,7 @@ class SendEmailsCommandTest extends TestCase
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertEquals('Simulating some random error', $email->fresh()->getError());
+        $this->assertContains('Simulating some random error', $email->fresh()->getError());
     }
 
     /** @test */

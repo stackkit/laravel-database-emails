@@ -317,7 +317,7 @@ class Email extends Model
         $this->update([
             'sending' => 0,
             'failed'  => 1,
-            'error'   => $exception->getMessage(),
+            'error'   => (string) $exception,
         ]);
     }
 
