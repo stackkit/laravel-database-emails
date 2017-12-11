@@ -2,15 +2,39 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Exception;
 
+/**
+ * @property $id
+ * @property $label
+ * @property $recipient
+ * @property $cc
+ * @property $bcc
+ * @property $subject
+ * @property $view
+ * @property $variables
+ * @property $body
+ * @property $attempts
+ * @property $sending
+ * @property $failed
+ * @property $error
+ * @property $encrypted
+ * @property $scheduled_at
+ * @property $sent_at
+ * @property $delivered_at
+ */
 class Email extends Model
 {
+    /**
+     * Make sure all encrypted attributes are decrypted.
+     */
+    use HasEncryptedAttributes;
+
     /**
      * The table in which the e-mails are stored.
      *
@@ -62,7 +86,7 @@ class Email extends Model
      */
     public function getRecipient()
     {
-        return $this->getEmailProperty('recipient');
+        return $this->recipient;
     }
 
     /**
@@ -72,12 +96,6 @@ class Email extends Model
      */
     public function getCc()
     {
-        if ($this->exists) {
-            $cc = $this->getEmailProperty('cc');
-
-            return json_decode($cc, 1);
-        }
-
         return $this->cc;
     }
 
@@ -88,12 +106,6 @@ class Email extends Model
      */
     public function getBcc()
     {
-        if ($this->exists) {
-            $bcc = $this->getEmailProperty('bcc');
-
-            return json_decode($bcc, 1);
-        }
-
         return $this->bcc;
     }
 
@@ -104,7 +116,7 @@ class Email extends Model
      */
     public function getSubject()
     {
-        return $this->getEmailProperty('subject');
+        return $this->subject;
     }
 
     /**
@@ -125,16 +137,6 @@ class Email extends Model
      */
     public function getVariables()
     {
-        if ($this->exists) {
-            $var = $this->getEmailProperty('variables');
-
-            return json_decode($var, 1);
-        }
-
-        if (is_string($this->variables)) {
-            return json_decode($this->variables, 1);
-        }
-
         return $this->variables;
     }
 
@@ -145,7 +147,7 @@ class Email extends Model
      */
     public function getBody()
     {
-        return $this->getEmailProperty('body');
+        return $this->body;
     }
 
     /**
@@ -251,7 +253,7 @@ class Email extends Model
      */
     public function isEncrypted()
     {
-        return !!$this->encrypted;
+        return !!$this->getOriginal('encrypted');
     }
 
     /**
@@ -272,25 +274,6 @@ class Email extends Model
     public function hasFailed()
     {
         return $this->failed == 1;
-    }
-
-    /**
-     * Get a decrypted property.
-     *
-     * @param string $property
-     * @return mixed
-     */
-    private function getEmailProperty($property)
-    {
-        if ($this->exists && $this->isEncrypted()) {
-            try {
-                return decrypt($this->{$property});
-            } catch (DecryptException $e) {
-                return '';
-            }
-        }
-
-        return $this->{$property};
     }
 
     /**
@@ -318,6 +301,8 @@ class Email extends Model
         $this->update([
             'sending' => 0,
             'sent_at' => $now,
+            'failed'  => 0,
+            'error'   => '',
         ]);
     }
 
@@ -352,8 +337,8 @@ class Email extends Model
         if (app()->runningUnitTests()) {
             Event::dispatch('before.send');
         }
-        
-        Mail::send([], [], function ($message) {
+
+        Mail::send([], [], function (Message $message) {
             $message->to($this->getRecipient())
                 ->cc($this->hasCc() ? $this->getCc() : [])
                 ->bcc($this->hasBcc() ? $this->getBcc() : [])

@@ -14,9 +14,6 @@ class Store
      */
     public function getQueue()
     {
-        $maxAttempts = Config::maxRetryCount();
-        $emailLimit = Config::cronjobEmailLimit();
-
         $query = new Email;
 
         return $query
@@ -26,11 +23,10 @@ class Store
                 $query->whereNull('scheduled_at')
                     ->orWhere('scheduled_at', '<=', Carbon::now()->toDateTimeString());
             })
-            ->where('failed', '=', 0)
             ->where('sending', '=', 0)
-            ->where('attempts', '<', $maxAttempts)
+            ->where('attempts', '<', Config::maxAttemptCount())
             ->orderBy('created_at', 'asc')
-            ->limit($emailLimit)
+            ->limit(Config::cronjobEmailLimit())
             ->get();
     }
 
@@ -49,6 +45,7 @@ class Store
                 $query->where('id', '=', $id);
             })
             ->where('failed', '=', 1)
+            ->where('attempts', '>=', Config::maxAttemptCount())
             ->whereNull('sent_at')
             ->whereNull('deleted_at')
             ->get();

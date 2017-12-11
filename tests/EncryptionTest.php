@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Buildcode\LaravelDatabaseEmails\Email;
+
 class EncryptionTest extends TestCase
 {
     function setUp()
@@ -26,7 +28,8 @@ class EncryptionTest extends TestCase
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
 
-        $this->assertNotEquals('john@doe.com', $email->recipient);
+        $this->assertEquals('john@doe.com', decrypt($email->getOriginal('recipient')));
+
         $this->assertEquals('john@doe.com', $email->getRecipient());
     }
 
@@ -38,12 +41,11 @@ class EncryptionTest extends TestCase
             'bcc' => $bcc = ['jane+1@doe.com', 'jane+2@doe.com']
         ]);
 
-        $email = $email->fresh();
+        $this->assertEquals($cc, decrypt($email->getOriginal('cc')));
+        $this->assertEquals($bcc, decrypt($email->getOriginal('bcc')));
 
-        $this->assertNotEquals(json_encode($cc), $email->cc);
         $this->assertEquals($cc, $email->getCc());
-        $this->assertNotEquals(json_encode($bcc), $email->bcc);
-        $this->assertEquals($bcc, $email->fresh()->getBcc());
+        $this->assertEquals($bcc, $email->getBcc());
     }
 
     /** @test */
@@ -51,7 +53,8 @@ class EncryptionTest extends TestCase
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
 
-        $this->assertNotEquals('test subject', $email->subject);
+        $this->assertEquals('test subject', decrypt($email->getOriginal('subject')));
+
         $this->assertEquals('test subject', $email->getSubject());
     }
 
@@ -60,8 +63,15 @@ class EncryptionTest extends TestCase
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
 
-        $this->assertNotEquals(['name' => 'Jane Doe'], $email->variables);
-        $this->assertEquals(['name' => 'Jane Doe'], $email->getVariables());
+        $this->assertEquals(
+            ['name'=> 'Jane Doe'],
+            decrypt($email->getOriginal('variables'))
+        );
+
+        $this->assertEquals(
+            ['name' => 'Jane Doe'],
+            $email->getVariables()
+        );
     }
 
     /** @test */
@@ -71,7 +81,8 @@ class EncryptionTest extends TestCase
 
         $expectedBody = "Name: Jane Doe\n";
 
-        $this->assertNotEquals($expectedBody, $email->body);
+        $this->assertEquals($expectedBody, decrypt($email->getOriginal('body')));
+
         $this->assertEquals($expectedBody, $email->getBody());
     }
 }

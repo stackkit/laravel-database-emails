@@ -21,7 +21,6 @@ class DatabaseInteractionTest extends TestCase
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
 
-        $this->assertEquals('john@doe.com', DB::table('emails')->find(1)->recipient);
         $this->assertEquals('john@doe.com', $email->getRecipient());
     }
 

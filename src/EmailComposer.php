@@ -2,18 +2,76 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-use Buildcode\LaravelDatabaseEmails\Decorators\EncryptEmail;
-use Buildcode\LaravelDatabaseEmails\Decorators\PrepareEmail;
-use Carbon\Carbon;
-use Psr\Log\InvalidArgumentException;
-
 class EmailComposer
 {
+    /**
+     * The e-mail that is being composed.
+     *
+     * @var Email
+     */
     private $email;
 
+    /**
+     * The e-email data.
+     *
+     * @var array
+     */
+    protected $data = [];
+
+    /**
+     * Create a new EmailComposer instance.
+     *
+     * @param Email $email
+     */
     public function __construct(Email $email)
     {
         $this->email = $email;
+    }
+
+    /**
+     * Get the e-mail that is being composed.
+     *
+     * @return Email
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Set a data value.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return static
+     */
+    protected function setData($key, $value)
+    {
+        $this->data[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get a data value.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getData($key)
+    {
+        return $this->data[$key];
+    }
+
+    /**
+     * Determine if the given data value was set.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function hasData($key)
+    {
+        return isset($this->data[$key]);
     }
 
     /**
@@ -24,48 +82,40 @@ class EmailComposer
      */
     public function label($label)
     {
-        $this->email->label = $label;
-
-        return $this;
+        return $this->setData('label', $label);
     }
 
     /**
-     * Set the e-mail recipient.
+     * Set the e-mail recipient(s).
      *
-     * @param string $recipient
+     * @param string|array $recipient
      * @return static
      */
     public function recipient($recipient)
     {
-        $this->email->recipient = $recipient;
-
-        return $this;
+        return $this->setData('recipient', $recipient);
     }
 
     /**
-     * Send a copy of this e-mail to the given addresses.
+     * Define the carbon-copy address(es).
      *
-     * @param array $cc
+     * @param string|array $cc
      * @return static
      */
     public function cc($cc)
     {
-        $this->email->cc = $cc;
-
-        return $this;
+        return $this->setData('cc', $cc);
     }
 
     /**
-     * Send a blind copy to the given addresses.
+     * Define the blind carbon-copy address(es).
      *
-     * @param array $bcc
+     * @param string|array $bcc
      * @return static
      */
     public function bcc($bcc)
     {
-        $this->email->bcc = $bcc;
-
-        return $this;
+        return $this->setData('bcc', $bcc);
     }
 
     /**
@@ -76,9 +126,7 @@ class EmailComposer
      */
     public function subject($subject)
     {
-        $this->email->subject = $subject;
-
-        return $this;
+        return $this->setData('subject', $subject);
     }
 
     /**
@@ -89,9 +137,7 @@ class EmailComposer
      */
     public function view($view)
     {
-        $this->email->view = $view;
-
-        return $this;
+        return $this->setData('view', $view);
     }
 
     /**
@@ -102,20 +148,29 @@ class EmailComposer
      */
     public function variables($variables)
     {
-        $this->email->variables = $variables;
-
-        return $this;
+        return $this->setData('variables', $variables);
     }
 
     /**
      * Schedule the e-mail.
      *
-     * @param mixed $scheduledFor
+     * @param mixed $scheduledAt
      * @return Email
      */
-    public function schedule($scheduledFor)
+    public function schedule($scheduledAt)
     {
-        $this->email->scheduled_at = $scheduledFor;
+        return $this->later($scheduledAt);
+    }
+
+    /**
+     * Schedule the e-mail.
+     *
+     * @param mixed $scheduledAt
+     * @return Email
+     */
+    public function later($scheduledAt)
+    {
+        $this->setData('scheduled_at', $scheduledAt);
 
         return $this->send();
     }
@@ -127,16 +182,16 @@ class EmailComposer
      */
     public function send()
     {
-        Validator::validate($this->email);
+        (new Validator)->validate($this);
+
+        (new Preparer)->prepare($this);
 
         if (Config::encryptEmails()) {
-            $email = (new EncryptEmail(new PrepareEmail($this->email)))->getEmail();
-        } else {
-            $email = (new PrepareEmail($this->email))->getEmail();
+            (new Encrypter)->encrypt($this);
         }
 
-        $email->save();
+        $this->email->save();
 
-        return $email;
+        return $this->email->fresh();
     }
 }

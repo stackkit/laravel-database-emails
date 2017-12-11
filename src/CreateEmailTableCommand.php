@@ -40,7 +40,6 @@ class CreateEmailTableCommand extends Command
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @param  \Illuminate\Support\Composer $composer
-     * @return void
      */
     public function __construct(Filesystem $files, Composer $composer)
     {

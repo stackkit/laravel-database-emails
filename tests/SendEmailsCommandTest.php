@@ -75,23 +75,6 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function a_failed_email_should_not_be_sent_again()
-    {
-        $email = $this->sendEmail();
-
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
-
-        $this->artisan('email:send');
-
-        # 1 min later...
-        $this->artisan('email:send');
-
-        $this->assertEquals(1, $email->fresh()->getAttempts());
-    }
-
-    /** @test */
     function the_number_of_emails_sent_per_minute_should_be_limited()
     {
         for ($i = 1; $i <= 30; $i++) {

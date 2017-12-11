@@ -94,7 +94,7 @@ class SendEmailsCommand extends Command
 
         $this->line("\n");
 
-        $this->table($headers, $emails->map(function ($email) {
+        $this->table($headers, $emails->map(function (Email $email) {
             return [
                 $email->getId(),
                 $email->getRecipient(),
