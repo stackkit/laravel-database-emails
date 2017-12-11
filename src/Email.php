@@ -90,6 +90,18 @@ class Email extends Model
     }
 
     /**
+     * Get the e-mail recipient(s) as string.
+     *
+     * @return string
+     */
+    public function getRecipientsAsString()
+    {
+        $glue = ',';
+
+        return implode($glue, (array) $this->recipient);
+    }
+
+    /**
      * Get the e-mail CC addresses.
      *
      * @return array|string
