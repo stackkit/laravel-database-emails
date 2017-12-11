@@ -10,7 +10,7 @@ class Store
     /**
      * Get all queued e-mails.
      *
-     * @return Collection
+     * @return Collection|Email[]
      */
     public function getQueue()
     {
