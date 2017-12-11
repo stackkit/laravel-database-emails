@@ -2,6 +2,8 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
+use Illuminate\Contracts\Encryption\DecryptException;
+
 trait HasEncryptedAttributes
 {
     /**
@@ -41,7 +43,11 @@ trait HasEncryptedAttributes
         $value = $this->attributes[$key];
 
         if ($this->isEncrypted() && in_array($key, $this->encrypted)) {
-            $value = decrypt($value);
+            try {
+                $value = decrypt($value);
+            } catch (DecryptException $e) {
+                $value = '';
+            }
         }
 
         if (in_array($key, $this->encoded) && is_string($value)) {
