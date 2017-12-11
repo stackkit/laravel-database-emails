@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Buildcode\LaravelDatabaseEmails\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -103,5 +104,42 @@ class SendEmailsCommandTest extends TestCase
         $email = $email->fresh();
         $this->assertEquals(1, $email->getAttempts());
         $this->assertNotNull($email->getSendDate());
+    }
+
+    /** @test */
+    function emails_will_be_sent_until_max_try_count_has_been_reached()
+    {
+        Event::listen('before.send', function () {
+            throw new \Exception('Simulating some random error');
+        });
+
+        $this->sendEmail();
+        $this->assertCount(1, (new Store)->getQueue());
+        $this->artisan('email:send');
+        $this->assertCount(1, (new Store)->getQueue());
+        $this->artisan('email:send');
+        $this->assertCount(1, (new Store)->getQueue());
+        $this->artisan('email:send');
+        $this->assertCount(0, (new Store)->getQueue());
+    }
+
+    /** @test */
+    function the_failed_status_and_error_is_cleared_if_a_previously_failed_email_is_sent_succesfully()
+    {
+        $email = $this->sendEmail();
+
+        $email->update([
+            'failed'   => true,
+            'error'    => 'Simulating some random error',
+            'attempts' => 1,
+        ]);
+
+        $this->assertTrue($email->fresh()->hasFailed());
+        $this->assertEquals('Simulating some random error', $email->fresh()->getError());
+
+        $this->artisan('email:send');
+
+        $this->assertFalse($email->fresh()->hasFailed());
+        $this->assertEmpty($email->fresh()->getError());
     }
 }
