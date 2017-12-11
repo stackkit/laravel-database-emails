@@ -222,7 +222,7 @@ class Email extends Model
      */
     public function hasCc()
     {
-        return !is_null($this->cc);
+        return strlen($this->getOriginal('cc')) > 0;
     }
 
     /**
@@ -232,7 +232,7 @@ class Email extends Model
      */
     public function hasBcc()
     {
-        return !is_null($this->bcc);
+        return strlen($this->getOriginal('bcc')) > 0;
     }
 
     /**
