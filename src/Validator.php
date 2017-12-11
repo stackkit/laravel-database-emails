@@ -133,6 +133,10 @@ class Validator
      */
     private function validateView(EmailComposer $composer)
     {
+        if ($composer->hasData('mailable')) {
+            return;
+        }
+
         if (!$composer->hasData('view')) {
             throw new InvalidArgumentException('No view specified');
         }

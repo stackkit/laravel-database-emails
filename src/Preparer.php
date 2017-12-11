@@ -151,12 +151,17 @@ class Preparer
      */
     private function prepareBody(EmailComposer $composer)
     {
-        $composer->getEmail()->fill([
-            'body' => view(
+        // If the body was predefined (by for example a mailable), use that.
+        if ($composer->hasData('body')) {
+            $body = $composer->getData('body');
+        } else {
+            $body = view(
                 $composer->getData('view'),
                 $composer->hasData('variables') ? $composer->getData('variables') : []
-            )->render(),
-        ]);
+            )->render();
+        }
+
+        $composer->getEmail()->fill(compact('body'));
     }
 
     /**

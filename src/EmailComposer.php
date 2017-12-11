@@ -2,6 +2,8 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
+use Illuminate\Mail\Mailable;
+
 class EmailComposer
 {
     /**
@@ -45,7 +47,7 @@ class EmailComposer
      * @param mixed $value
      * @return static
      */
-    protected function setData($key, $value)
+    public function setData($key, $value)
     {
         $this->data[$key] = $value;
 
@@ -173,6 +175,21 @@ class EmailComposer
         $this->setData('scheduled_at', $scheduledAt);
 
         return $this->send();
+    }
+
+    /**
+     * Set the Mailable.
+     *
+     * @param Mailable $mailable
+     * @return static
+     */
+    public function mailable(Mailable $mailable)
+    {
+        $this->setData('mailable', $mailable);
+
+        (new MailableReader)->read($this);
+
+        return $this;
     }
 
     /**
