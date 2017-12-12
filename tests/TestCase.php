@@ -48,6 +48,7 @@ class Testcase extends \Orchestra\Testbench\TestCase
             $table->string('view', 255);
             $table->binary('variables')->nullable();
             $table->binary('body');
+            $table->binary('attachments');
             $table->integer('attempts')->default(0);
             $table->boolean('sending')->default(0);
             $table->boolean('failed')->default(0);
@@ -130,6 +131,11 @@ class Testcase extends \Orchestra\Testbench\TestCase
             ->subject($params['subject'])
             ->view($params['view'])
             ->variables($params['variables']);
+    }
+
+    public function composeEmail($overwrite = [])
+    {
+        return $this->createEmail($overwrite);
     }
 
     public function sendEmail($overwrite = [])

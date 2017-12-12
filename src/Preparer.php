@@ -29,6 +29,8 @@ class Preparer
 
         $this->prepareBody($composer);
 
+        $this->prepareAttachments($composer);
+
         $this->prepareScheduled($composer);
     }
 
@@ -162,6 +164,34 @@ class Preparer
         }
 
         $composer->getEmail()->fill(compact('body'));
+    }
+
+    /**
+     * Prepare the e-mail attachments.
+     *
+     * @param EmailComposer $composer
+     */
+    private function prepareAttachments(EmailComposer $composer)
+    {
+        $attachments = [];
+
+        foreach ((array)$composer->getData('attachments', []) as $attachment) {
+            $attachments[] = [
+                'type'       => 'attachment',
+                'attachment' => $attachment,
+            ];
+        }
+
+        foreach ((array)$composer->getData('rawAttachments', []) as $rawAttachment) {
+            $attachments[] = [
+                'type'       => 'rawAttachment',
+                'attachment' => $rawAttachment,
+            ];
+        }
+
+        $composer->getEmail()->fill([
+            'attachments' => json_encode($attachments),
+        ]);
     }
 
     /**

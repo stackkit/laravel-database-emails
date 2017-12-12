@@ -58,10 +58,15 @@ class EmailComposer
      * Get a data value.
      *
      * @param string $key
+     * @param mixed $default
      * @return mixed
      */
-    public function getData($key)
+    public function getData($key, $default = null)
     {
+        if (!is_null($default) && !$this->hasData($key)) {
+            return $default;
+        }
+
         return $this->data[$key];
     }
 
@@ -146,7 +151,7 @@ class EmailComposer
      * Set the e-mail variables.
      *
      * @param array $variables
-     * @return static
+     * @return EmailComposer
      */
     public function variables($variables)
     {
@@ -190,6 +195,39 @@ class EmailComposer
         (new MailableReader)->read($this);
 
         return $this;
+    }
+
+    /**
+     * Attach a file to the e-mail.
+     *
+     * @param string $file
+     * @param array $options
+     * @return static
+     */
+    public function attach($file, $options = [])
+    {
+        $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
+
+        $attachments[] = compact('file', 'options');
+
+        return $this->setData('attachments', $attachments);
+    }
+
+    /**
+     * Attach in-memory data as an attachment.
+     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachData($data, $name, array $options = [])
+    {
+        $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
+
+        $attachments[] = compact('data', 'name', 'options');
+
+        return $this->setData('rawAttachments', $attachments);
     }
 
     /**

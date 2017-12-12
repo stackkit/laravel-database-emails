@@ -2,6 +2,7 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
+use function call_user_func_array;
 use Exception;
 use Illuminate\Mail\Mailable;
 
@@ -23,6 +24,8 @@ class MailableReader
         $this->readSubject($composer);
 
         $this->readBody($composer);
+
+        $this->readAttachments($composer);
     }
 
     /**
@@ -105,5 +108,23 @@ class MailableReader
         $composer->setData('view', '');
 
         $composer->setData('body', $composer->getData('mailable')->render());
+    }
+
+    /**
+     * Read the mailable attachments to the email composer.
+     *
+     * @param EmailComposer $composer
+     */
+    private function readAttachments(EmailComposer $composer)
+    {
+        $mailable = $composer->getData('mailable');
+
+        foreach ((array)$mailable->attachments as $attachment) {
+            call_user_func_array([$composer, 'attach'], $attachment);
+        }
+
+        foreach ((array)$mailable->rawAttachments as $rawAttachment) {
+            call_user_func_array([$composer, 'attachData'], $rawAttachment);
+        }
     }
 }

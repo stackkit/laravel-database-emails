@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Email;
 use Illuminate\Support\Facades\DB;
+use Dompdf\Dompdf;
 
 class DatabaseInteractionTest extends TestCase
 {
@@ -159,5 +159,49 @@ class DatabaseInteractionTest extends TestCase
         $email = $this->sendEmail(['recipient' => 'jane@doe.com']);
 
         $this->assertEquals('test@address.com', $email->getRecipient());
+    }
+
+    /** @test */
+    function attachments_should_be_saved_correctly()
+    {
+        $email = $this->composeEmail()
+            ->attach(__DIR__ . '/files/pdf-sample.pdf')
+            ->send();
+
+        $this->assertCount(1, $email->getAttachments());
+
+        $attachment = $email->getAttachments()[0];
+
+        $this->assertEquals('attachment', $attachment['type']);
+        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $attachment['attachment']['file']);
+
+        $email = $this->composeEmail()
+            ->attach(__DIR__ . '/files/pdf-sample.pdf')
+            ->attach(__DIR__ . '/files/pdf-sample-2.pdf')
+            ->send();
+
+        $this->assertCount(2, $email->getAttachments());
+
+        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $email->getAttachments()[0]['attachment']['file']);
+        $this->assertEquals(__DIR__ . '/files/pdf-sample-2.pdf', $email->getAttachments()[1]['attachment']['file']);
+    }
+
+    /** @test */
+    function in_memory_attachments_should_be_saved_correctly()
+    {
+        $pdf = new Dompdf;
+        $pdf->loadHtml('Hello CI!');
+        $pdf->setPaper('A4', 'landscape');
+
+        $email = $this->composeEmail()
+            ->attachData($pdf->outputHtml(), 'generated.pdf', [
+                'mime' => 'application/pdf'
+            ])
+            ->send();
+
+        $this->assertCount(1, $email->getAttachments());
+
+        $this->assertEquals('rawAttachment', $email->getAttachments()[0]['type']);
+        $this->assertEquals($pdf->outputHtml(), $email->getAttachments()[0]['attachment']['data']);
     }
 }

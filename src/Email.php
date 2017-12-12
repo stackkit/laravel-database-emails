@@ -19,6 +19,7 @@ use Exception;
  * @property $view
  * @property $variables
  * @property $body
+ * @property $attachments
  * @property $attempts
  * @property $sending
  * @property $failed
@@ -160,6 +161,16 @@ class Email extends Model
     public function getBody()
     {
         return $this->body;
+    }
+
+    /**
+     * Get the e-mail attachments.
+     *
+     * @return array
+     */
+    public function getAttachments()
+    {
+        return $this->attachments;
     }
 
     /**
@@ -340,26 +351,7 @@ class Email extends Model
      */
     public function send()
     {
-        if ($this->isSent()) {
-            return;
-        }
-
-        $this->markAsSending();
-
-        if (app()->runningUnitTests()) {
-            Event::dispatch('before.send');
-        }
-
-        Mail::send([], [], function (Message $message) {
-            $message->to($this->getRecipient())
-                ->cc($this->hasCc() ? $this->getCc() : [])
-                ->bcc($this->hasBcc() ? $this->getBcc() : [])
-                ->subject($this->getSubject())
-                ->from(config('mail.from.address'), config('mail.from.name'))
-                ->setBody($this->getBody(), 'text/html');
-        });
-
-        $this->markAsSent();
+        (new Sender)->send($this);
     }
 
     /**

@@ -54,6 +54,23 @@ class MailableReaderTest extends TestCase
 
         $this->assertEquals("Name: John Doe\n", $composer->getData('body'));
     }
+
+    /** @test */
+    function it_extracts_attachments()
+    {
+        $email = Email::compose()->mailable(new TestMailable())->send();
+
+        $attachments = $email->getAttachments();
+
+        $this->assertCount(2, $attachments);
+
+        $this->assertEquals('attachment', $attachments[0]['type']);
+        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $attachments[0]['attachment']['file']);
+
+        $this->assertEquals('rawAttachment', $attachments[1]['type']);
+        $this->assertEquals('order.html', $attachments[1]['attachment']['name']);
+        $this->assertEquals('<p>Thanks for your oder</p>', $attachments[1]['attachment']['data']);
+    }
 }
 
 class TestMailable extends Mailable
@@ -68,7 +85,11 @@ class TestMailable extends Mailable
         $this->to('john@doe.com')
             ->cc(['john+cc@doe.com', 'john+cc2@doe.com'])
             ->bcc(['john+bcc@doe.com', 'john+bcc2@doe.com'])
-            ->subject('Your order has shipped!');
+            ->subject('Your order has shipped!')
+            ->attach(__DIR__ . '/files/pdf-sample.pdf', [
+                'mime' => 'application/pdf',
+            ])
+            ->attachData('<p>Thanks for your oder</p>', 'order.html');
     }
 
     /**

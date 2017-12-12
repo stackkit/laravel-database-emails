@@ -30,6 +30,7 @@ trait HasEncryptedAttributes
         'cc',
         'bcc',
         'variables',
+        'attachments',
     ];
 
     /**
