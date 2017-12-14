@@ -27,7 +27,6 @@ class CreateEmailsTable extends Migration
             $table->string('view', 255);
             $table->binary('variables')->nullable();
             $table->binary('body');
-            $table->binary('attachments');
             $table->integer('attempts')->default(0);
             $table->boolean('sending')->default(0);
             $table->boolean('failed')->default(0);
