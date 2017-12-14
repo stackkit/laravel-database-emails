@@ -74,15 +74,11 @@ class Preparer
     private function prepareCc(EmailComposer $composer)
     {
         if (Config::testing()) {
-            return;
-        }
-
-        if (!$composer->hasData('cc')) {
-            return;
+            $composer->setData('cc', []);
         }
 
         $composer->getEmail()->fill([
-            'cc' => json_encode($composer->getData('cc')),
+            'cc' => json_encode($composer->getData('cc', [])),
         ]);
     }
 
@@ -94,15 +90,11 @@ class Preparer
     private function prepareBcc(EmailComposer $composer)
     {
         if (Config::testing()) {
-            return;
-        }
-
-        if (!$composer->hasData('bcc')) {
-            return;
+            $composer->setData('bcc', []);
         }
 
         $composer->getEmail()->fill([
-            'bcc' => json_encode($composer->getData('bcc')),
+            'bcc' => json_encode($composer->getData('bcc', [])),
         ]);
     }
 
