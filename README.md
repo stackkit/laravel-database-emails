@@ -144,6 +144,6 @@ If you wish to encrypt your e-mails, please enable the `encrypt` option in the c
 
 ### Testing Address
 
-If you wish to send e-mails to a test address but don't necessarily want to use a service like mailtrap, please take a look at the `testing` configuration. This is turned on by default.
+If you wish to send e-mails to a test address but don't necessarily want to use a service like mailtrap, please take a look at the `testing` configuration. This is turned off by default.
 
 During the creation of an e-mail, the recipient will be replaced by the test e-mail. This is useful for local development or testing on a staging server.

@@ -48,7 +48,9 @@ return [
         'email' => 'test@email.com',
 
         'enabled' => function () {
-            return app()->environment('local', 'staging');
+            return false;
+            // ...or...
+            // return app()->environment('local', 'staging');
         }
 
     ],
