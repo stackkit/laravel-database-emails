@@ -47,32 +47,16 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function an_email_should_be_locked_so_overlapping_cronjobs_cannot_send_an_already_processing_email()
-    {
-        $email = $this->sendEmail();
-
-        Event::listen('before.send', function () {
-            $this->artisan('email:send');
-        });
-
-        $this->artisan('email:send');
-
-        $this->assertEquals(1, $email->fresh()->getAttempts());
-    }
-
-    /** @test */
     function if_an_email_fails_to_be_sent_it_should_be_logged_in_the_database()
     {
-        $email = $this->sendEmail();
+        $this->app['config']['mail.driver'] = 'does-not-exist';
 
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
+        $email = $this->sendEmail();
 
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertContains('Simulating some random error', $email->fresh()->getError());
+        $this->assertContains('Driver [does-not-exist] not supported.', $email->fresh()->getError());
     }
 
     /** @test */
@@ -109,9 +93,7 @@ class SendEmailsCommandTest extends TestCase
     /** @test */
     function emails_will_be_sent_until_max_try_count_has_been_reached()
     {
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
+        $this->app['config']['mail.driver'] = 'does-not-exist';
 
         $this->sendEmail();
         $this->assertCount(1, (new Store)->getQueue());

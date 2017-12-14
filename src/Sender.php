@@ -4,7 +4,6 @@ namespace Buildcode\LaravelDatabaseEmails;
 
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;
-use Illuminate\Support\Facades\Event;
 
 class Sender
 {
@@ -20,10 +19,6 @@ class Sender
         }
 
         $email->markAsSending();
-
-        if (app()->runningUnitTests()) {
-            Event::dispatch('before.send');
-        }
 
         $this->getMailerInstance()->send([], [], function (Message $message) use ($email) {
             $this->buildMessage($message, $email);

@@ -13,15 +13,13 @@ class RetryFailedEmailsCommandTest extends TestCase
         parent::setUp();
 
         $this->app['config']['laravel-database-emails.attempts'] = 3;
-
-        Event::listen('before.send', function() {
-            throw new \Exception('Simulating some random error');
-        });
     }
 
     /** @test */
     function an_email_cannot_be_reset_if_the_max_attempt_count_has_not_been_reached()
     {
+        $this->app['config']['mail.driver'] = 'does-not-exist';
+
         $this->sendEmail();
 
         $this->artisan('email:send');
