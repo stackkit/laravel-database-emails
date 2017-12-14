@@ -3,7 +3,6 @@
 namespace Tests;
 
 use Buildcode\LaravelDatabaseEmails\Email;
-use Illuminate\Database\Schema\Blueprint;
 use Eloquent;
 
 class Testcase extends \Orchestra\Testbench\TestCase
@@ -26,40 +25,9 @@ class Testcase extends \Orchestra\Testbench\TestCase
             },
         ];
 
-        $this->createSchema();
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         view()->addNamespace('tests', __DIR__ . '/views');
-    }
-
-    /**
-     * Setup the database schema.
-     *
-     * @return void
-     */
-    public function createSchema()
-    {
-        $this->schema()->create('emails', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('label')->nullable();
-            $table->binary('recipient');
-            $table->binary('cc')->nullable();
-            $table->binary('bcc')->nullable();
-            $table->binary('subject');
-            $table->string('view', 255);
-            $table->binary('variables')->nullable();
-            $table->binary('body');
-            $table->binary('attachments');
-            $table->integer('attempts')->default(0);
-            $table->boolean('sending')->default(0);
-            $table->boolean('failed')->default(0);
-            $table->text('error')->nullable();
-            $table->boolean('encrypted')->default(0);
-            $table->timestamp('scheduled_at')->nullable();
-            $table->timestamp('sent_at')->nullable();
-            $table->timestamp('delivered_at')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
     }
 
     /**

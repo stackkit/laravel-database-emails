@@ -13,11 +13,15 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        $baseDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
+        $configDir = $baseDir . 'config' . DIRECTORY_SEPARATOR;
+        $migrationsDir = $baseDir . 'database' . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR;
 
         $this->publishes([
-            $dir . 'laravel-database-emails.php' => config_path('laravel-database-emails.php')
+            $configDir . 'laravel-database-emails.php' => config_path('laravel-database-emails.php'),
         ]);
+
+        $this->loadMigrationsFrom([$migrationsDir]);
     }
 
     /**
@@ -28,7 +32,6 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->commands([
-            CreateEmailTableCommand::class,
             SendEmailsCommand::class,
             RetryFailedEmailsCommand::class,
         ]);
