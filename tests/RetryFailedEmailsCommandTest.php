@@ -2,49 +2,50 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Store;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 
 class RetryFailedEmailsCommandTest extends TestCase
 {
-    /** @test */
-    function it_should_retry_sending_failed_emails()
+    function setUp()
     {
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
+        parent::setUp();
 
-        $email = $this->sendEmail();
+        $this->app['config']['laravel-database-emails.attempts'] = 3;
+    }
+
+    /** @test */
+    function an_email_cannot_be_reset_if_the_max_attempt_count_has_not_been_reached()
+    {
+        $this->app['config']['mail.driver'] = 'does-not-exist';
+
+        $this->sendEmail();
 
         $this->artisan('email:send');
 
-        $email = $email->fresh();
-
-        $this->assertTrue($email->fresh()->hasFailed());
         $this->assertEquals(1, DB::table('emails')->count());
 
         $this->artisan('email:retry');
 
+        $this->assertEquals(1, DB::table('emails')->count());
+
+        // try 2 more times, reaching 3 attempts and thus failing and able to retry
+        $this->artisan('email:send');
+        $this->artisan('email:send');
+        $this->artisan('email:retry');
+
         $this->assertEquals(2, DB::table('emails')->count());
-        $this->assertEquals(1, (new Store())->getQueue()->count());
     }
 
     /** @test */
     function a_single_email_can_be_resent()
     {
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
+        $emailA = $this->sendEmail();
+        $emailB = $this->sendEmail();
 
-        $this->sendEmail();
-        $this->sendEmail();
+        // simulate emailB being failed...
+        $emailB->update(['failed' => 1, 'attempts' => 3]);
 
-        $this->artisan('email:send');
-
-        $this->assertEquals(2, DB::table('emails')->count());
-
-        $this->artisan('email:retry', ['id' => 1]);
+        $this->artisan('email:retry', ['id' => 2]);
 
         $this->assertEquals(3, DB::table('emails')->count());
     }

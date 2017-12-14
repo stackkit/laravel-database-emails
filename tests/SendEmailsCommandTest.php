@@ -2,9 +2,9 @@
 
 namespace Tests;
 
+use Buildcode\LaravelDatabaseEmails\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 
 class SendEmailsCommandTest extends TestCase
 {
@@ -46,49 +46,16 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function an_email_should_be_locked_so_overlapping_cronjobs_cannot_send_an_already_processing_email()
-    {
-        $email = $this->sendEmail();
-
-        Event::listen('before.send', function () {
-            $this->artisan('email:send');
-        });
-
-        $this->artisan('email:send');
-
-        $this->assertEquals(1, $email->fresh()->getAttempts());
-    }
-
-    /** @test */
     function if_an_email_fails_to_be_sent_it_should_be_logged_in_the_database()
     {
-        $email = $this->sendEmail();
+        $this->app['config']['mail.driver'] = 'does-not-exist';
 
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
+        $email = $this->sendEmail();
 
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertEquals('Simulating some random error', $email->fresh()->getError());
-    }
-
-    /** @test */
-    function a_failed_email_should_not_be_sent_again()
-    {
-        $email = $this->sendEmail();
-
-        Event::listen('before.send', function () {
-            throw new \Exception('Simulating some random error');
-        });
-
-        $this->artisan('email:send');
-
-        # 1 min later...
-        $this->artisan('email:send');
-
-        $this->assertEquals(1, $email->fresh()->getAttempts());
+        $this->assertContains('Driver [does-not-exist] not supported.', $email->fresh()->getError());
     }
 
     /** @test */
@@ -120,5 +87,40 @@ class SendEmailsCommandTest extends TestCase
         $email = $email->fresh();
         $this->assertEquals(1, $email->getAttempts());
         $this->assertNotNull($email->getSendDate());
+    }
+
+    /** @test */
+    function emails_will_be_sent_until_max_try_count_has_been_reached()
+    {
+        $this->app['config']['mail.driver'] = 'does-not-exist';
+
+        $this->sendEmail();
+        $this->assertCount(1, (new Store)->getQueue());
+        $this->artisan('email:send');
+        $this->assertCount(1, (new Store)->getQueue());
+        $this->artisan('email:send');
+        $this->assertCount(1, (new Store)->getQueue());
+        $this->artisan('email:send');
+        $this->assertCount(0, (new Store)->getQueue());
+    }
+
+    /** @test */
+    function the_failed_status_and_error_is_cleared_if_a_previously_failed_email_is_sent_succesfully()
+    {
+        $email = $this->sendEmail();
+
+        $email->update([
+            'failed'   => true,
+            'error'    => 'Simulating some random error',
+            'attempts' => 1,
+        ]);
+
+        $this->assertTrue($email->fresh()->hasFailed());
+        $this->assertEquals('Simulating some random error', $email->fresh()->getError());
+
+        $this->artisan('email:send');
+
+        $this->assertFalse($email->fresh()->hasFailed());
+        $this->assertEmpty($email->fresh()->getError());
     }
 }

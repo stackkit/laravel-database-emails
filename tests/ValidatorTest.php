@@ -11,6 +11,17 @@ class PackageTest extends TestCase
     /**
      * @test
      * @expectedException InvalidArgumentException
+     */
+    function a_label_cannot_contain_more_than_255_characters()
+    {
+        Email::compose()
+            ->label(str_repeat('a', 256))
+            ->send();
+    }
+
+    /**
+     * @test
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage No recipient specified
      */
     function a_recipient_is_required()
@@ -22,7 +33,7 @@ class PackageTest extends TestCase
     /**
      * @test
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No valid e-mail specified
+     * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
     function the_recipient_email_must_be_valid()
     {
@@ -34,7 +45,7 @@ class PackageTest extends TestCase
     /**
      * @test
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Not a valid e-mail: [not-a-valid-email-address]
+     * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
     function cc_must_contain_valid_email_addresses()
     {
@@ -50,7 +61,7 @@ class PackageTest extends TestCase
     /**
      * @test
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Not a valid e-mail: [not-a-valid-email-address]
+     * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
     function bcc_must_contain_valid_email_addresses()
     {

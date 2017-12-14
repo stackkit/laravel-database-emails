@@ -9,7 +9,7 @@
 
 ## Introduction
 
-This is a package that stores and queues e-mails using a database table. Easily send e-mails using a cronjob or schedule e-mails that should be sent at a specific date and time.
+This is a package that stores and queues e-mails using a database table. Easily send e-mails using a cronjob and schedule e-mails that should be sent at a specific date and time.
 ## Installation
 
 First, require the package using composer.
@@ -24,16 +24,15 @@ If you're running Laravel 5.5 or later you may skip this step. Add the service p
 Buildcode\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
 ```
 
-Publish the configuration file.
+Publish the configuration files.
 
 ```bash
 $ php artisan vendor:publish --provider=Buildcode\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider
 ```
 
-Create the e-mails database table migration.
+Create the database table required for this package.
 
 ```bash
-$ php artisan email:table
 $ php artisan migrate
 ```
 
@@ -57,7 +56,7 @@ protected function schedule(Schedule $schedule)
 ### Create An Email
 
 ```php
-Buildcode\LaravelDatabaseEmails\Email::compose()
+Email::compose()
     ->label('welcome-mail-1.0')
     ->recipient('john@doe.com')
     ->subject('This is a test')
@@ -68,20 +67,53 @@ Buildcode\LaravelDatabaseEmails\Email::compose()
     ->send();
 ```
 
-### Schedule An Email
-
-You may schedule an e-mail by calling `schedule` instead of `send` at the end of the chain. You must provide a Carbon instance or a strtotime valid date.
+### Specify Recipients
 
 ```php
-Buildcode\LaravelDatabaseEmails\Email::compose()
-  ->label('welcome-mail-1.0')
-  ->recipient('john@doe.com')
-  ->subject('This is a test')
-  ->view('emails.welcome')
-  ->variables([
-      'name' => 'John Doe',
-  ])
-  ->schedule('+2 hours');
+$one = 'john@doe.com';
+$multiple = ['john@doe.com', 'jane@doe.com'];
+
+Email::compose()->recipient($one);
+Email::compose()->recipient($multiple);
+
+Email::compose()->cc($one);
+Email::compose()->cc($multiple);
+
+Email::compose()->bcc($one);
+Email::compose()->bcc($multiple);
+```
+
+### Mailables
+
+You may also pass a mailable to the e-mail composer.
+
+```php
+Email::compose()
+	->mailable(new OrderShipped())
+	->send();
+```
+
+### Attachments
+
+```php
+Email::compose()
+	->attach('/path/to/file');
+```
+
+Or for in-memory attachments...
+
+```php
+Email::compose()
+	->attachData('<p>Your order has shipped!</p>', 'order.html');
+```
+
+### Schedule An Email
+
+You may schedule an e-mail by calling `later` instead of `send` at the end of the chain. You must provide a Carbon instance or a strtotime valid date.
+
+```php
+Email::compose()
+  ->later('+2 hours');
 ```
 
 ### Manually Sending E-mails
@@ -112,11 +144,6 @@ If you wish to encrypt your e-mails, please enable the `encrypt` option in the c
 
 ### Testing Address
 
-If you wish to send e-mails to a test address but don't necessarily want to use a service like mailtrap, please take a look at the `testing` configuration. This is turned on by default.
+If you wish to send e-mails to a test address but don't necessarily want to use a service like mailtrap, please take a look at the `testing` configuration. This is turned off by default.
 
 During the creation of an e-mail, the recipient will be replaced by the test e-mail. This is useful for local development or testing on a staging server.
-
-## Todo
-
-- Add support for attachments
-- Add support for Mailables
