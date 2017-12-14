@@ -110,7 +110,6 @@ class PackageTest extends TestCase
                 ->view('tests::dummy')
                 ->send();
         } catch (InvalidArgumentException $e) {
-            dd($e->getTraceAsString());
             $this->fail('Expected view [tests::dummy] to exist but it does not');
         }
 
