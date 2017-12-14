@@ -3,9 +3,6 @@
 namespace Buildcode\LaravelDatabaseEmails;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Mail\Message;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Exception;
 
@@ -31,9 +28,6 @@ use Exception;
  */
 class Email extends Model
 {
-    /**
-     * Make sure all encrypted attributes are decrypted.
-     */
     use HasEncryptedAttributes;
 
     /**
@@ -97,9 +91,9 @@ class Email extends Model
      */
     public function getRecipientsAsString()
     {
-        $glue = ',';
+        $glue = ', ';
 
-        return implode($glue, (array) $this->recipient);
+        return implode($glue, (array)$this->recipient);
     }
 
     /**
@@ -182,7 +176,6 @@ class Email extends Model
     {
         return $this->attempts;
     }
-
 
     /**
      * Get the scheduled date.
@@ -268,7 +261,6 @@ class Email extends Model
         return !is_null($this->getScheduledDate());
     }
 
-
     /**
      * Determine if the e-mail is encrypted.
      *
@@ -340,7 +332,7 @@ class Email extends Model
         $this->update([
             'sending' => 0,
             'failed'  => 1,
-            'error'   => (string) $exception,
+            'error'   => (string)$exception,
         ]);
     }
 

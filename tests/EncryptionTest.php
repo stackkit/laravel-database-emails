@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Email;
-
 class EncryptionTest extends TestCase
 {
     function setUp()

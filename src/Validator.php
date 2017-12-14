@@ -144,7 +144,7 @@ class Validator
         $view = $composer->getData('view');
 
         if (!view()->exists($view)) {
-            throw new InvalidArgumentException('View [' . $view .'] does not exist');
+            throw new InvalidArgumentException('View [' . $view . '] does not exist');
         }
     }
 

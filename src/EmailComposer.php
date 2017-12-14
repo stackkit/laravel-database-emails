@@ -44,7 +44,7 @@ class EmailComposer
      * Set a data value.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @return static
      */
     public function setData($key, $value)
@@ -58,7 +58,7 @@ class EmailComposer
      * Get a data value.
      *
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
      * @return mixed
      */
     public function getData($key, $default = null)
@@ -201,7 +201,7 @@ class EmailComposer
      * Attach a file to the e-mail.
      *
      * @param string $file
-     * @param array $options
+     * @param array  $options
      * @return static
      */
     public function attach($file, $options = [])
@@ -216,8 +216,8 @@ class EmailComposer
     /**
      * Attach in-memory data as an attachment.
      *
-     * @param  string  $data
-     * @param  string  $name
+     * @param  string $data
+     * @param  string $name
      * @param  array  $options
      * @return $this
      */

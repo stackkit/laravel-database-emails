@@ -2,9 +2,7 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Store;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 
 class RetryFailedEmailsCommandTest extends TestCase
 {

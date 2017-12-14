@@ -4,7 +4,6 @@ namespace Buildcode\LaravelDatabaseEmails;
 
 use function call_user_func_array;
 use Exception;
-use Illuminate\Mail\Mailable;
 
 class MailableReader
 {

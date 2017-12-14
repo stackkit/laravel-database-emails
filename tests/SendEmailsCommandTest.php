@@ -5,7 +5,6 @@ namespace Tests;
 use Buildcode\LaravelDatabaseEmails\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 
 class SendEmailsCommandTest extends TestCase
 {

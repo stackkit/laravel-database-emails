@@ -34,7 +34,7 @@ class Store
      * Get all e-mails that failed to be sent.
      *
      * @param int $id
-     * @return Collection
+     * @return Collection|Email[]
      */
     public function getFailed($id = null)
     {
