@@ -13,6 +13,7 @@ trait HasEncryptedAttributes
      */
     private $encrypted = [
         'recipient',
+        'from',
         'cc',
         'bcc',
         'subject',
@@ -27,6 +28,7 @@ trait HasEncryptedAttributes
      */
     private $encoded = [
         'recipient',
+        'from',
         'cc',
         'bcc',
         'variables',

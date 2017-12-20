@@ -17,6 +17,8 @@ class Preparer
 
         $this->prepareRecipient($composer);
 
+        $this->prepareFrom($composer);
+
         $this->prepareCc($composer);
 
         $this->prepareBcc($composer);
@@ -63,6 +65,22 @@ class Preparer
 
         $composer->getEmail()->fill([
             'recipient' => json_encode($composer->getData('recipient')),
+        ]);
+    }
+
+    /**
+     * Prepare the from values for database storage.
+     *
+     * @param EmailComposer $composer
+     */
+    private function prepareFrom(EmailComposer $composer)
+    {
+        if (!$composer->hasData('from')) {
+            return;
+        }
+
+        $composer->getEmail()->fill([
+            'from' => json_encode($composer->getData('from')),
         ]);
     }
 

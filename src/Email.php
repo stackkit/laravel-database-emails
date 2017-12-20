@@ -10,6 +10,7 @@ use Exception;
  * @property $id
  * @property $label
  * @property $recipient
+ * @property $from
  * @property $cc
  * @property $bcc
  * @property $subject
@@ -82,6 +83,16 @@ class Email extends Model
     public function getRecipient()
     {
         return $this->recipient;
+    }
+
+    /**
+     * Get the e-mail from.
+     *
+     * @return string|null
+     */
+    public function getFrom()
+    {
+        return $this->from;
     }
 
     /**
@@ -229,6 +240,16 @@ class Email extends Model
     public function getError()
     {
         return $this->error;
+    }
+
+    /**
+     * Determine if the e-mail should be sent with custom from values.
+     *
+     * @return bool
+     */
+    public function hasFrom()
+    {
+        return strlen($this->getOriginal('from')) > 0;
     }
 
     /**

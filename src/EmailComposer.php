@@ -93,6 +93,17 @@ class EmailComposer
     }
 
     /**
+     * Set the e-mail from address and aname.
+     *
+     * @param array $from
+     * @return static
+     */
+    public function from($address, $name)
+    {
+        return $this->setData('from', ['address' => $address, 'name' => $name]);
+    }
+
+    /**
      * Set the e-mail recipient(s).
      *
      * @param string|array $recipient

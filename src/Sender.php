@@ -45,11 +45,17 @@ class Sender
      */
     private function buildMessage(Message $message, Email $email)
     {
+
+        $from = $email->hasFrom() ? $email->getFrom() : ['address' => config('mail.from.address'), 'name' => config('mail.from.name')];
+        foreach ($from as $key => $val) {
+            $from[$key] = !empty($val) ? $val : config('mail.from.' . $key);
+        }
+
         $message->to($email->getRecipient())
             ->cc($email->hasCc() ? $email->getCc() : [])
             ->bcc($email->hasBcc() ? $email->getBcc() : [])
             ->subject($email->getSubject())
-            ->from(config('mail.from.address'), config('mail.from.name'))
+            ->from($from['address'], $from['name'])
             ->setBody($email->getBody(), 'text/html');
 
         $attachmentMap = [

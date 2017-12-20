@@ -21,6 +21,7 @@ class CreateEmailsTable extends Migration
             $table->increments('id');
             $table->string('label')->nullable();
             $table->binary('recipient');
+            $table->binary('from')>nullable();
             $table->binary('cc')->nullable();
             $table->binary('bcc')->nullable();
             $table->binary('subject');
