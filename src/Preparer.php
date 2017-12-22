@@ -75,12 +75,8 @@ class Preparer
      */
     private function prepareFrom(EmailComposer $composer)
     {
-        if (!$composer->hasData('from')) {
-            return;
-        }
-
         $composer->getEmail()->fill([
-            'from' => json_encode($composer->getData('from')),
+            'from' => json_encode($composer->getData('from', '')),
         ]);
     }
 

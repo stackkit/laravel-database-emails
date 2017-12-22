@@ -43,6 +43,31 @@ class SenderTest extends TestCase
 
         $this->assertEquals('testfromaddress@gmail.com', key($from));
         $this->assertEquals('From CI test', $from[key($from)]);
+
+        // custom from...
+        $this->sent = [];
+
+        $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
+        $this->artisan('email:send');
+        $from = reset($this->sent)->getMessage()->getFrom();
+        $this->assertEquals('marick@dolphiq.nl', key($from));
+        $this->assertEquals('Marick', $from[key($from)]);
+
+        // only address
+        $this->sent = [];
+        $this->composeEmail()->from('marick@dolphiq.nl')->send();
+        $this->artisan('email:send');
+        $from = reset($this->sent)->getMessage()->getFrom();
+        $this->assertEquals('marick@dolphiq.nl', key($from));
+        $this->assertEquals(config('mail.from.name'), $from[key($from)]);
+
+        // only name
+        $this->sent = [];
+        $this->composeEmail()->from(null, 'Marick')->send();
+        $this->artisan('email:send');
+        $from = reset($this->sent)->getMessage()->getFrom();
+        $this->assertEquals(config('mail.from.address'), key($from));
+        $this->assertEquals('Marick', $from[key($from)]);
     }
 
     /** @test */

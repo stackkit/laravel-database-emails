@@ -88,11 +88,31 @@ class Email extends Model
     /**
      * Get the e-mail from.
      *
-     * @return string|null
+     * @return array
      */
     public function getFrom()
     {
         return $this->from;
+    }
+
+    /**
+     * Get the e-mail from address.
+     *
+     * @return string|null
+     */
+    public function getFromAddress()
+    {
+        return $this->from['address'] ?? config('mail.from.address');
+    }
+
+    /**
+     * Get the e-mail from address.
+     *
+     * @return string|null
+     */
+    public function getFromName()
+    {
+        return $this->from['name'] ?? config('mail.from.name');
     }
 
     /**
@@ -249,7 +269,7 @@ class Email extends Model
      */
     public function hasFrom()
     {
-        return strlen($this->getOriginal('from')) > 0;
+        return is_array($this->from) && count($this->from) > 0;
     }
 
     /**

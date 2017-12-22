@@ -16,11 +16,7 @@ class MailableReader
     {
         $this->readRecipient($composer);
 
-
-
         $this->readFrom($composer);
-
-
 
         $this->readCc($composer);
 
@@ -67,11 +63,12 @@ class MailableReader
      */
     private function readFrom(EmailComposer $composer)
     {
-        $from = $this->convertMailableAddresses(
-            $composer->getData('mailable')->from
-        );
+        $from = reset($composer->getData('mailable')->from);
 
-        $composer->from($from);
+        $composer->from(
+            $from['address'],
+            $from['name']
+        );
     }
 
     /**

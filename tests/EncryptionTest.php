@@ -62,7 +62,7 @@ class EncryptionTest extends TestCase
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
 
         $this->assertEquals(
-            ['name'=> 'Jane Doe'],
+            ['name' => 'Jane Doe'],
             decrypt($email->getOriginal('variables'))
         );
 
@@ -82,5 +82,19 @@ class EncryptionTest extends TestCase
         $this->assertEquals($expectedBody, decrypt($email->getOriginal('body')));
 
         $this->assertEquals($expectedBody, $email->getBody());
+    }
+
+    /** @test */
+    function from_should_be_encrypted_and_decrypted()
+    {
+        $email = $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
+
+        $expect = [
+            'address' => 'marick@dolphiq.nl',
+            'name'    => 'Marick',
+        ];
+
+        $this->assertEquals($expect, decrypt($email->getOriginal('from')));
+        $this->assertEquals($expect, $email->getFrom());
     }
 }

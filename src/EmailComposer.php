@@ -95,12 +95,13 @@ class EmailComposer
     /**
      * Set the e-mail from address and aname.
      *
-     * @param array $from
+     * @param array $address
+     * @param array $name
      * @return static
      */
-    public function from($address, $name)
+    public function from($address = null, $name = null)
     {
-        return $this->setData('from', ['address' => $address, 'name' => $name]);
+        return $this->setData('from', compact('address', 'name'));
     }
 
     /**
