@@ -28,6 +28,8 @@ class Testcase extends \Orchestra\Testbench\TestCase
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         view()->addNamespace('tests', __DIR__ . '/views');
+
+        Email::truncate();
     }
 
     /**
@@ -77,6 +79,17 @@ class Testcase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('laravel-database-emails.retry.attempts', 3);
+
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver'   => getenv('CI_DB_DRIVER'),
+            'host'     => getenv('CI_DB_HOST'),
+            'database' => getenv('CI_DB_DATABASE'),
+            'username' => getenv('CI_DB_USERNAME'),
+            'password' => getenv('CI_DB_PASSWORD'),
+            'prefix'   => '',
+            'strict' => true,
+        ]);
     }
 
     public function createEmail($overwrite = [])

@@ -18,7 +18,7 @@ class AddAttachmentsToEmailsTable extends Migration
         }
 
         Schema::table('emails', function (Blueprint $table) {
-            $table->binary('attachments')->nullable()->after('body');
+            $table->binary('attachments')->after('body')->nullable();
         });
     }
 
