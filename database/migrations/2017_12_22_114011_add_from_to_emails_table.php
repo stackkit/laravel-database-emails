@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddAttachmentsToEmailsTable extends Migration
+class AddFromToEmailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class AddAttachmentsToEmailsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasColumn('emails', 'attachments')) {
+        if (Schema::hasColumn('emails', 'from')) {
             return;
         }
 
         Schema::table('emails', function (Blueprint $table) {
-            $table->binary('attachments')->nullable()->after('body');
+            $table->binary('from')->after('body')->nullable();
         });
     }
 

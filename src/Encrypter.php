@@ -15,6 +15,8 @@ class Encrypter
 
         $this->encryptRecipients($composer);
 
+        $this->encryptFrom($composer);
+
         $this->encryptSubject($composer);
 
         $this->encryptVariables($composer);
@@ -45,6 +47,20 @@ class Encrypter
             'recipient' => encrypt($email->recipient),
             'cc'        => $composer->hasData('cc') ? encrypt($email->cc) : '',
             'bcc'       => $composer->hasData('bcc') ? encrypt($email->bcc) : '',
+        ]);
+    }
+
+    /**
+     * Encrypt the e-mail addresses for the from field.
+     *
+     * @param EmailComposer $composer
+     */
+    private function encryptFrom(EmailComposer $composer)
+    {
+        $email = $composer->getEmail();
+
+        $email->fill([
+            'from' => encrypt($email->from),
         ]);
     }
 

@@ -102,6 +102,22 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
+    function from_should_be_saved_correctly()
+    {
+        $email = $this->composeEmail()->send();
+
+        $this->assertFalse($email->hasFrom());
+        $this->assertEquals(config('mail.from.address'), $email->getFromAddress());
+        $this->assertEquals(config('mail.from.name'), $email->getFromName());
+
+        $email = $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
+
+        $this->assertTrue($email->hasFrom());
+        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
+        $this->assertEquals('Marick', $email->getFromName());
+    }
+
+    /** @test */
     function variables_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'John Doe']]);
