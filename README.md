@@ -89,22 +89,29 @@ You may also pass a mailable to the e-mail composer.
 
 ```php
 Email::compose()
-	->mailable(new OrderShipped())
-	->send();
+    ->mailable(new OrderShipped())
+    ->send();
 ```
 
 ### Attachments
 
 ```php
 Email::compose()
-	->attach('/path/to/file');
+    ->attach('/path/to/file');
 ```
 
 Or for in-memory attachments...
 
 ```php
 Email::compose()
-	->attachData('<p>Your order has shipped!</p>', 'order.html');
+    ->attachData('<p>Your order has shipped!</p>', 'order.html');
+```
+
+### Custom Sender
+
+```php
+Email::compose()
+    ->from('john@doe.com', 'John Doe');
 ```
 
 ### Schedule An Email
@@ -113,7 +120,7 @@ You may schedule an e-mail by calling `later` instead of `send` at the end of th
 
 ```php
 Email::compose()
-  ->later('+2 hours');
+    ->later('+2 hours');
 ```
 
 ### Manually Sending E-mails
