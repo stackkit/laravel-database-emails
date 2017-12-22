@@ -26,9 +26,9 @@
         }
     },
     "require-dev": {
-        "illuminate/database": "^5.5",
-        "illuminate/console": "^5.5",
-        "illuminate/validation": "^5.5",
+        "illuminate/database": "5.5.*",
+        "illuminate/console": "5.5.*",
+        "illuminate/validation": "5.5.*",
         "orchestra/testbench": "^3.5",
         "orchestra/database": "^3.5",
         "phpunit/phpunit": "^6.0",
