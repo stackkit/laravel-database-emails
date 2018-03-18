@@ -23,8 +23,8 @@ This is a package that stores and queues e-mails using a database table. Easily 
   - [Custom sender](#custom-sender)
   - [Scheduling](#scheduling)
   - [Resend failed e-mails](#resend-failed-e-mails)
-  - [Encryption (optional)](#encryption-(optional))
-  - [Test mode (optional)](#test-mode-(optional))
+  - [Encryption (optional)](#encryption-optional)
+  - [Test mode (optional)](#test-mode-optional)
 
 ### Installation
 
