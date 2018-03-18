@@ -164,13 +164,13 @@ Email::compose()
 ##### Resend all failed e-mails
 
 ```bash
-php artisan email:retry
+php artisan email:resend
 ```
 
 ##### Resend a specific failed e-mail
 
 ```bash
-php artisan email:retry 1
+php artisan email:resend 1
 ```
 
 #### Encryption (Optional)
