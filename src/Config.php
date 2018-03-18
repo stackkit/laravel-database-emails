@@ -11,7 +11,7 @@ class Config
      */
     public static function maxAttemptCount()
     {
-        return max(config('laravel-database-emails.retry.attempts', 1), 3);
+        return max(config('laravel-database-emails.attempts', 1), 3);
     }
 
     /**
