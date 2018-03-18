@@ -46,6 +46,10 @@ class RetryFailedEmailsCommand extends Command
      */
     public function handle()
     {
+        if (get_class($this) === RetryFailedEmailsCommand::class) {
+            $this->warn('This command is deprecated, please use email:resend instead');
+        }
+
         $emails = $this->store->getFailed(
             $this->argument('id')
         );

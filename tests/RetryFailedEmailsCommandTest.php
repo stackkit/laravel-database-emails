@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class RetryFailedEmailsCommandTest extends TestCase
@@ -31,7 +32,7 @@ class RetryFailedEmailsCommandTest extends TestCase
         // try 2 more times, reaching 3 attempts and thus failing and able to retry
         $this->artisan('email:send');
         $this->artisan('email:send');
-        $this->artisan('email:retry');
+        $this->artisan('email:resend');
 
         $this->assertEquals(2, DB::table('emails')->count());
     }
@@ -45,8 +46,22 @@ class RetryFailedEmailsCommandTest extends TestCase
         // simulate emailB being failed...
         $emailB->update(['failed' => 1, 'attempts' => 3]);
 
-        $this->artisan('email:retry', ['id' => 2]);
+        $this->artisan('email:resend', ['id' => 2]);
 
         $this->assertEquals(3, DB::table('emails')->count());
+    }
+
+    /** @test */
+    function email_retry_is_deprecated()
+    {
+        $deprecated = 'This command is deprecated';
+
+        $this->artisan('email:retry');
+
+        $this->assertContains($deprecated, Artisan::output());
+
+        $this->artisan('email:resend');
+
+        $this->assertNotContains($deprecated, Artisan::output());
     }
 }

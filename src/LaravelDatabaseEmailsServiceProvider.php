@@ -34,6 +34,7 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
         $this->commands([
             SendEmailsCommand::class,
             RetryFailedEmailsCommand::class,
+            ResendEmailsCommand::class,
         ]);
     }
 }
