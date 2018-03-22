@@ -49,7 +49,7 @@ class Sender
             ->cc($email->hasCc() ? $email->getCc() : [])
             ->bcc($email->hasBcc() ? $email->getBcc() : [])
             ->subject($email->getSubject())
-            ->from(config('mail.from.address'), config('mail.from.name'))
+            ->from($email->getFromAddress(), $email->getFromName())
             ->setBody($email->getBody(), 'text/html');
 
         $attachmentMap = [

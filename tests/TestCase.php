@@ -78,7 +78,7 @@ class Testcase extends \Orchestra\Testbench\TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('laravel-database-emails.retry.attempts', 3);
+        $app['config']->set('laravel-database-emails.attempts', 3);
 
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [

@@ -10,12 +10,29 @@
 ## Introduction
 
 This is a package that stores and queues e-mails using a database table. Easily send e-mails using a cronjob and schedule e-mails that should be sent at a specific date and time.
-## Installation
+
+## Table Of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Send an e-mail](#send-an-email)
+  - [Specify multiple recipients](#specify-multiple-recipients)
+  - [CC and BCC](#cc-and-bcc)
+  - [Mailables](#using-mailables)
+  - [Attachments](#attachments)
+  - [Custom sender](#custom-sender)
+  - [Scheduling](#scheduling)
+  - [Resend failed e-mails](#resend-failed-e-mails)
+  - [Encryption (optional)](#encryption-optional)
+  - [Test mode (optional)](#test-mode-optional)
+  - [E-mails to send per minute](#e-mails-to-send-per-minute)
+
+### Installation
 
 First, require the package using composer.
 
 ```bash
-$ composer require buildcode/laravel-database-emails
+composer require buildcode/laravel-database-emails
 ```
 
 If you're running Laravel 5.5 or later you may skip this step. Add the service provider to your application.
@@ -27,13 +44,13 @@ Buildcode\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
 Publish the configuration files.
 
 ```bash
-$ php artisan vendor:publish --provider=Buildcode\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider
+php artisan vendor:publish --provider=Buildcode\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider
 ```
 
 Create the database table required for this package.
 
 ```bash
-$ php artisan migrate
+php artisan migrate
 ```
 
 Now add the e-mail cronjob to your scheduler.
@@ -47,17 +64,21 @@ Now add the e-mail cronjob to your scheduler.
  */
 protected function schedule(Schedule $schedule)
 {
-     $schedule->command('email:send')->everyMinute();
+     $schedule->command('email:send', ['--timeout' => 300])->everyMinute()->withoutOverlapping(5);
 }
 ```
 
-## Usage
+Using the above configuration, the `email:send` process will exit after 5 minutes (`--timeout`) and won't overlap if the process still runs after 5 minutes (`withoutOverlapping`)
 
-### Create An Email
+### Usage
+
+#### Send an email
 
 ```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
 Email::compose()
-    ->label('welcome-mail-1.0')
+    ->label('welcome')
     ->recipient('john@doe.com')
     ->subject('This is a test')
     ->view('emails.welcome')
@@ -67,83 +88,118 @@ Email::compose()
     ->send();
 ```
 
-### Specify Recipients
+#### Specify multiple recipients
 
 ```php
-$one = 'john@doe.com';
-$multiple = ['john@doe.com', 'jane@doe.com'];
+use Buildcode\LaravelDatabaseEmails\Email;
 
-Email::compose()->recipient($one);
-Email::compose()->recipient($multiple);
-
-Email::compose()->cc($one);
-Email::compose()->cc($multiple);
-
-Email::compose()->bcc($one);
-Email::compose()->bcc($multiple);
+Buildcode\LaravelDatabaseEmails\Email::compose()
+    ->recipient([
+        'john@doe.com',
+        'jane@doe.com'
+    ]);
 ```
 
-### Mailables
+#### CC and BCC
+
+```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
+Email::compose()
+    ->cc('john@doe.com')
+    ->cc(['john@doe.com', 'jane@doe.com'])
+    ->bcc('john@doe.com')
+    ->bcc(['john@doe.com', 'jane@doe.com']);
+```
+
+#### Using mailables
 
 You may also pass a mailable to the e-mail composer.
 
 ```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
 Email::compose()
-	->mailable(new OrderShipped())
-	->send();
+    ->mailable(new OrderShipped())
+    ->send();
 ```
 
-### Attachments
+#### Attachments
 
 ```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
 Email::compose()
-	->attach('/path/to/file');
+    ->attach('/path/to/file');
 ```
 
-Or for in-memory attachments...
+Or for in-memory attachments:
 
 ```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
 Email::compose()
-	->attachData('<p>Your order has shipped!</p>', 'order.html');
+    ->attachData('<p>Your order has shipped!</p>', 'order.html');
 ```
 
-### Schedule An Email
-
-You may schedule an e-mail by calling `later` instead of `send` at the end of the chain. You must provide a Carbon instance or a strtotime valid date.
+#### Custom Sender
 
 ```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
 Email::compose()
-  ->later('+2 hours');
+    ->from('john@doe.com', 'John Doe');
 ```
 
-### Manually Sending E-mails
+#### Scheduling
 
-If you're not running the cronjob and wish to send the queued e-mails, you can run the `email:send` command.
+You may schedule an e-mail by calling `later` instead of `send`. You must provide a Carbon instance or a strtotime valid date.
+
+```php
+use Buildcode\LaravelDatabaseEmails\Email;
+
+Email::compose()
+    ->later('+2 hours');
+```
+
+#### Resend failed e-mails
+
+##### Resend all failed e-mails
 
 ```bash
-$ php artisan email:send
+php artisan email:resend
 ```
 
-### Failed E-mails
-
-By default, we will attempt to send an e-mail 3 times if it fails. If it still fails the 3rd time, it will permanently be marked as failed. You can change the number of times an e-mail should be attempted to be sent using the `retry.attempts` configuration.
-
-### Retry sending failed e-mails
-
-If you wish to retry sending failed e-mails, you may call the `email:retry` command. The command will grab any failed e-mail and push it onto the queue. You may also provide the id of a specific e-mail.
+##### Resend a specific failed e-mail
 
 ```bash
-$ php artisan email:retry
-# or...
-$ php artisan email:retry 1
+php artisan email:resend 1
 ```
 
-### Encryption
+#### Encryption (Optional)
 
-If you wish to encrypt your e-mails, please enable the `encrypt` option in the configuration file. This is disabled by default. Encryption and decryption will be handled by Laravel's built-in encryption mechanism. Please note that encrypting the e-mail body takes a lot of disk space.
+If you wish to encrypt your e-mails, please enable the `encrypt` option in the configuration file. This is disabled by default. Encryption and decryption will be handled by Laravel's built-in encryption mechanism. Please note that by encrypting the e-mail it takes more disk space.
 
-### Testing Address
+```text
+Without encryption
 
-If you wish to send e-mails to a test address but don't necessarily want to use a service like mailtrap, please take a look at the `testing` configuration. This is turned off by default.
+7    bytes (label)
+16   bytes (recipient)
+20   bytes (subject)
+48   bytes (view name)
+116  bytes (variables)
+1874 bytes (e-mail content)
+4    bytes (attempts, sending, failed, encrypted)
+57   bytes (created_at, updated_at, deleted_at)
+... x 10.000 rows = ± 21.55 MB
 
-During the creation of an e-mail, the recipient will be replaced by the test e-mail. This is useful for local development or testing on a staging server.
+With encryption the table size is ± 50.58 MB.
+```
+
+#### Test mode (Optional)
+
+When enabled, all newly created e-mails will be sent to the specified test e-mail address. This is turned off by default.
+
+#### E-mails to send per minute
+
+To configure how many e-mails should be sent each command, please check the `limit` option. The default is `20` e-mails every command.

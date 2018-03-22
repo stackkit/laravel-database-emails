@@ -4,29 +4,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Retry Mode
+    | Attempts
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the number of attempts the cronjob should get
-    | to send an email. If the sending fails after the number of max
-    | tries, we will no longer attempt to send that e-mail.
+    | Here you may specify the number of times the cronjob will try to send an e-mail.
+    | Once the max attempt count is reached, the e-mail will be marked as failed
+    | and will no longer be sent.
     |
     */
 
-    'retry' => [
-
-        'attempts' => 3,
-
-    ],
+    'attempts' => 3,
 
     /*
     |--------------------------------------------------------------------------
     | Encryption
     |--------------------------------------------------------------------------
     |
-    | Here you may enable encryption for all e-mails. If enabled, we
-    | will automatically encrypt all the view data, recipient and
-    | decrypt it during the sending phase.
+    | Here you may enable encryption for all e-mails. The e-mail will be encrypted according
+    | your application's configuration (OpenSSL AES-256-CBC by default).
     |
     */
 
@@ -37,9 +32,9 @@ return [
     | Test E-mail
     |--------------------------------------------------------------------------
     |
-    | When developing the application or testing on a staging server you may
-    | wish to send all e-mails to a specific test inbox. If enabled, all
-    | recpient emails will be hijacked and sent to the test address.
+    | When developing your application or testing on a staging server you may
+    | wish to send all e-mails to a specific test inbox. Once enabled, every
+    | newly created e-mail will be sent to the specified test address.
     |
     */
 
@@ -60,9 +55,9 @@ return [
     | Cronjob Limit
     |--------------------------------------------------------------------------
     |
-    | Limit the number of e-mails the cronjob may send at a time. This is useful
-    | if you want to prevent overlapping cronjobs. Keep in mind we already
-    | handle overlapping gracefully, however setting a limit is adviced.
+    | Limit the number of e-mails that should be sent at a time. Please ajust this
+    | configuration based on the number of e-mails you expect to send and
+    | the throughput of your e-mail sending provider.
     |
     */
 

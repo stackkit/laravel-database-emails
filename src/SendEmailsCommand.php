@@ -13,7 +13,7 @@ class SendEmailsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'email:send';
+    protected $signature = 'email:send {--timeout=300}';
 
     /**
      * The console command description.
@@ -48,6 +48,8 @@ class SendEmailsCommand extends Command
      */
     public function handle()
     {
+        set_time_limit($this->option('timeout'));
+
         $emails = $this->store->getQueue();
 
         if ($emails->isEmpty()) {
@@ -70,6 +72,8 @@ class SendEmailsCommand extends Command
         $progress->finish();
 
         $this->result($emails);
+
+        set_time_limit(0);
     }
 
     /**

@@ -16,6 +16,8 @@ class MailableReader
     {
         $this->readRecipient($composer);
 
+        $this->readFrom($composer);
+
         $this->readCc($composer);
 
         $this->readBcc($composer);
@@ -52,6 +54,21 @@ class MailableReader
         );
 
         $composer->recipient($to);
+    }
+
+    /**
+     * Read the mailable from field to the email composer.
+     *
+     * @param EmailComposer $composer
+     */
+    private function readFrom(EmailComposer $composer)
+    {
+        $from = reset($composer->getData('mailable')->from);
+
+        $composer->from(
+            $from['address'],
+            $from['name']
+        );
     }
 
     /**

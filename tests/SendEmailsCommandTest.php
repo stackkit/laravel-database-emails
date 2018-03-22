@@ -123,4 +123,18 @@ class SendEmailsCommandTest extends TestCase
         $this->assertFalse($email->fresh()->hasFailed());
         $this->assertEmpty($email->fresh()->getError());
     }
+
+    /** @test */
+    function the_command_will_be_stopped_after_the_timeout()
+    {
+        $this->assertEquals(0, ini_get('max_execution_time'));
+
+        $this->artisan('email:send');
+
+        $this->assertEquals(300, ini_get('max_execution_time'));
+
+        $this->artisan('email:send', ['--timeout' => 60]);
+
+        $this->assertEquals(60, ini_get('max_execution_time'));
+    }
 }

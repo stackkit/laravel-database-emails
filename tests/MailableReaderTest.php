@@ -71,6 +71,37 @@ class MailableReaderTest extends TestCase
         $this->assertEquals('order.html', $attachments[1]['attachment']['name']);
         $this->assertEquals('<p>Thanks for your oder</p>', $attachments[1]['attachment']['data']);
     }
+
+    /** @test */
+    function it_extracts_the_from_address_and_or_name()
+    {
+        $email = Email::compose()->mailable(
+            (new TestMailable())
+                ->from('marick@dolphiq.nl', 'Marick')
+        )->send();
+
+        $this->assertTrue($email->hasFrom());
+        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
+        $this->assertEquals('Marick', $email->getFromName());
+
+        $email = Email::compose()->mailable(
+            (new TestMailable())
+                ->from('marick@dolphiq.nl')
+        )->send();
+
+        $this->assertTrue($email->hasFrom());
+        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
+        $this->assertEquals(config('mail.from.name'), $email->getFromName());
+
+        $email = Email::compose()->mailable(
+            (new TestMailable())
+                ->from(null, 'Marick')
+        )->send();
+
+        $this->assertTrue($email->hasFrom());
+        $this->assertEquals(config('mail.from.address'), $email->getFromAddress());
+        $this->assertEquals('Marick', $email->getFromName());
+    }
 }
 
 class TestMailable extends Mailable

@@ -25,7 +25,7 @@ class RetryFailedEmailsCommandTest extends TestCase
 
         $this->assertEquals(1, DB::table('emails')->count());
 
-        $this->artisan('email:retry');
+        $this->artisan('email:resend');
 
         $this->assertEquals(1, DB::table('emails')->count());
 
