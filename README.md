@@ -25,6 +25,7 @@ This is a package that stores and queues e-mails using a database table. Easily 
   - [Resend failed e-mails](#resend-failed-e-mails)
   - [Encryption (optional)](#encryption-optional)
   - [Test mode (optional)](#test-mode-optional)
+  - [E-mails to send per minute](#e-mails-to-send-per-minute)
 
 ### Installation
 
@@ -63,9 +64,11 @@ Now add the e-mail cronjob to your scheduler.
  */
 protected function schedule(Schedule $schedule)
 {
-     $schedule->command('email:send')->everyMinute()->withoutOverlapping(5);
+     $schedule->command('email:send', ['--timeout' => 300])->everyMinute()->withoutOverlapping(5);
 }
 ```
+
+Using the above configuration, the `email:send` process will exit after 5 minutes (`--timeout`) and won't overlap if the process still runs after 5 minutes (`withoutOverlapping`)
 
 ### Usage
 
@@ -196,3 +199,7 @@ With encryption the table size is ± 50.58 MB.
 #### Test mode (Optional)
 
 When enabled, all newly created e-mails will be sent to the specified test e-mail address. This is turned off by default.
+
+#### E-mails to send per minute
+
+To configure how many e-mails should be sent each command, please check the `limit` option. The default is `20` e-mails every command.
