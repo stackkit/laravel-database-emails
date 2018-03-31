@@ -2,9 +2,9 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 use Exception;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property $id
@@ -124,7 +124,7 @@ class Email extends Model
     {
         $glue = ', ';
 
-        return implode($glue, (array)$this->recipient);
+        return implode($glue, (array) $this->recipient);
     }
 
     /**
@@ -164,7 +164,6 @@ class Email extends Model
      */
     public function getView()
     {
-
         return $this->view;
     }
 
@@ -225,7 +224,7 @@ class Email extends Model
      */
     public function hasVariables()
     {
-        return !is_null($this->variables);
+        return ! is_null($this->variables);
     }
 
     /**
@@ -299,7 +298,7 @@ class Email extends Model
      */
     public function isScheduled()
     {
-        return !is_null($this->getScheduledDate());
+        return ! is_null($this->getScheduledDate());
     }
 
     /**
@@ -309,7 +308,7 @@ class Email extends Model
      */
     public function isEncrypted()
     {
-        return !!$this->getOriginal('encrypted');
+        return (bool) $this->getOriginal('encrypted');
     }
 
     /**
@@ -319,7 +318,7 @@ class Email extends Model
      */
     public function isSent()
     {
-        return !is_null($this->sent_at);
+        return ! is_null($this->sent_at);
     }
 
     /**
@@ -373,7 +372,7 @@ class Email extends Model
         $this->update([
             'sending' => 0,
             'failed'  => 1,
-            'error'   => (string)$exception,
+            'error'   => (string) $exception,
         ]);
     }
 

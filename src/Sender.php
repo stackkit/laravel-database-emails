@@ -57,7 +57,7 @@ class Sender
             'rawAttachment' => 'attachData',
         ];
 
-        foreach ((array)$email->getAttachments() as $attachment) {
+        foreach ((array) $email->getAttachments() as $attachment) {
             call_user_func_array([$message, $attachmentMap[$attachment['type']]], $attachment['attachment']);
         }
     }

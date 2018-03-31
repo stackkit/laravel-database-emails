@@ -2,14 +2,14 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Email;
 use Eloquent;
+use Buildcode\LaravelDatabaseEmails\Email;
 
-class Testcase extends \Orchestra\Testbench\TestCase
+class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $invalid;
 
-    function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -20,7 +20,7 @@ class Testcase extends \Orchestra\Testbench\TestCase
             1.0,
             'test',
             new \stdClass(),
-            (object)[],
+            (object) [],
             function () {
             },
         ];

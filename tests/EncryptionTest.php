@@ -4,7 +4,7 @@ namespace Tests;
 
 class EncryptionTest extends TestCase
 {
-    function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -14,7 +14,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function an_email_should_be_marked_as_encrypted()
+    public function an_email_should_be_marked_as_encrypted()
     {
         $email = $this->sendEmail();
 
@@ -22,7 +22,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function the_recipient_should_be_encrypted_and_decrypted()
+    public function the_recipient_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
 
@@ -32,11 +32,11 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function cc_and_bb_should_be_encrypted_and_decrypted()
+    public function cc_and_bb_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail([
             'cc'  => $cc = ['john+1@doe.com', 'john+2@doe.com'],
-            'bcc' => $bcc = ['jane+1@doe.com', 'jane+2@doe.com']
+            'bcc' => $bcc = ['jane+1@doe.com', 'jane+2@doe.com'],
         ]);
 
         $this->assertEquals($cc, decrypt($email->getOriginal('cc')));
@@ -47,7 +47,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function the_subject_should_be_encrypted_and_decrypted()
+    public function the_subject_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
 
@@ -57,7 +57,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function the_variables_should_be_encrypted_and_decrypted()
+    public function the_variables_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
 
@@ -73,7 +73,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function the_body_should_be_encrypted_and_decrypted()
+    public function the_body_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
 
@@ -85,7 +85,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
-    function from_should_be_encrypted_and_decrypted()
+    public function from_should_be_encrypted_and_decrypted()
     {
         $email = $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
 
