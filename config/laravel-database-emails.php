@@ -44,9 +44,9 @@ return [
 
         'enabled' => function () {
             return false;
-            // ...or...
+        // ...or...
             // return app()->environment('local', 'staging');
-        }
+        },
 
     ],
 
@@ -61,5 +61,5 @@ return [
     |
     */
 
-    'limit' => 20
+    'limit' => 20,
 ];

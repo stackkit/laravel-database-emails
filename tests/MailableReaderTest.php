@@ -2,13 +2,13 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Email;
 use Illuminate\Mail\Mailable;
+use Buildcode\LaravelDatabaseEmails\Email;
 
 class MailableReaderTest extends TestCase
 {
     /** @test */
-    function it_extracts_the_recipient()
+    public function it_extracts_the_recipient()
     {
         $composer = Email::compose()
             ->mailable(new TestMailable());
@@ -24,7 +24,7 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
-    function it_extracts_cc_addresses()
+    public function it_extracts_cc_addresses()
     {
         $composer = Email::compose()->mailable(new TestMailable());
 
@@ -32,7 +32,7 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
-    function it_extracts_bcc_addresses()
+    public function it_extracts_bcc_addresses()
     {
         $composer = Email::compose()->mailable(new TestMailable());
 
@@ -40,7 +40,7 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
-    function it_extracts_the_subject()
+    public function it_extracts_the_subject()
     {
         $composer = Email::compose()->mailable(new TestMailable());
 
@@ -48,7 +48,7 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
-    function it_extracts_the_body()
+    public function it_extracts_the_body()
     {
         $composer = Email::compose()->mailable(new TestMailable());
 
@@ -56,7 +56,7 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
-    function it_extracts_attachments()
+    public function it_extracts_attachments()
     {
         $email = Email::compose()->mailable(new TestMailable())->send();
 
@@ -73,7 +73,7 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
-    function it_extracts_the_from_address_and_or_name()
+    public function it_extracts_the_from_address_and_or_name()
     {
         $email = Email::compose()->mailable(
             (new TestMailable())

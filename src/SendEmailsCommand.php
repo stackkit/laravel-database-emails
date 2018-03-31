@@ -2,8 +2,8 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-use Illuminate\Console\Command;
 use Exception;
+use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 
 class SendEmailsCommand extends Command
@@ -54,6 +54,7 @@ class SendEmailsCommand extends Command
 
         if ($emails->isEmpty()) {
             $this->line('There is nothing to send.');
+
             return;
         }
 

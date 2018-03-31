@@ -2,12 +2,12 @@
 
 namespace Tests;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 
 class RetryFailedEmailsCommandTest extends TestCase
 {
-    function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -15,7 +15,7 @@ class RetryFailedEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function an_email_cannot_be_reset_if_the_max_attempt_count_has_not_been_reached()
+    public function an_email_cannot_be_reset_if_the_max_attempt_count_has_not_been_reached()
     {
         $this->app['config']['mail.driver'] = 'does-not-exist';
 
@@ -38,7 +38,7 @@ class RetryFailedEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function a_single_email_can_be_resent()
+    public function a_single_email_can_be_resent()
     {
         $emailA = $this->sendEmail();
         $emailB = $this->sendEmail();
@@ -52,7 +52,7 @@ class RetryFailedEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function email_retry_is_deprecated()
+    public function email_retry_is_deprecated()
     {
         $deprecated = 'This command is deprecated';
 

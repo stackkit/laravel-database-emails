@@ -43,12 +43,12 @@ class Preparer
      */
     private function prepareLabel(EmailComposer $composer)
     {
-        if (!$composer->hasData('label')) {
+        if (! $composer->hasData('label')) {
             return;
         }
 
         $composer->getEmail()->fill([
-            'label' => $composer->getData('label')
+            'label' => $composer->getData('label'),
         ]);
     }
 
@@ -143,7 +143,7 @@ class Preparer
      */
     private function prepareVariables(EmailComposer $composer)
     {
-        if (!$composer->hasData('variables')) {
+        if (! $composer->hasData('variables')) {
             return;
         }
 
@@ -181,14 +181,14 @@ class Preparer
     {
         $attachments = [];
 
-        foreach ((array)$composer->getData('attachments', []) as $attachment) {
+        foreach ((array) $composer->getData('attachments', []) as $attachment) {
             $attachments[] = [
                 'type'       => 'attachment',
                 'attachment' => $attachment,
             ];
         }
 
-        foreach ((array)$composer->getData('rawAttachments', []) as $rawAttachment) {
+        foreach ((array) $composer->getData('rawAttachments', []) as $rawAttachment) {
             $attachments[] = [
                 'type'       => 'rawAttachment',
                 'attachment' => $rawAttachment,
@@ -207,7 +207,7 @@ class Preparer
      */
     private function prepareScheduled(EmailComposer $composer)
     {
-        if (!$composer->hasData('scheduled_at')) {
+        if (! $composer->hasData('scheduled_at')) {
             return;
         }
 

@@ -2,13 +2,13 @@
 
 namespace Tests;
 
-use Illuminate\Support\Facades\DB;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseInteractionTest extends TestCase
 {
     /** @test */
-    function label_should_be_saved_correctly()
+    public function label_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['label' => 'welcome-email']);
 
@@ -17,7 +17,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function recipient_should_be_saved_correctly()
+    public function recipient_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
 
@@ -25,15 +25,15 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function cc_and_bcc_should_be_saved_correctly()
+    public function cc_and_bcc_should_be_saved_correctly()
     {
         $email = $this->sendEmail([
             'cc'  => $cc = [
                 'john@doe.com',
             ],
             'bcc' => $bcc = [
-                'jane@doe.com'
-            ]
+                'jane@doe.com',
+            ],
         ]);
 
         $this->assertEquals(json_encode($cc), DB::table('emails')->find(1)->cc);
@@ -45,7 +45,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function subject_should_be_saved_correclty()
+    public function subject_should_be_saved_correclty()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
 
@@ -54,7 +54,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function view_should_be_saved_correctly()
+    public function view_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['view' => 'tests::dummy']);
 
@@ -63,7 +63,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function encrypted_should_be_saved_correctly()
+    public function encrypted_should_be_saved_correctly()
     {
         $email = $this->sendEmail();
 
@@ -79,7 +79,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function scheduled_date_should_be_saved_correctly()
+    public function scheduled_date_should_be_saved_correctly()
     {
         $email = $this->sendEmail();
         $this->assertNull(DB::table('emails')->find(1)->scheduled_at);
@@ -91,7 +91,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function the_body_should_be_saved_correctly()
+    public function the_body_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
 
@@ -102,7 +102,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function from_should_be_saved_correctly()
+    public function from_should_be_saved_correctly()
     {
         $email = $this->composeEmail()->send();
 
@@ -118,7 +118,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function variables_should_be_saved_correctly()
+    public function variables_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'John Doe']]);
 
@@ -127,7 +127,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function the_sent_date_should_be_null()
+    public function the_sent_date_should_be_null()
     {
         $email = $this->sendEmail();
 
@@ -136,7 +136,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function failed_should_be_zero()
+    public function failed_should_be_zero()
     {
         $email = $this->sendEmail();
 
@@ -145,7 +145,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function attempts_should_be_zero()
+    public function attempts_should_be_zero()
     {
         $email = $this->sendEmail();
 
@@ -154,7 +154,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function the_scheduled_date_should_be_saved_correctly()
+    public function the_scheduled_date_should_be_saved_correctly()
     {
         $scheduledFor = date('Y-m-d H:i:s', strtotime('+2 weeks'));
 
@@ -165,7 +165,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function recipient_should_be_swapped_for_test_address_when_in_testing_mode()
+    public function recipient_should_be_swapped_for_test_address_when_in_testing_mode()
     {
         $this->app['config']->set('laravel-database-emails.testing.enabled', function () {
             return true;
@@ -178,7 +178,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function attachments_should_be_saved_correctly()
+    public function attachments_should_be_saved_correctly()
     {
         $email = $this->composeEmail()
             ->attach(__DIR__ . '/files/pdf-sample.pdf')
@@ -203,7 +203,7 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
-    function in_memory_attachments_should_be_saved_correctly()
+    public function in_memory_attachments_should_be_saved_correctly()
     {
         $pdf = new Dompdf;
         $pdf->loadHtml('Hello CI!');
@@ -211,7 +211,7 @@ class DatabaseInteractionTest extends TestCase
 
         $email = $this->composeEmail()
             ->attachData($pdf->outputHtml(), 'generated.pdf', [
-                'mime' => 'application/pdf'
+                'mime' => 'application/pdf',
             ])
             ->send();
 

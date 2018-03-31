@@ -2,9 +2,9 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
+use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
-use Exception;
 
 class Validator
 {
@@ -61,14 +61,14 @@ class Validator
      */
     private function validateRecipient(EmailComposer $composer)
     {
-        if (!$composer->hasData('recipient')) {
+        if (! $composer->hasData('recipient')) {
             throw new InvalidArgumentException('No recipient specified');
         }
 
-        $recipients = (array)$composer->getData('recipient');
+        $recipients = (array) $composer->getData('recipient');
 
         foreach ($recipients as $recipient) {
-            if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidArgumentException('E-mail address [' . $recipient . '] is invalid');
             }
         }
@@ -82,12 +82,12 @@ class Validator
      */
     private function validateCc(EmailComposer $composer)
     {
-        if (!$composer->hasData('cc')) {
+        if (! $composer->hasData('cc')) {
             return;
         }
 
-        foreach ((array)$composer->getData('cc') as $cc) {
-            if (!filter_var($cc, FILTER_VALIDATE_EMAIL)) {
+        foreach ((array) $composer->getData('cc') as $cc) {
+            if (! filter_var($cc, FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidArgumentException('E-mail address [' . $cc . '] is invalid');
             }
         }
@@ -101,12 +101,12 @@ class Validator
      */
     private function validateBcc(EmailComposer $composer)
     {
-        if (!$composer->hasData('bcc')) {
+        if (! $composer->hasData('bcc')) {
             return;
         }
 
-        foreach ((array)$composer->getData('bcc') as $bcc) {
-            if (!filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
+        foreach ((array) $composer->getData('bcc') as $bcc) {
+            if (! filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidargumentException('E-mail address [' . $bcc . '] is invalid');
             }
         }
@@ -120,7 +120,7 @@ class Validator
      */
     private function validateSubject(EmailComposer $composer)
     {
-        if (!$composer->hasData('subject')) {
+        if (! $composer->hasData('subject')) {
             throw new InvalidArgumentException('No subject specified');
         }
     }
@@ -137,13 +137,13 @@ class Validator
             return;
         }
 
-        if (!$composer->hasData('view')) {
+        if (! $composer->hasData('view')) {
             throw new InvalidArgumentException('No view specified');
         }
 
         $view = $composer->getData('view');
 
-        if (!view()->exists($view)) {
+        if (! view()->exists($view)) {
             throw new InvalidArgumentException('View [' . $view . '] does not exist');
         }
     }
@@ -156,7 +156,7 @@ class Validator
      */
     private function validateVariables(EmailComposer $composer)
     {
-        if ($composer->hasData('variables') && !is_array($composer->getData('variables'))) {
+        if ($composer->hasData('variables') && ! is_array($composer->getData('variables'))) {
             throw new InvalidArgumentException('Variables must be an array');
         }
     }
@@ -169,13 +169,13 @@ class Validator
      */
     private function validateScheduled(EmailComposer $composer)
     {
-        if (!$composer->hasData('scheduled_at')) {
+        if (! $composer->hasData('scheduled_at')) {
             return;
         }
 
         $scheduled = $composer->getData('scheduled_at');
 
-        if (!$scheduled instanceof Carbon && !is_string($scheduled)) {
+        if (! $scheduled instanceof Carbon && ! is_string($scheduled)) {
             throw new InvalidArgumentException('Scheduled date must be a Carbon\Carbon instance or a strtotime-valid string');
         }
 

@@ -3,15 +3,15 @@
 namespace Tests;
 
 use Dompdf\Dompdf;
-use Illuminate\Support\Facades\Mail;
 use Swift_Events_SendEvent;
+use Illuminate\Support\Facades\Mail;
 
 class SenderTest extends TestCase
 {
     /** @var Swift_Events_SendEvent[] */
     public $sent = [];
 
-    function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function it_sends_an_email()
+    public function it_sends_an_email()
     {
         $this->sendEmail();
 
@@ -30,7 +30,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function the_email_has_a_correct_from_email_and_from_name()
+    public function the_email_has_a_correct_from_email_and_from_name()
     {
         $this->app['config']->set('mail.from.address', 'testfromaddress@gmail.com');
         $this->app['config']->set('mail.from.name', 'From CI test');
@@ -71,7 +71,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function it_sends_emails_to_the_correct_recipients()
+    public function it_sends_emails_to_the_correct_recipients()
     {
         $this->sendEmail(['recipient' => 'john@doe.com']);
         $this->artisan('email:send');
@@ -89,7 +89,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function it_adds_the_cc_addresses()
+    public function it_adds_the_cc_addresses()
     {
         $this->sendEmail(['cc' => 'cc@test.com']);
         $this->artisan('email:send');
@@ -107,7 +107,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function it_adds_the_bcc_addresses()
+    public function it_adds_the_bcc_addresses()
     {
         $this->sendEmail(['bcc' => 'bcc@test.com']);
         $this->artisan('email:send');
@@ -125,7 +125,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function the_email_has_the_correct_subject()
+    public function the_email_has_the_correct_subject()
     {
         $this->sendEmail(['subject' => 'Hello World']);
 
@@ -137,7 +137,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function the_email_has_the_correct_body()
+    public function the_email_has_the_correct_body()
     {
         $this->sendEmail(['variables' => ['name' => 'John Doe']]);
         $this->artisan('email:send');
@@ -152,7 +152,7 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    function attachments_are_added_to_the_email()
+    public function attachments_are_added_to_the_email()
     {
         $this->composeEmail()
             ->attach(__DIR__ . '/files/pdf-sample.pdf')
@@ -163,12 +163,12 @@ class SenderTest extends TestCase
         $attachment = reset($attachments);
 
         $this->assertCount(1, $attachments);
-        $this->assertEquals('attachment; filename=pdf-sample.pdf',$attachment->getHeaders()->get('content-disposition')->getFieldBody());
+        $this->assertEquals('attachment; filename=pdf-sample.pdf', $attachment->getHeaders()->get('content-disposition')->getFieldBody());
         $this->assertEquals('application/pdf', $attachment->getContentType());
     }
 
     /** @test */
-    function raw_attachments_are_added_to_the_email()
+    public function raw_attachments_are_added_to_the_email()
     {
         $pdf = new Dompdf;
         $pdf->loadHtml('Hello CI!');
@@ -176,7 +176,7 @@ class SenderTest extends TestCase
 
         $this->composeEmail()
             ->attachData($pdf->outputHtml(), 'hello-ci.pdf', [
-                'mime' => 'application/pdf'
+                'mime' => 'application/pdf',
             ])
             ->send();
         $this->artisan('email:send');
@@ -185,7 +185,7 @@ class SenderTest extends TestCase
         $attachment = reset($attachments);
 
         $this->assertCount(1, $attachments);
-        $this->assertEquals('attachment; filename=hello-ci.pdf',$attachment->getHeaders()->get('content-disposition')->getFieldBody());
+        $this->assertEquals('attachment; filename=hello-ci.pdf', $attachment->getHeaders()->get('content-disposition')->getFieldBody());
         $this->assertEquals('application/pdf', $attachment->getContentType());
         $this->assertContains('Hello CI!', $attachment->getBody());
     }

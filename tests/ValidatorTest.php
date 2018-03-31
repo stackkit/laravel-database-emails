@@ -2,17 +2,17 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Email;
-use InvalidArgumentException;
 use Carbon;
+use InvalidArgumentException;
+use Buildcode\LaravelDatabaseEmails\Email;
 
-class PackageTest extends TestCase
+class ValidatorTest extends TestCase
 {
     /**
      * @test
      * @expectedException InvalidArgumentException
      */
-    function a_label_cannot_contain_more_than_255_characters()
+    public function a_label_cannot_contain_more_than_255_characters()
     {
         Email::compose()
             ->label(str_repeat('a', 256))
@@ -24,7 +24,7 @@ class PackageTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage No recipient specified
      */
-    function a_recipient_is_required()
+    public function a_recipient_is_required()
     {
         Email::compose()
             ->send();
@@ -35,7 +35,7 @@ class PackageTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
-    function the_recipient_email_must_be_valid()
+    public function the_recipient_email_must_be_valid()
     {
         Email::compose()
             ->recipient('not-a-valid-email-address')
@@ -47,7 +47,7 @@ class PackageTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
-    function cc_must_contain_valid_email_addresses()
+    public function cc_must_contain_valid_email_addresses()
     {
         Email::compose()
             ->recipient('john@doe.com')
@@ -63,7 +63,7 @@ class PackageTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
-    function bcc_must_contain_valid_email_addresses()
+    public function bcc_must_contain_valid_email_addresses()
     {
         Email::compose()
             ->recipient('john@doe.com')
@@ -79,7 +79,7 @@ class PackageTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage No subject specified
      */
-    function a_subject_is_required()
+    public function a_subject_is_required()
     {
         Email::compose()
             ->recipient('john@doe.com')
@@ -91,7 +91,7 @@ class PackageTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage No view specified
      */
-    function a_view_is_required()
+    public function a_view_is_required()
     {
         Email::compose()
             ->recipient('john@doe.com')
@@ -100,7 +100,7 @@ class PackageTest extends TestCase
     }
 
     /** @test */
-    function the_view_must_exist()
+    public function the_view_must_exist()
     {
         // this view exists, if error thrown -> fail test
         try {
@@ -124,7 +124,7 @@ class PackageTest extends TestCase
     }
 
     /** @test */
-    function variables_must_be_defined_as_an_array()
+    public function variables_must_be_defined_as_an_array()
     {
         $email = Email::compose()
             ->recipient('john@doe.com')
@@ -150,7 +150,7 @@ class PackageTest extends TestCase
     }
 
     /** @test */
-    function the_scheduled_date_must_be_a_carbon_instance_or_a_valid_date()
+    public function the_scheduled_date_must_be_a_carbon_instance_or_a_valid_date()
     {
         // invalid
         foreach ($this->invalid as $value) {
@@ -183,5 +183,4 @@ class PackageTest extends TestCase
             $this->fail('Dit not expect exception to be thrown');
         }
     }
-
 }
