@@ -56,7 +56,7 @@ trait HasEncryptedAttributes
         if (in_array($key, $this->encoded) && is_string($value)) {
             $decoded = json_decode($value, true);
 
-            if (!is_null($decoded)) {
+            if (! is_null($decoded)) {
                 $value = $decoded;
             }
         }

@@ -63,7 +63,7 @@ class EmailComposer
      */
     public function getData($key, $default = null)
     {
-        if (!is_null($default) && !$this->hasData($key)) {
+        if (! is_null($default) && ! $this->hasData($key)) {
             return $default;
         }
 

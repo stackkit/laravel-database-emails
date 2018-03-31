@@ -46,7 +46,7 @@ class RetryFailedEmailsCommand extends Command
      */
     public function handle()
     {
-        if (get_class($this) === RetryFailedEmailsCommand::class) {
+        if (get_class($this) === self::class) {
             $this->warn('This command is deprecated, please use email:resend instead');
         }
 
@@ -56,6 +56,7 @@ class RetryFailedEmailsCommand extends Command
 
         if ($emails->isEmpty()) {
             $this->line('There is nothing to reset.');
+
             return;
         }
 

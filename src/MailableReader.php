@@ -2,8 +2,8 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-use function call_user_func_array;
 use Exception;
+use function call_user_func_array;
 
 class MailableReader
 {
@@ -135,11 +135,11 @@ class MailableReader
     {
         $mailable = $composer->getData('mailable');
 
-        foreach ((array)$mailable->attachments as $attachment) {
+        foreach ((array) $mailable->attachments as $attachment) {
             call_user_func_array([$composer, 'attach'], $attachment);
         }
 
-        foreach ((array)$mailable->rawAttachments as $rawAttachment) {
+        foreach ((array) $mailable->rawAttachments as $rawAttachment) {
             call_user_func_array([$composer, 'attachData'], $rawAttachment);
         }
     }

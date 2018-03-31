@@ -85,7 +85,7 @@ class Encrypter
      */
     private function encryptVariables(EmailComposer $composer)
     {
-        if (!$composer->hasData('variables')) {
+        if (! $composer->hasData('variables')) {
             return;
         }
 

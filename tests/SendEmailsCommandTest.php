@@ -2,14 +2,14 @@
 
 namespace Tests;
 
-use Buildcode\LaravelDatabaseEmails\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Buildcode\LaravelDatabaseEmails\Store;
 
 class SendEmailsCommandTest extends TestCase
 {
     /** @test */
-    function an_email_should_be_marked_as_sent()
+    public function an_email_should_be_marked_as_sent()
     {
         $email = $this->sendEmail();
 
@@ -19,7 +19,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function the_number_of_attempts_should_be_incremented()
+    public function the_number_of_attempts_should_be_incremented()
     {
         $email = $this->sendEmail();
 
@@ -31,7 +31,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function an_email_should_not_be_sent_once_it_is_marked_as_sent()
+    public function an_email_should_not_be_sent_once_it_is_marked_as_sent()
     {
         $email = $this->sendEmail();
 
@@ -46,7 +46,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function if_an_email_fails_to_be_sent_it_should_be_logged_in_the_database()
+    public function if_an_email_fails_to_be_sent_it_should_be_logged_in_the_database()
     {
         $this->app['config']['mail.driver'] = 'does-not-exist';
 
@@ -59,7 +59,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function the_number_of_emails_sent_per_minute_should_be_limited()
+    public function the_number_of_emails_sent_per_minute_should_be_limited()
     {
         for ($i = 1; $i <= 30; $i++) {
             $this->sendEmail();
@@ -73,14 +73,13 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function an_email_should_never_be_sent_before_its_scheduled_date()
+    public function an_email_should_never_be_sent_before_its_scheduled_date()
     {
         $email = $this->scheduleEmail(Carbon::now()->addHour(1));
         $this->artisan('email:send');
         $email = $email->fresh();
         $this->assertEquals(0, $email->getAttempts());
         $this->assertNull($email->getSendDate());
-
 
         $email->update(['scheduled_at' => Carbon::now()->toDateTimeString()]);
         $this->artisan('email:send');
@@ -90,7 +89,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function emails_will_be_sent_until_max_try_count_has_been_reached()
+    public function emails_will_be_sent_until_max_try_count_has_been_reached()
     {
         $this->app['config']['mail.driver'] = 'does-not-exist';
 
@@ -105,7 +104,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function the_failed_status_and_error_is_cleared_if_a_previously_failed_email_is_sent_succesfully()
+    public function the_failed_status_and_error_is_cleared_if_a_previously_failed_email_is_sent_succesfully()
     {
         $email = $this->sendEmail();
 
@@ -125,7 +124,7 @@ class SendEmailsCommandTest extends TestCase
     }
 
     /** @test */
-    function the_command_will_be_stopped_after_the_timeout()
+    public function the_command_will_be_stopped_after_the_timeout()
     {
         $this->assertEquals(0, ini_get('max_execution_time'));
 
