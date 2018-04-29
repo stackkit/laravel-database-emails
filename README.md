@@ -11,4 +11,4 @@
 
 This package allows you to easily send e-mails using a database table.
 
-Official documentation, changelog and more [is located here](https://stackkit.github.io/laravel-database-emails-docs/).
+Official documentation, changelog and more [is located here](https://stackkit.github.io/laravel-database-emails/).
