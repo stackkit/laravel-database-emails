@@ -463,10 +463,9 @@ class Email extends Model
      */
     public function retry()
     {
-        $retry = new static;
+        $retry = $this->replicate();
 
-        $retry->fill(array_merge(
-            $this->toArray(),
+        $retry->fill(
             [
                 'id'           => null,
                 'attempts'     => 0,
@@ -476,7 +475,7 @@ class Email extends Model
                 'sent_at'      => null,
                 'delivered_at' => null,
             ]
-        ));
+        );
 
         $retry->save();
     }
