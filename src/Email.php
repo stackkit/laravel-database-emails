@@ -86,11 +86,31 @@ class Email extends Model
     }
 
     /**
+     * Get the e-mail recipient.
+     *
+     * @return string
+     */
+    public function getRecipientAttribute()
+    {
+        return $this->recipient;
+    }
+
+    /**
      * Get the e-mail from.
      *
-     * @return array
+     * @return string
      */
     public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * Get the e-mail from.
+     *
+     * @return string
+     */
+    public function getFromAttribute()
     {
         return $this->from;
     }
@@ -138,11 +158,31 @@ class Email extends Model
     }
 
     /**
+     * Get the e-mail CC addresses.
+     *
+     * @return array
+     */
+    public function getCcAttribute()
+    {
+        return $this->cc;
+    }
+
+    /**
      * Get the e-mail BCC addresses.
      *
      * @return array|string
      */
     public function getBcc()
+    {
+        return $this->bcc;
+    }
+
+    /**
+     * Get the e-mail BCC addresses.
+     *
+     * @return array
+     */
+    public function getBccAttribute()
     {
         return $this->bcc;
     }
@@ -155,6 +195,16 @@ class Email extends Model
     public function getSubject()
     {
         return $this->subject;
+    }
+
+    /**
+     * Get the e-mail subject.
+     *
+     * @return string
+     */
+    public function getSubjectAttribute()
+    {
+        return $this->view;
     }
 
     /**
@@ -178,11 +228,31 @@ class Email extends Model
     }
 
     /**
+     * Get the e-mail variables.
+     *
+     * @return array
+     */
+    public function getVariablesAttribute()
+    {
+        return $this->variables;
+    }
+
+    /**
      * Get the e-mail body.
      *
      * @return string
      */
     public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * Get the e-mail body.
+     *
+     * @return string
+     */
+    public function getBodyAttribute()
     {
         return $this->body;
     }
@@ -393,10 +463,9 @@ class Email extends Model
      */
     public function retry()
     {
-        $retry = new static;
+        $retry = $this->replicate();
 
-        $retry->fill(array_merge(
-            $this->toArray(),
+        $retry->fill(
             [
                 'id'           => null,
                 'attempts'     => 0,
@@ -406,7 +475,7 @@ class Email extends Model
                 'sent_at'      => null,
                 'delivered_at' => null,
             ]
-        ));
+        );
 
         $retry->save();
     }
