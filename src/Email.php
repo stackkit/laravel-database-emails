@@ -86,7 +86,6 @@ class Email extends Model
     }
 
     /**
-     *
      * Get the e-mail recipient.
      *
      * @return string
