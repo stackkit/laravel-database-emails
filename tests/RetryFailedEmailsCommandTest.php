@@ -50,18 +50,4 @@ class RetryFailedEmailsCommandTest extends TestCase
 
         $this->assertEquals(3, DB::table('emails')->count());
     }
-
-    /** @test */
-    public function email_retry_is_deprecated()
-    {
-        $deprecated = 'This command is deprecated';
-
-        $this->artisan('email:retry');
-
-        $this->assertContains($deprecated, Artisan::output());
-
-        $this->artisan('email:resend');
-
-        $this->assertNotContains($deprecated, Artisan::output());
-    }
 }

@@ -2,7 +2,9 @@
 
 namespace Buildcode\LaravelDatabaseEmails;
 
-class ResendEmailsCommand extends RetryFailedEmailsCommand
+use Illuminate\Console\Command;
+
+class ResendEmailsCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -17,4 +19,57 @@ class ResendEmailsCommand extends RetryFailedEmailsCommand
      * @var string
      */
     protected $description = 'Resend failed e-mails';
+
+    /**
+     * The e-mail repository.
+     *
+     * @var Store
+     */
+    protected $store;
+
+    /**
+     * Create a new SendEmailsCommand instance.
+     *
+     * @param Store $store
+     */
+    public function __construct(Store $store)
+    {
+        parent::__construct();
+
+        $this->store = $store;
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        $emails = $this->store->getFailed(
+            $this->argument('id')
+        );
+
+        if ($emails->isEmpty()) {
+            $this->line('There is nothing to reset.');
+
+            return;
+        }
+
+        foreach ($emails as $email) {
+            $email->retry();
+        }
+
+        $this->info('Reset ' . $emails->count() . ' ' . ngettext('e-mail', 'e-mails', $emails->count()) . '!');
+    }
+
+    /**
+     * Execute the console command (backwards compatibility for Laravel 5.4 and below).
+     *
+     * @return void
+     */
+    public function fire()
+    {
+        $this->handle();
+    }
 }
