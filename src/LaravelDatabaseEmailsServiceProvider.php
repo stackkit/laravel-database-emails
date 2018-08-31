@@ -33,7 +33,6 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
     {
         $this->commands([
             SendEmailsCommand::class,
-            ResendEmailsCommand::class,
         ]);
     }
 }

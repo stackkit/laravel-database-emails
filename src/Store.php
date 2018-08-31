@@ -29,25 +29,4 @@ class Store
             ->limit(Config::cronjobEmailLimit())
             ->get();
     }
-
-    /**
-     * Get all e-mails that failed to be sent.
-     *
-     * @param int $id
-     * @return Collection|Email[]
-     */
-    public function getFailed($id = null)
-    {
-        $query = new Email;
-
-        return $query
-            ->when($id, function ($query) use ($id) {
-                $query->where('id', '=', $id);
-            })
-            ->where('failed', '=', 1)
-            ->where('attempts', '>=', Config::maxAttemptCount())
-            ->whereNull('sent_at')
-            ->whereNull('deleted_at')
-            ->get();
-    }
 }
