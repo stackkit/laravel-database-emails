@@ -204,7 +204,7 @@ class Email extends Model
      */
     public function getSubjectAttribute()
     {
-        return $this->view;
+        return $this->subject;
     }
 
     /**
