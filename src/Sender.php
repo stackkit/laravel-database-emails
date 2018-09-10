@@ -1,6 +1,6 @@
 <?php
 
-namespace Stackkit\LaravelDatabaseEmails;
+namespace Buildcode\LaravelDatabaseEmails;
 
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;

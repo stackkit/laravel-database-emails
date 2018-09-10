@@ -1,6 +1,6 @@
 <?php
 
-namespace Stackkit\LaravelDatabaseEmails;
+namespace Buildcode\LaravelDatabaseEmails;
 
 use Exception;
 use Illuminate\Console\Command;

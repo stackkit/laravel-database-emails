@@ -1,5 +1,5 @@
 {
-    "name": "stackkit/laravel-database-emails",
+    "name": "buildcode/laravel-database-emails",
     "description": "Store and send e-mails using the database",
     "license": "MIT",
     "authors": [
@@ -10,7 +10,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Stackkit\\LaravelDatabaseEmails\\": "src/"
+            "Buildcode\\LaravelDatabaseEmails\\": "src/"
         }
     },
     "autoload-dev": {
@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Stackkit\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider"
+                "Buildcode\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider"
             ]
         }
     },

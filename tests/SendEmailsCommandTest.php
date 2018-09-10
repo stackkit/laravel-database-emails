@@ -4,7 +4,7 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Stackkit\LaravelDatabaseEmails\Store;
+use Buildcode\LaravelDatabaseEmails\Store;
 
 class SendEmailsCommandTest extends TestCase
 {
