@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Illuminate\Mail\Mailable;
-use Stackkit\LaravelDatabaseEmails\Email;
+use Buildcode\LaravelDatabaseEmails\Email;
 
 class MailableReaderTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stackkit\LaravelDatabaseEmails;
+namespace Buildcode\LaravelDatabaseEmails;
 
 use Exception;
 use Carbon\Carbon;
@@ -204,7 +204,7 @@ class Email extends Model
      */
     public function getSubjectAttribute()
     {
-        return $this->view;
+        return $this->subject;
     }
 
     /**
