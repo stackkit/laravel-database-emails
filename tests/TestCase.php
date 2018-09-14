@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Eloquent;
-use Buildcode\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\Email;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -66,7 +66,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             \Orchestra\Database\ConsoleServiceProvider::class,
-            \Buildcode\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
+            \Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
         ];
     }
 
