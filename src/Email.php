@@ -1,6 +1,6 @@
 <?php
 
-namespace Buildcode\LaravelDatabaseEmails;
+namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
 use Carbon\Carbon;

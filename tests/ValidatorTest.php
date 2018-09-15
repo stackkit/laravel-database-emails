@@ -4,7 +4,7 @@ namespace Tests;
 
 use Carbon;
 use InvalidArgumentException;
-use Buildcode\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\Email;
 
 class ValidatorTest extends TestCase
 {
