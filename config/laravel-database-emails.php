@@ -42,11 +42,7 @@ return [
 
         'email' => 'test@email.com',
 
-        'enabled' => function () {
-            return false;
-        // ...or...
-            // return app()->environment('local', 'staging');
-        },
+        'enabled' => env('LARAVEL_DATABASE_EMAILS_TESTING_ENABLED', true),
 
     ],
 
