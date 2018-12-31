@@ -7,7 +7,7 @@ use Throwable;
 class ConfigCacheTest extends TestCase
 {
     /** @test */
-    function the_configuration_file_can_be_cached()
+    public function the_configuration_file_can_be_cached()
     {
         $failed = false;
 
