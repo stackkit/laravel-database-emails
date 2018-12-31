@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Changed package namespace
 
+**Removed**
+
+- Removed resend/retry option entirely
+- Removed process time limit
+
 ## 3.0.3 - 2018-07-24
 
 **Fixed**
