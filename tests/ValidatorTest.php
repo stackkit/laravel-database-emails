@@ -33,6 +33,18 @@ class ValidatorTest extends TestCase
     /**
      * @test
      * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage No recipient specified
+     */
+    public function a_recipient_cannot_be_empty()
+    {
+        Email::compose()
+            ->recipient([])
+            ->send();
+    }
+
+    /**
+     * @test
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
      */
     public function the_recipient_email_must_be_valid()
