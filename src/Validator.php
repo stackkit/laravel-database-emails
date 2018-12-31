@@ -67,6 +67,10 @@ class Validator
 
         $recipients = (array) $composer->getData('recipient');
 
+        if (count($recipients) == 0) {
+            throw new InvalidArgumentException('No recipient specified');
+        }
+
         foreach ($recipients as $recipient) {
             if (! filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidArgumentException('E-mail address [' . $recipient . '] is invalid');

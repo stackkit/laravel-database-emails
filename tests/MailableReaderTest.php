@@ -20,7 +20,9 @@ class MailableReaderTest extends TestCase
                 (new TestMailable())->to(['jane@doe.com'])
             );
 
-        $this->assertEquals(['john@doe.com', 'jane@doe.com'], $composer->getData('recipient'));
+        $this->assertCount(2, $composer->getData('recipient'));
+        $this->assertContains('john@doe.com', $composer->getData('recipient'));
+        $this->assertContains('jane@doe.com', $composer->getData('recipient'));
     }
 
     /** @test */
@@ -107,29 +109,20 @@ class MailableReaderTest extends TestCase
 class TestMailable extends Mailable
 {
     /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->to('john@doe.com')
-            ->cc(['john+cc@doe.com', 'john+cc2@doe.com'])
-            ->bcc(['john+bcc@doe.com', 'john+bcc2@doe.com'])
-            ->subject('Your order has shipped!')
-            ->attach(__DIR__ . '/files/pdf-sample.pdf', [
-                'mime' => 'application/pdf',
-            ])
-            ->attachData('<p>Thanks for your oder</p>', 'order.html');
-    }
-
-    /**
      * Build the message.
      *
      * @return $this
      */
     public function build()
     {
-        return $this->view('tests::dummy', ['name' => 'John Doe']);
+        return $this->to('john@doe.com')
+            ->cc(['john+cc@doe.com', 'john+cc2@doe.com'])
+            ->bcc(['john+bcc@doe.com', 'john+bcc2@doe.com'])
+            ->subject('Your order has shipped!')
+            ->attach(__DIR__ . '/files/pdf-sample.pdf', [
+                'mime' => 'application/pdf',
+            ])
+            ->attachData('<p>Thanks for your oder</p>', 'order.html')
+            ->view('tests::dummy', ['name' => 'John Doe']);
     }
 }

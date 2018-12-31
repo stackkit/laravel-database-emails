@@ -4,6 +4,7 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
 use function call_user_func_array;
+use Illuminate\Container\Container;
 
 class MailableReader
 {
@@ -14,6 +15,8 @@ class MailableReader
      */
     public function read(EmailComposer $composer)
     {
+        Container::getInstance()->call([$composer->getData('mailable'), 'build']);
+
         $this->readRecipient($composer);
 
         $this->readFrom($composer);
@@ -123,7 +126,9 @@ class MailableReader
 
         $composer->setData('view', '');
 
-        $composer->setData('body', $composer->getData('mailable')->render());
+        $mailable = $composer->getData('mailable');
+
+        $composer->setData('body', view($mailable->view, $mailable->buildViewData()));
     }
 
     /**
