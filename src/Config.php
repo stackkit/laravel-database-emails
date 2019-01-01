@@ -31,7 +31,7 @@ class Config
      */
     public static function testing()
     {
-        return (boolean) config('laravel-database-emails.testing.enabled', false);
+        return (bool) config('laravel-database-emails.testing.enabled', false);
     }
 
     /**
