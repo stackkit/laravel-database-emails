@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-
 use Stackkit\LaravelDatabaseEmails\Config;
 
 class ConfigTest extends TestCase
