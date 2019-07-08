@@ -220,7 +220,7 @@ class EmailComposer
     {
         $attachments = null;
 
-        if ( !empty($file) || !is_null($file) ) {
+        if (! empty($file) || ! is_null($file)) {
 
             $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
 
@@ -243,7 +243,7 @@ class EmailComposer
     {
         $attachments = null;
 
-        if ( !empty($data) || !is_null($data) ) {
+        if (! empty($data) || ! is_null($data)) {
 
             $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
 
