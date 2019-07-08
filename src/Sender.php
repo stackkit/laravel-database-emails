@@ -58,7 +58,9 @@ class Sender
         ];
 
         foreach ((array) $email->getAttachments() as $attachment) {
-            call_user_func_array([$message, $attachmentMap[$attachment['type']]], $attachment['attachment']);
+            if (!empty($attachment['attachment']['file']) || !is_null($attachment['attachment']['file'])) {
+                call_user_func_array([$message, $attachmentMap[$attachment['type']]], $attachment['attachment']);
+            }
         }
     }
 }
