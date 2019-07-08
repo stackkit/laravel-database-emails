@@ -221,11 +221,9 @@ class EmailComposer
         $attachments = null;
 
         if (! empty($file) || ! is_null($file)) {
-
             $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
 
             $attachments[] = compact('file', 'options');
-
         }
 
         return $this->setData('attachments', $attachments);
@@ -244,11 +242,9 @@ class EmailComposer
         $attachments = null;
 
         if (! empty($data) || ! is_null($data)) {
-
             $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
 
             $attachments[] = compact('data', 'name', 'options');
-
         }
 
         return $this->setData('rawAttachments', $attachments);
