@@ -3,10 +3,10 @@
 namespace Tests;
 
 use Dompdf\Dompdf;
-use Stackkit\LaravelDatabaseEmails\Config;
-use Stackkit\LaravelDatabaseEmails\Email;
 use Swift_Events_SendEvent;
 use Illuminate\Support\Facades\Mail;
+use Stackkit\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\Config;
 
 class SenderTest extends TestCase
 {
@@ -229,7 +229,7 @@ class SenderTest extends TestCase
         $this->artisan('email:send');
         $this->assertCount(1, $this->sent);
     }
-  
+
     /** @test */
     public function raw_attachments_are_not_added_if_the_data_is_not_valid()
     {
