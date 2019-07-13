@@ -197,3 +197,13 @@ When enabled, all newly created e-mails will be sent to the specified test e-mai
 ### E-mails to send per minute
 
 To configure how many e-mails should be sent each command, please check the `limit` option. The default is `20` e-mails every command.
+
+### Send e-mails immediately (Optional)
+
+Useful during development when Laravel Scheduler is not running
+
+To enable, set the following environment variable:
+
+```
+LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY=true
+```
