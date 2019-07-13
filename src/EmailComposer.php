@@ -218,6 +218,12 @@ class EmailComposer
      */
     public function attach($file, $options = [])
     {
+        $validFileName = (is_string($file) && strlen($file) > 0);
+
+        if (! $validFileName) {
+            return $this;
+        }
+
         $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
 
         $attachments[] = compact('file', 'options');
@@ -235,6 +241,12 @@ class EmailComposer
      */
     public function attachData($data, $name, array $options = [])
     {
+        $validData = (is_string($data) && strlen($data) > 0);
+
+        if (! $validData) {
+            return $this;
+        }
+
         $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
 
         $attachments[] = compact('data', 'name', 'options');
