@@ -220,7 +220,7 @@ class EmailComposer
     {
         $validFileName = (is_string($file) && strlen($file) > 0);
 
-        if (!$validFileName) {
+        if (! $validFileName) {
             return $this;
         }
 
@@ -243,7 +243,7 @@ class EmailComposer
     {
         $validData = (is_string($data) && strlen($data) > 0);
 
-        if (!$validData) {
+        if (! $validData) {
             return $this;
         }
 
