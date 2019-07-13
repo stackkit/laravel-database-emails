@@ -53,4 +53,14 @@ class Config
     {
         return config('laravel-database-emails.limit', 20);
     }
+
+    /**
+     * Determine if e-mails should be sent immediately.
+     *
+     * @return bool
+     */
+    public static function sendImmediately()
+    {
+        return (bool) config('laravel-database-emails.immediately', false);
+    }
 }

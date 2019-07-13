@@ -5,6 +5,8 @@ namespace Tests;
 use Dompdf\Dompdf;
 use Swift_Events_SendEvent;
 use Illuminate\Support\Facades\Mail;
+use Stackkit\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\Config;
 
 class SenderTest extends TestCase
 {
@@ -210,6 +212,22 @@ class SenderTest extends TestCase
         $this->assertEquals('attachment; filename=hello-ci.pdf', $attachment->getHeaders()->get('content-disposition')->getFieldBody());
         $this->assertEquals('application/pdf', $attachment->getContentType());
         $this->assertContains('Hello CI!', $attachment->getBody());
+    }
+
+    /** @test */
+    public function emails_can_be_sent_immediately()
+    {
+        $this->app['config']->set('laravel-database-emails.immediately', false);
+        $this->sendEmail();
+        $this->assertCount(0, $this->sent);
+        Email::truncate();
+
+        $this->app['config']->set('laravel-database-emails.immediately', true);
+        $this->sendEmail();
+        $this->assertCount(1, $this->sent);
+
+        $this->artisan('email:send');
+        $this->assertCount(1, $this->sent);
     }
 
     /** @test */
