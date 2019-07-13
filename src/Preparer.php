@@ -34,6 +34,8 @@ class Preparer
         $this->prepareAttachments($composer);
 
         $this->prepareScheduled($composer);
+
+        $this->prepareImmediately($composer);
     }
 
     /**
@@ -220,5 +222,17 @@ class Preparer
         $composer->getEmail()->fill([
             'scheduled_at' => $scheduled->toDateTimeString(),
         ]);
+    }
+
+    /**
+     * Prepare the e-mail so it can be sent immediately.
+     *
+     * @param EmailComposer $composer
+     */
+    private function prepareImmediately(EmailComposer $composer)
+    {
+        if (Config::sendImmediately()) {
+            $composer->getEmail()->fill(['sending' => 1]);
+        }
     }
 }

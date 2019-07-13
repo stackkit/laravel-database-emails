@@ -259,6 +259,12 @@ class EmailComposer
 
         $this->email->save();
 
-        return $this->email->fresh();
+        $this->email->refresh();
+
+        if (Config::sendImmediately()) {
+            $this->email->send();
+        }
+
+        return $this->email;
     }
 }

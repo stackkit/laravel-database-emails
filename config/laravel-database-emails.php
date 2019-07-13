@@ -58,4 +58,17 @@ return [
     */
 
     'limit' => 20,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Send E-mails Immediately
+    |--------------------------------------------------------------------------
+    |
+    | Sends e-mails immediately after calling send() or schedule(). Useful for development
+    | when you don't have Laravel Scheduler running or don't want to wait up to
+    | 60 seconds for each e-mail to be sent.
+    |
+    */
+
+    'immediately' => env('LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY', false),
 ];
