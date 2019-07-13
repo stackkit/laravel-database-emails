@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 4.0.2 - 2019-01-01
+
+**Fixed**
+
+- Fixed regression bug (testing mode)
+
+## 4.0.1 - 2018-12-31
+
+**Added**
+
+- New environment variable `LARAVEL_DATABASE_EMAILS_TESTING_ENABLED` to indicate if testing mode is enabled (*)
+
+**Fixed**
+
+- Fixed issue where Mailables would not be read correctly
+- Config file was not cachable (*)
+
+(*) = To be able to cache the config file, change the 'testing' closure to the environment variable as per `laravel-database-emails.php` config file.
+
+## 4.0.0 - 2018-09-15
+
+**Changed**
+
+- Changed package namespace
+
+**Removed**
+
+- Removed resend/retry option entirely
+- Removed process time limit
+
 ## 3.0.3 - 2018-07-24
 
 **Fixed**
