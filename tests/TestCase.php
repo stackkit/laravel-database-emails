@@ -9,7 +9,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $invalid;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -25,9 +25,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
             },
         ];
 
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
         view()->addNamespace('tests', __DIR__ . '/views');
+
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         Email::truncate();
     }
@@ -65,7 +65,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
-            \Orchestra\Database\ConsoleServiceProvider::class,
             \Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
         ];
     }
@@ -86,6 +85,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('database.connections.testbench', [
             'driver'   => getenv('CI_DB_DRIVER'),
             'host'     => getenv('CI_DB_HOST'),
+            'port'     => getenv('CI_DB_PORT'),
             'database' => getenv('CI_DB_DATABASE'),
             'username' => getenv('CI_DB_USERNAME'),
             'password' => getenv('CI_DB_PASSWORD'),
@@ -129,5 +129,14 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function scheduleEmail($scheduledFor, $overwrite = [])
     {
         return $this->createEmail($overwrite)->schedule($scheduledFor);
+    }
+
+    public function assertStringContains($needle, $haystack)
+    {
+        if (method_exists($this, 'assertStringContainsString')) {
+            $this->assertStringContainsString($needle, $haystack);
+        } else {
+            $this->assertContains($needle, $haystack);
+        }
     }
 }

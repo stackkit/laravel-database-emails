@@ -37,7 +37,9 @@ class SendEmailsCommandTest extends TestCase
 
         $this->artisan('email:send');
 
-        $this->assertEquals($firstSend = date('Y-m-d H:i:s'), $email->fresh()->getSendDate());
+        $this->assertNotNull($firstSend = $email->fresh()->getSendDate());
+
+        sleep(1);
 
         $this->artisan('email:send');
 
@@ -55,7 +57,7 @@ class SendEmailsCommandTest extends TestCase
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertContains('Driver [does-not-exist] not supported.', $email->fresh()->getError());
+        $this->assertStringContains('Driver [does-not-exist] not supported.', $email->fresh()->getError());
     }
 
     /** @test */

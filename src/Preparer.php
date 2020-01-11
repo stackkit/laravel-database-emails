@@ -198,7 +198,7 @@ class Preparer
         }
 
         $composer->getEmail()->fill([
-            'attachments' => json_encode($attachments),
+            'attachments' => serialize($attachments),
         ]);
     }
 

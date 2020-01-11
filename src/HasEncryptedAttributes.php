@@ -32,7 +32,6 @@ trait HasEncryptedAttributes
         'cc',
         'bcc',
         'variables',
-        'attachments',
     ];
 
     /**
@@ -58,6 +57,25 @@ trait HasEncryptedAttributes
 
             if (! is_null($decoded)) {
                 $value = $decoded;
+            }
+        }
+
+        // BC fix for attachments in 4.1.0 and lower.
+        // Attachments were stored json encoded.
+        // Because this doesn't work for raw attachments, value is now serialized.
+        // Check if value is json encoded or serialized, and decode or unserialize accordingly.
+        if ($key == 'attachments') {
+            if (substr($value, 0, 2) === 'a:') {
+                $unserialized = @unserialize($value);
+                if ($value !== false) {
+                    $value = $unserialized;
+                }
+            } else {
+                $decoded = json_decode($value, true);
+
+                if (! is_null($decoded)) {
+                    $value = $decoded;
+                }
             }
         }
 

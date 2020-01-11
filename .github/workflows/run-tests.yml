@@ -1,0 +1,74 @@
+name: Run tests
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  php-tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        php: [7.4, 7.3, 7.2]
+        laravel: [6.*, 5.8.*, 5.7.*, 5.6.*]
+        os: [ubuntu-latest]
+        include:
+          - laravel: 6.*
+            testbench: 4.*
+          - laravel: 5.8.*
+            testbench: 3.8.*
+          - laravel: 5.7.*
+            testbench: 3.7.*
+          - laravel: 5.6.*
+            testbench: 3.6.*
+        exclude:
+          - laravel: 5.7.*
+            php: 7.4
+          - laravel: 5.6.*
+            php: 7.4
+          - laravel: 5.5.*
+            php: 7.4
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+
+    services:
+      mysql:
+        image: mysql:5.7.27
+        env:
+          MYSQL_USER: root
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_PASSWORD:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: test
+        ports:
+          - 3307:3306
+        volumes:
+          - $HOME/mysql:/var/lib/mysql
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v1
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, dom, fileinfo, mysql
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
+      - name: Execute tests
+        env:
+          CI_DB_DRIVER: mysql
+          CI_DB_HOST: 127.0.0.1
+          CI_DB_PORT: 3307
+          CI_DB_DATABASE: test
+          CI_DB_USERNAME: root
+          CI_DB_PASSWORD: root
+        run: vendor/bin/phpunit

@@ -2,18 +2,17 @@
 
 namespace Tests;
 
-use Dompdf\Dompdf;
 use Swift_Events_SendEvent;
 use Illuminate\Support\Facades\Mail;
 use Stackkit\LaravelDatabaseEmails\Email;
-use Stackkit\LaravelDatabaseEmails\Config;
+use TCPDF;
 
 class SenderTest extends TestCase
 {
     /** @var Swift_Events_SendEvent[] */
     public $sent = [];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -194,12 +193,13 @@ class SenderTest extends TestCase
     /** @test */
     public function raw_attachments_are_added_to_the_email()
     {
-        $pdf = new Dompdf;
-        $pdf->loadHtml('Hello CI!');
-        $pdf->setPaper('A4');
+        $pdf = new TCPDF;
+        $pdf->Write(0, 'Hello CI!');
+
+        $rawData = $pdf->Output('generated.pdf', 'S');
 
         $this->composeEmail()
-            ->attachData($pdf->outputHtml(), 'hello-ci.pdf', [
+            ->attachData($rawData, 'hello-ci.pdf', [
                 'mime' => 'application/pdf',
             ])
             ->send();
@@ -211,7 +211,22 @@ class SenderTest extends TestCase
         $this->assertCount(1, $attachments);
         $this->assertEquals('attachment; filename=hello-ci.pdf', $attachment->getHeaders()->get('content-disposition')->getFieldBody());
         $this->assertEquals('application/pdf', $attachment->getContentType());
-        $this->assertContains('Hello CI!', $attachment->getBody());
+        $this->assertTrue(md5($attachment->getBody()) == md5($rawData));
+    }
+
+    /** @test */
+    public function old_json_encoded_attachments_can_still_be_read()
+    {
+        $email = $this->sendEmail();
+        $email->attachments = json_encode([1, 2, 3]);
+        $email->save();
+
+        $this->assertEquals([1, 2, 3], $email->fresh()->getAttachments());
+
+        $email->attachments = serialize([4, 5, 6]);
+        $email->save();
+
+        $this->assertEquals([4, 5, 6], $email->fresh()->getAttachments());
     }
 
     /** @test */

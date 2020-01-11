@@ -2,7 +2,7 @@
   <img src="/logo.png">
 </p>
 <p align="center">
-<a href="https://travis-ci.org/stackkit/laravel-database-emails"><img src="https://travis-ci.org/stackkit/laravel-database-emails.svg?branch=master" alt="Build Status"></a>
+<img src="https://github.com/marickvantuil/laravel-database-emails/workflows/Run tests/badge.svg" alt="Build Status">
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/license.svg" alt="License"></a>
 </p>
@@ -197,3 +197,13 @@ When enabled, all newly created e-mails will be sent to the specified test e-mai
 ### E-mails to send per minute
 
 To configure how many e-mails should be sent each command, please check the `limit` option. The default is `20` e-mails every command.
+
+### Send e-mails immediately (Optional)
+
+Useful during development when Laravel Scheduler is not running
+
+To enable, set the following environment variable:
+
+```
+LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY=true
+```
