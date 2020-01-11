@@ -2,8 +2,9 @@
 
 namespace Tests;
 
-use Dompdf\Dompdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use TCPDF;
 
 class DatabaseInteractionTest extends TestCase
 {
@@ -85,9 +86,10 @@ class DatabaseInteractionTest extends TestCase
         $this->assertNull(DB::table('emails')->find(1)->scheduled_at);
         $this->assertNull($email->getScheduledDate());
 
+        Carbon::setTestNow(Carbon::create(2019, 1, 1, 1, 2, 3));
         $email = $this->scheduleEmail('+2 weeks');
         $this->assertNotNull(DB::table('emails')->find(2)->scheduled_at);
-        $this->assertEquals(date('Y-m-d H:i:s', strtotime('+2 weeks')), $email->getScheduledDate());
+        $this->assertEquals('2019-01-15 01:02:03', $email->getScheduledDate());
     }
 
     /** @test */
@@ -156,7 +158,9 @@ class DatabaseInteractionTest extends TestCase
     /** @test */
     public function the_scheduled_date_should_be_saved_correctly()
     {
-        $scheduledFor = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        Carbon::setTestNow(Carbon::now());
+
+        $scheduledFor = date('Y-m-d H:i:s', Carbon::now()->addWeek(2)->timestamp);
 
         $email = $this->scheduleEmail('+2 weeks');
 
@@ -205,12 +209,13 @@ class DatabaseInteractionTest extends TestCase
     /** @test */
     public function in_memory_attachments_should_be_saved_correctly()
     {
-        $pdf = new Dompdf;
-        $pdf->loadHtml('Hello CI!');
-        $pdf->setPaper('A4', 'landscape');
+        $pdf = new TCPDF;
+        $pdf->Write(0, 'Hello CI!');
+
+        $rawData = $pdf->Output('generated.pdf', 'S');
 
         $email = $this->composeEmail()
-            ->attachData($pdf->outputHtml(), 'generated.pdf', [
+            ->attachData($rawData, 'generated.pdf', [
                 'mime' => 'application/pdf',
             ])
             ->send();
@@ -218,6 +223,6 @@ class DatabaseInteractionTest extends TestCase
         $this->assertCount(1, $email->getAttachments());
 
         $this->assertEquals('rawAttachment', $email->getAttachments()[0]['type']);
-        $this->assertEquals($pdf->outputHtml(), $email->getAttachments()[0]['attachment']['data']);
+        $this->assertEquals(md5($rawData), md5($email->getAttachments()[0]['attachment']['data']));
     }
 }

@@ -68,6 +68,10 @@ class MailableReader
     {
         $from = reset($composer->getData('mailable')->from);
 
+        if (!$from) {
+            return;
+        }
+
         $composer->from(
             $from['address'],
             $from['name']

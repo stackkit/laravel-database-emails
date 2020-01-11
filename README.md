@@ -2,7 +2,7 @@
   <img src="/logo.png">
 </p>
 <p align="center">
-<a href="https://travis-ci.org/stackkit/laravel-database-emails"><img src="https://travis-ci.org/stackkit/laravel-database-emails.svg?branch=master" alt="Build Status"></a>
+<img src="https://github.com/marickvantuil/laravel-database-emails/workflows/Run tests/badge.svg" alt="Build Status">
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/license.svg" alt="License"></a>
 </p>

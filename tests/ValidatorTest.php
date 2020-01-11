@@ -8,59 +8,54 @@ use Stackkit\LaravelDatabaseEmails\Email;
 
 class ValidatorTest extends TestCase
 {
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     */
+    /** @test */
     public function a_label_cannot_contain_more_than_255_characters()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         Email::compose()
             ->label(str_repeat('a', 256))
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No recipient specified
-     */
+    /** @test */
     public function a_recipient_is_required()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No recipient specified');
+
         Email::compose()
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No recipient specified
-     */
+    /** @test */
     public function a_recipient_cannot_be_empty()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No recipient specified');
+
         Email::compose()
             ->recipient([])
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
-     */
+    /** @test */
     public function the_recipient_email_must_be_valid()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('E-mail address [not-a-valid-email-address] is invalid');
+
         Email::compose()
             ->recipient('not-a-valid-email-address')
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
-     */
+    /** @test */
     public function cc_must_contain_valid_email_addresses()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('E-mail address [not-a-valid-email-address] is invalid');
+
         Email::compose()
             ->recipient('john@doe.com')
             ->cc([
@@ -70,13 +65,12 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage E-mail address [not-a-valid-email-address] is invalid
-     */
+    /** @test */
     public function bcc_must_contain_valid_email_addresses()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('E-mail address [not-a-valid-email-address] is invalid');
+
         Email::compose()
             ->recipient('john@doe.com')
             ->bcc([
@@ -86,25 +80,23 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No subject specified
-     */
+    /** @test */
     public function a_subject_is_required()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No subject specified');
+
         Email::compose()
             ->recipient('john@doe.com')
             ->send();
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No view specified
-     */
+    /** @test */
     public function a_view_is_required()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No view specified');
+
         Email::compose()
             ->recipient('john@doe.com')
             ->subject('test')
