@@ -131,9 +131,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return $this->createEmail($overwrite)->schedule($scheduledFor);
     }
 
-    public function queueEmail($connection = null, $queue = null, $overwrite = [])
+    public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [])
     {
-        return $this->createEmail($overwrite)->queue($connection, $queue);
+        return $this->createEmail($overwrite)->queue($connection, $queue, $delay);
     }
 
     public function assertStringContains($needle, $haystack)

@@ -60,6 +60,20 @@ class QueuedEmailsTest extends TestCase
     }
 
     /** @test */
+    public function emails_can_be_queued_with_a_delay()
+    {
+        Queue::fake();
+
+        $delay = now()->addMinutes(6);
+
+        $this->queueEmail(null, null, $delay);
+
+        Queue::assertPushed(SendEmailJob::class, function (SendEmailJob $job) use ($delay) {
+            return $job->delay->getTimestamp() === $delay->timestamp;
+        });
+    }
+
+    /** @test */
     public function the_send_email_job_will_call_send_on_the_email_instance()
     {
         Queue::fake();
