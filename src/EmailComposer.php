@@ -290,7 +290,7 @@ class EmailComposer
 
         $this->email->refresh();
 
-        if ($this->getData('queued') === true) {
+        if ($this->getData('queued', false) === true) {
             dispatch(new SendEmailJob($this->email))
                 ->onConnection($this->getData('connection'))
                 ->onQueue($this->getData('queue'));
