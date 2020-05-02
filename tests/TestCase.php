@@ -92,6 +92,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'prefix'   => '',
             'strict' => true,
         ]);
+
+        $app['config']->set('mail.driver', 'log');
     }
 
     public function createEmail($overwrite = [])

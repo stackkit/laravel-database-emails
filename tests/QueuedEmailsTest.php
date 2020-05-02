@@ -11,8 +11,6 @@ class QueuedEmailsTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        Mail::getSwiftMailer()->registerPlugin(new TestingMailEventListener($this));
     }
 
     /** @test */

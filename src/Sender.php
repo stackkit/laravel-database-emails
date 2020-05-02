@@ -2,8 +2,8 @@
 
 namespace Stackkit\LaravelDatabaseEmails;
 
-use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Mail;
 
 class Sender
 {
@@ -20,21 +20,11 @@ class Sender
 
         $email->markAsSending();
 
-        $this->getMailerInstance()->send([], [], function (Message $message) use ($email) {
+        Mail::send([], [], function (Message $message) use ($email) {
             $this->buildMessage($message, $email);
         });
 
         $email->markAsSent();
-    }
-
-    /**
-     * Get the instance of the Laravel mailer.
-     *
-     * @return Mailer
-     */
-    private function getMailerInstance()
-    {
-        return app('mailer');
     }
 
     /**

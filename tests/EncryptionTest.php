@@ -26,7 +26,7 @@ class EncryptionTest extends TestCase
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
 
-        $this->assertEquals('john@doe.com', decrypt($email->getOriginal('recipient')));
+        $this->assertEquals('john@doe.com', decrypt($email->getRawDatabaseValue('recipient')));
 
         $this->assertEquals('john@doe.com', $email->getRecipient());
     }
@@ -39,8 +39,8 @@ class EncryptionTest extends TestCase
             'bcc' => $bcc = ['jane+1@doe.com', 'jane+2@doe.com'],
         ]);
 
-        $this->assertEquals($cc, decrypt($email->getOriginal('cc')));
-        $this->assertEquals($bcc, decrypt($email->getOriginal('bcc')));
+        $this->assertEquals($cc, decrypt($email->getRawDatabaseValue('cc')));
+        $this->assertEquals($bcc, decrypt($email->getRawDatabaseValue('bcc')));
 
         $this->assertEquals($cc, $email->getCc());
         $this->assertEquals($bcc, $email->getBcc());
@@ -51,7 +51,7 @@ class EncryptionTest extends TestCase
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
 
-        $this->assertEquals('test subject', decrypt($email->getOriginal('subject')));
+        $this->assertEquals('test subject', decrypt($email->getRawDatabaseValue('subject')));
 
         $this->assertEquals('test subject', $email->getSubject());
     }
@@ -63,7 +63,7 @@ class EncryptionTest extends TestCase
 
         $this->assertEquals(
             ['name' => 'Jane Doe'],
-            decrypt($email->getOriginal('variables'))
+            decrypt($email->getRawDatabaseValue('variables'))
         );
 
         $this->assertEquals(
@@ -79,7 +79,7 @@ class EncryptionTest extends TestCase
 
         $expectedBody = "Name: Jane Doe\n";
 
-        $this->assertEquals($expectedBody, decrypt($email->getOriginal('body')));
+        $this->assertEquals($expectedBody, decrypt($email->getRawDatabaseValue('body')));
 
         $this->assertEquals($expectedBody, $email->getBody());
     }
@@ -94,7 +94,7 @@ class EncryptionTest extends TestCase
             'name'    => 'Marick',
         ];
 
-        $this->assertEquals($expect, decrypt($email->getOriginal('from')));
+        $this->assertEquals($expect, decrypt($email->getRawDatabaseValue('from')));
         $this->assertEquals($expect, $email->getFrom());
     }
 }
