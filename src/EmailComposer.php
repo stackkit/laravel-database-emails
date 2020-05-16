@@ -195,6 +195,27 @@ class EmailComposer
     }
 
     /**
+     * Queue the e-mail.
+     *
+     * @param string|null $connection
+     * @param string|null $queue
+     * @param \DateTimeInterface|\DateInterval|int|null $delay
+     * @return Email
+     */
+    public function queue($connection = null, $queue = null, $delay = null)
+    {
+        $connection = $connection ?: config('queue.default');
+        $queue = $queue ?: 'default';
+
+        $this->setData('queued', true);
+        $this->setData('connection', $connection);
+        $this->setData('queue', $queue);
+        $this->setData('delay', $delay);
+
+        return $this->send();
+    }
+
+    /**
      * Set the Mailable.
      *
      * @param Mailable $mailable
@@ -272,6 +293,15 @@ class EmailComposer
         $this->email->save();
 
         $this->email->refresh();
+
+        if ($this->getData('queued', false) === true) {
+            dispatch(new SendEmailJob($this->email))
+                ->onConnection($this->getData('connection'))
+                ->onQueue($this->getData('queue'))
+                ->delay($this->getData('delay'));
+
+            return $this->email;
+        }
 
         if (Config::sendImmediately()) {
             $this->email->send();

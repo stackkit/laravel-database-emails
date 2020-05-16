@@ -39,8 +39,6 @@ class SendEmailsCommandTest extends TestCase
 
         $this->assertNotNull($firstSend = $email->fresh()->getSendDate());
 
-        sleep(1);
-
         $this->artisan('email:send');
 
         $this->assertEquals(1, $email->fresh()->getAttempts());
@@ -50,14 +48,14 @@ class SendEmailsCommandTest extends TestCase
     /** @test */
     public function if_an_email_fails_to_be_sent_it_should_be_logged_in_the_database()
     {
-        $this->app['config']['mail.driver'] = 'does-not-exist';
-
         $email = $this->sendEmail();
+
+        $email->update(['recipient' => 'asdf']);
 
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertStringContains('Driver [does-not-exist] not supported.', $email->fresh()->getError());
+        $this->assertStringContains('Swift_RfcComplianceException', $email->fresh()->getError());
     }
 
     /** @test */

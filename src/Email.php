@@ -348,7 +348,7 @@ class Email extends Model
      */
     public function hasCc()
     {
-        return strlen($this->getOriginal('cc')) > 0;
+        return strlen($this->getRawDatabaseValue('cc')) > 0;
     }
 
     /**
@@ -358,7 +358,7 @@ class Email extends Model
      */
     public function hasBcc()
     {
-        return strlen($this->getOriginal('bcc')) > 0;
+        return strlen($this->getRawDatabaseValue('bcc')) > 0;
     }
 
     /**
@@ -378,7 +378,7 @@ class Email extends Model
      */
     public function isEncrypted()
     {
-        return (bool) $this->getOriginal('encrypted');
+        return (bool) $this->getRawDatabaseValue('encrypted');
     }
 
     /**
@@ -478,5 +478,14 @@ class Email extends Model
         );
 
         $retry->save();
+    }
+
+    public function getRawDatabaseValue($key = null, $default = null)
+    {
+        if (method_exists($this, 'getRawOriginal')) {
+            return $this->getRawOriginal($key, $default);
+        }
+
+        return $this->getOriginal($key, $default);
     }
 }

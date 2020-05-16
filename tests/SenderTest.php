@@ -24,8 +24,7 @@ class SenderTest extends TestCase
     {
         $this->sendEmail();
 
-        Mail::shouldReceive('send')
-            ->once();
+        Mail::shouldReceive('send')->once();
 
         $this->artisan('email:send');
     }

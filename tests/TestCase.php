@@ -92,6 +92,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'prefix'   => '',
             'strict' => true,
         ]);
+
+        $app['config']->set('mail.driver', 'log');
     }
 
     public function createEmail($overwrite = [])
@@ -129,6 +131,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function scheduleEmail($scheduledFor, $overwrite = [])
     {
         return $this->createEmail($overwrite)->schedule($scheduledFor);
+    }
+
+    public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [])
+    {
+        return $this->createEmail($overwrite)->queue($connection, $queue, $delay);
     }
 
     public function assertStringContains($needle, $haystack)
