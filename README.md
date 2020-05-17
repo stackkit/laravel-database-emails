@@ -17,6 +17,19 @@ The package is MIT licenced, meaning it's open source and you are free to copy o
 
 We feel the package is currently feature complete, but feel free to send a pull request or help improve existing code.
 
+# Requirements
+
+This package requires Laravel 5.6 or higher.
+
+Please check the table below for supported Laravel and PHP versions:
+
+|Laravel Version| PHP Version |
+|---|---|
+| 5.6 | 7.2 or 7.3
+| 5.7 | 7.2 or 7.3
+| 5.8 | 7.2 or 7.3 or 7.4
+| 6.x | 7.2 or 7.3 or 7.4
+| 7.x | 7.2 or 7.3 or 7.4
 
 # Installation
 
@@ -24,12 +37,6 @@ Require the package using composer.
 
 ```bash
 composer require stackkit/laravel-database-emails
-```
-
-If you're running Laravel 5.5 or later you may skip this step. Add the service provider to your application.
-
-```
-Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
 ```
 
 Publish the configuration files.
@@ -188,6 +195,32 @@ Without encryption
 ... x 10.000 rows = ± 21.55 MB
 
 With encryption the table size is ± 50.58 MB.
+```
+
+
+### Queueing e-mails
+
+**Important**: When queueing mail using the `queue` function, it is no longer necessary to schedule the `email:send` command. Please make sure it is removed from `app/Console/Kernel.php`.
+
+```php
+<?php
+
+use Stackkit\LaravelDatabaseEmails\Email;
+
+Email::compose()
+    ->queue();
+
+// on a specific connection
+Email::compose()
+    ->queue('sqs');
+
+// on a specific queue
+Email::compose()
+    ->queue(null, 'email-queue');
+
+// timeout (send mail in 10 minutes)
+Email::compose()
+    ->queue(null, null, now()->addMinutes(10));
 ```
 
 ### Test mode (Optional)
