@@ -203,6 +203,8 @@ With encryption the table size is ± 50.58 MB.
 **Important**: When queueing mail using the `queue` function, it is no longer necessary to schedule the `email:send` command. Please make sure it is removed from `app/Console/Kernel.php`.
 
 ```php
+<?php
+
 use Stackkit\LaravelDatabaseEmails\Email;
 
 Email::compose()
