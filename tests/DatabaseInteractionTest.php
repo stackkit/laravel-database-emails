@@ -4,7 +4,6 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use TCPDF;
 
 class DatabaseInteractionTest extends TestCase
 {
@@ -209,10 +208,7 @@ class DatabaseInteractionTest extends TestCase
     /** @test */
     public function in_memory_attachments_should_be_saved_correctly()
     {
-        $pdf = new TCPDF;
-        $pdf->Write(0, 'Hello CI!');
-
-        $rawData = $pdf->Output('generated.pdf', 'S');
+        $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
 
         $email = $this->composeEmail()
             ->attachData($rawData, 'generated.pdf', [
