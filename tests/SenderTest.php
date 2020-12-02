@@ -5,7 +5,6 @@ namespace Tests;
 use Swift_Events_SendEvent;
 use Illuminate\Support\Facades\Mail;
 use Stackkit\LaravelDatabaseEmails\Email;
-use TCPDF;
 
 class SenderTest extends TestCase
 {
@@ -192,10 +191,7 @@ class SenderTest extends TestCase
     /** @test */
     public function raw_attachments_are_added_to_the_email()
     {
-        $pdf = new TCPDF;
-        $pdf->Write(0, 'Hello CI!');
-
-        $rawData = $pdf->Output('generated.pdf', 'S');
+        $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
 
         $this->composeEmail()
             ->attachData($rawData, 'hello-ci.pdf', [
