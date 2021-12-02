@@ -43,7 +43,7 @@ composer require stackkit/laravel-database-emails
 Publish the configuration files.
 
 ```bash
-php artisan vendor:publish --provider=Stackkit\\LaravelDatabaseEmails\\LaravelDatabaseEmailsServiceProvider
+php artisan vendor:publish --tag=laravel-database-emails-config
 ```
 
 Create the database table required for this package.

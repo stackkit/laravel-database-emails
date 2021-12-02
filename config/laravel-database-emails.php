@@ -71,4 +71,17 @@ return [
     */
 
     'immediately' => env('LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manual migrations
+    |--------------------------------------------------------------------------
+    |
+    | This option allows you to use:
+    | `php artisan vendor:publish --tag=laravel-database-emails-migrations` to push migrations
+    | to your app's folder so you're free to modify before migrating.
+    |
+    */
+
+    'manual_migrations' => (bool) env('LARAVEL_DATABASE_EMAILS_MANUAL_MIGRATIONS', false),
 ];
