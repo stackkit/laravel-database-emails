@@ -36,6 +36,8 @@ class Preparer
         $this->prepareScheduled($composer);
 
         $this->prepareImmediately($composer);
+
+        $this->prepareQueued($composer);
     }
 
     /**
@@ -235,4 +237,19 @@ class Preparer
             $composer->getEmail()->fill(['sending' => 1]);
         }
     }
+
+    /**
+     * Prepare the queued date.
+     *
+     * @param EmailComposer $composer
+     */
+    private function prepareQueued(EmailComposer $composer)
+    {
+        if ($this->getData('queued', false) === true) {
+            $composer->getEmail()->fill([
+                'queued_at' => Carbon::now()->toDateTimeString(),
+            ]);
+        }
+    }
+
 }

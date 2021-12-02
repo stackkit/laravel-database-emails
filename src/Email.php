@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property $failed
  * @property $error
  * @property $encrypted
+ * @property $queued_at
  * @property $scheduled_at
  * @property $sent_at
  * @property $delivered_at
@@ -275,6 +276,30 @@ class Email extends Model
     public function getAttempts()
     {
         return $this->attempts;
+    }
+
+    /**
+     * Get the queued date.
+     *
+     * @return mixed
+     */
+    public function getQueuedDate()
+    {
+        return $this->queued_at;
+    }
+
+    /**
+     * Get the queued date as a Carbon instance.
+     *
+     * @return Carbon
+     */
+    public function getQueuedDateAsCarbon()
+    {
+        if ($this->queued_at instanceof Carbon) {
+            return $this->queued_at;
+        }
+
+        return Carbon::parse($this->queued_at);
     }
 
     /**
