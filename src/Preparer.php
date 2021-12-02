@@ -245,7 +245,7 @@ class Preparer
      */
     private function prepareQueued(EmailComposer $composer)
     {
-        if ($this->getData('queued', false) === true) {
+        if ($composer->getData('queued', false) === true) {
             $composer->getEmail()->fill([
                 'queued_at' => Carbon::now()->toDateTimeString(),
             ]);
