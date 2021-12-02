@@ -52,7 +52,7 @@ class Email extends Model
      */
     public static function compose()
     {
-        return new EmailComposer(new self);
+        return new EmailComposer(new static);
     }
 
     /**
