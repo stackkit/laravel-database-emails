@@ -19,6 +19,7 @@ class Store
         return $query
             ->whereNull('deleted_at')
             ->whereNull('sent_at')
+            ->whereNull('queued_at')
             ->where(function ($query) {
                 $query->whereNull('scheduled_at')
                     ->orWhere('scheduled_at', '<=', Carbon::now()->toDateTimeString());
