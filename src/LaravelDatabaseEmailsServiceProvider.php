@@ -13,15 +13,42 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->bootConfig();
+        $this->bootDatabase();
+    }
+
+    /**
+     * Boot the config for the package.
+     *
+     * @return void
+     */
+    private function bootConfig(): void
+    {
         $baseDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
         $configDir = $baseDir . 'config' . DIRECTORY_SEPARATOR;
-        $migrationsDir = $baseDir . 'database' . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR;
 
         $this->publishes([
             $configDir . 'laravel-database-emails.php' => config_path('laravel-database-emails.php'),
-        ]);
+        ], 'laravel-database-emails-config');
+    }
 
-        $this->loadMigrationsFrom([$migrationsDir]);
+    /**
+     * Boot the database for the package.
+     *
+     * @return void
+     */
+    private function bootDatabase(): void
+    {
+        $baseDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
+        $migrationsDir = $baseDir . 'database' . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR;
+
+        if ($this->app['config']->get('laravel-database-emails.manual_migrations')) {
+            $this->publishes([
+                $migrationsDir => "{$this->app->databasePath()}/migrations",
+            ], 'laravel-database-emails-migrations');
+        } else {
+            $this->loadMigrationsFrom([$migrationsDir]);
+        }
     }
 
     /**
