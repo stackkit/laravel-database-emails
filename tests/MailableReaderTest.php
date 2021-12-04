@@ -100,9 +100,15 @@ class MailableReaderTest extends TestCase
                 ->from(null, 'Marick')
         )->send();
 
-        $this->assertTrue($email->hasFrom());
-        $this->assertEquals(config('mail.from.address'), $email->getFromAddress());
-        $this->assertEquals('Marick', $email->getFromName());
+        // 8.x no longer accepts an empty address.
+        // https://github.com/laravel/framework/pull/39035
+        if (version_compare(app()->version(), '8.0.0', '>=')) {
+            $this->assertFalse($email->hasFrom());
+        } else {
+            $this->assertTrue($email->hasFrom());
+            $this->assertEquals(config('mail.from.address'), $email->getFromAddress());
+            $this->assertEquals('Marick', $email->getFromName());
+        }
     }
 }
 
