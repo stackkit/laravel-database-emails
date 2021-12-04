@@ -4,6 +4,7 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Stackkit\LaravelDatabaseEmails\Store;
 
 class SendEmailsCommandTest extends TestCase
@@ -43,6 +44,18 @@ class SendEmailsCommandTest extends TestCase
 
         $this->assertEquals(1, $email->fresh()->getAttempts());
         $this->assertEquals($firstSend, $email->fresh()->getSendDate());
+    }
+
+    /** @test */
+    public function an_email_should_not_be_sent_if_it_is_queued()
+    {
+        Queue::fake();
+
+        $email = $this->queueEmail();
+
+        $this->artisan('email:send');
+
+        $this->assertNull($email->fresh()->getSendDate());
     }
 
     /** @test */
