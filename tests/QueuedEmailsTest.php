@@ -22,6 +22,14 @@ class QueuedEmailsTest extends TestCase
     }
 
     /** @test */
+    public function queueing_an_email_will_set_the_queued_at_column()
+    {
+        $email = $this->queueEmail();
+
+        $this->assertNotNull($email->queued_at);
+    }
+
+    /** @test */
     public function queueing_an_email_will_dispatch_a_job()
     {
         Queue::fake();
