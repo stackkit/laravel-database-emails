@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 5.0.0 - 2021-12-05
+
+**Added**
+
+- Option to switch from auto-loaded migrations to manually published. Useful for using a multi tenant Laravel app (stancl/tenancy for example).
+
+**Fixed**
+
+- Before, when an email was queued using `queue()` it could still be sent using the `email:send` command, thus resulting in duplicate email sends. This has been fixed by adding a `queued_at` column.
+
 ## 4.2.0 - 2020-05-16
 
 **Added**
