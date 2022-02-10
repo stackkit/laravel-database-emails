@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
@@ -46,7 +48,7 @@ class SendEmailsCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $emails = $this->store->getQueue();
 
@@ -74,22 +76,12 @@ class SendEmailsCommand extends Command
     }
 
     /**
-     * Execute the console command (backwards compatibility for Laravel 5.4 and below).
-     *
-     * @return void
-     */
-    public function fire()
-    {
-        $this->handle();
-    }
-
-    /**
      * Output a table with the cronjob result.
      *
      * @param Collection $emails
      * @return void
      */
-    protected function result($emails)
+    protected function result(Collection $emails): void
     {
         $headers = ['ID', 'Recipient', 'Subject', 'Status'];
 

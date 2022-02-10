@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
@@ -20,7 +21,7 @@ class SendEmailJob implements ShouldQueue
         $this->email = $email;
     }
 
-    public function handle()
+    public function handle(): void
     {
         (new Sender())->send($this->email);
     }

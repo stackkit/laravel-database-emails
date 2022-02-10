@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
@@ -21,7 +23,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    public function validate(EmailComposer $composer)
+    public function validate(EmailComposer $composer): void
     {
         $this->validateLabel($composer);
 
@@ -46,7 +48,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateLabel(EmailComposer $composer)
+    private function validateLabel(EmailComposer $composer): void
     {
         if ($composer->hasData('label') && strlen($composer->getData('label')) > 255) {
             throw new InvalidArgumentException('The given label [' . $composer->getData('label') . '] is too large for database storage');
@@ -59,7 +61,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateRecipient(EmailComposer $composer)
+    private function validateRecipient(EmailComposer $composer): void
     {
         if (! $composer->hasData('recipient')) {
             throw new InvalidArgumentException('No recipient specified');
@@ -84,7 +86,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateCc(EmailComposer $composer)
+    private function validateCc(EmailComposer $composer): void
     {
         if (! $composer->hasData('cc')) {
             return;
@@ -103,7 +105,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateBcc(EmailComposer $composer)
+    private function validateBcc(EmailComposer $composer): void
     {
         if (! $composer->hasData('bcc')) {
             return;
@@ -122,7 +124,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateSubject(EmailComposer $composer)
+    private function validateSubject(EmailComposer $composer): void
     {
         if (! $composer->hasData('subject')) {
             throw new InvalidArgumentException('No subject specified');
@@ -135,7 +137,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidARgumentException
      */
-    private function validateView(EmailComposer $composer)
+    private function validateView(EmailComposer $composer): void
     {
         if ($composer->hasData('mailable')) {
             return;
@@ -158,7 +160,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateVariables(EmailComposer $composer)
+    private function validateVariables(EmailComposer $composer): void
     {
         if ($composer->hasData('variables') && ! is_array($composer->getData('variables'))) {
             throw new InvalidArgumentException('Variables must be an array');
@@ -171,7 +173,7 @@ class Validator
      * @param EmailComposer $composer
      * @throws InvalidArgumentException
      */
-    private function validateScheduled(EmailComposer $composer)
+    private function validateScheduled(EmailComposer $composer): void
     {
         if (! $composer->hasData('scheduled_at')) {
             return;

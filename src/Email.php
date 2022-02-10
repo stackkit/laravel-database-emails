@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
@@ -51,7 +53,7 @@ class Email extends Model
      *
      * @return EmailComposer
      */
-    public static function compose()
+    public static function compose(): EmailComposer
     {
         return new EmailComposer(new static);
     }
@@ -61,7 +63,7 @@ class Email extends Model
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -71,7 +73,7 @@ class Email extends Model
      *
      * @return string|null
      */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
@@ -79,7 +81,7 @@ class Email extends Model
     /**
      * Get the e-mail recipient.
      *
-     * @return string
+     * @return string|array
      */
     public function getRecipient()
     {
@@ -89,7 +91,7 @@ class Email extends Model
     /**
      * Get the e-mail recipient.
      *
-     * @return string
+     * @return string|array
      */
     public function getRecipientAttribute()
     {
@@ -99,9 +101,9 @@ class Email extends Model
     /**
      * Get the e-mail from.
      *
-     * @return string
+     * @return array|null
      */
-    public function getFrom()
+    public function getFrom(): ?array
     {
         return $this->from;
     }
@@ -109,9 +111,9 @@ class Email extends Model
     /**
      * Get the e-mail from.
      *
-     * @return string
+     * @return array|null
      */
-    public function getFromAttribute()
+    public function getFromAttribute(): ?array
     {
         return $this->from;
     }
@@ -121,7 +123,7 @@ class Email extends Model
      *
      * @return string|null
      */
-    public function getFromAddress()
+    public function getFromAddress(): ?string
     {
         return $this->from['address'] ?? config('mail.from.address');
     }
@@ -131,7 +133,7 @@ class Email extends Model
      *
      * @return string|null
      */
-    public function getFromName()
+    public function getFromName(): ?string
     {
         return $this->from['name'] ?? config('mail.from.name');
     }
@@ -141,7 +143,7 @@ class Email extends Model
      *
      * @return string
      */
-    public function getRecipientsAsString()
+    public function getRecipientsAsString(): string
     {
         $glue = ', ';
 
@@ -161,7 +163,7 @@ class Email extends Model
     /**
      * Get the e-mail CC addresses.
      *
-     * @return array
+     * @return array|string
      */
     public function getCcAttribute()
     {
@@ -181,7 +183,7 @@ class Email extends Model
     /**
      * Get the e-mail BCC addresses.
      *
-     * @return array
+     * @return array|string
      */
     public function getBccAttribute()
     {
@@ -193,7 +195,7 @@ class Email extends Model
      *
      * @return string
      */
-    public function getSubject()
+    public function getSubject(): string
     {
         return $this->subject;
     }
@@ -203,7 +205,7 @@ class Email extends Model
      *
      * @return string
      */
-    public function getSubjectAttribute()
+    public function getSubjectAttribute(): string
     {
         return $this->subject;
     }
@@ -213,7 +215,7 @@ class Email extends Model
      *
      * @return string
      */
-    public function getView()
+    public function getView(): string
     {
         return $this->view;
     }
@@ -221,9 +223,9 @@ class Email extends Model
     /**
      * Get the e-mail variables.
      *
-     * @return array
+     * @return array|null
      */
-    public function getVariables()
+    public function getVariables(): ?array
     {
         return $this->variables;
     }
@@ -231,9 +233,9 @@ class Email extends Model
     /**
      * Get the e-mail variables.
      *
-     * @return array
+     * @return array|null
      */
-    public function getVariablesAttribute()
+    public function getVariablesAttribute(): ?array
     {
         return $this->variables;
     }
@@ -243,7 +245,7 @@ class Email extends Model
      *
      * @return string
      */
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
@@ -253,7 +255,7 @@ class Email extends Model
      *
      * @return string
      */
-    public function getBodyAttribute()
+    public function getBodyAttribute(): string
     {
         return $this->body;
     }
@@ -263,7 +265,7 @@ class Email extends Model
      *
      * @return array
      */
-    public function getAttachments()
+    public function getAttachments(): array
     {
         return $this->attachments;
     }
@@ -273,7 +275,7 @@ class Email extends Model
      *
      * @return int
      */
-    public function getAttempts()
+    public function getAttempts(): int
     {
         return $this->attempts;
     }
@@ -281,9 +283,9 @@ class Email extends Model
     /**
      * Get the queued date.
      *
-     * @return mixed
+     * @return string|null
      */
-    public function getQueuedDate()
+    public function getQueuedDate(): ?string
     {
         return $this->queued_at;
     }
@@ -293,7 +295,7 @@ class Email extends Model
      *
      * @return Carbon
      */
-    public function getQueuedDateAsCarbon()
+    public function getQueuedDateAsCarbon(): Carbon
     {
         if ($this->queued_at instanceof Carbon) {
             return $this->queued_at;
@@ -305,9 +307,9 @@ class Email extends Model
     /**
      * Get the scheduled date.
      *
-     * @return mixed
+     * @return string|null
      */
-    public function getScheduledDate()
+    public function getScheduledDate(): ?string
     {
         return $this->scheduled_at;
     }
@@ -317,7 +319,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function hasVariables()
+    public function hasVariables(): bool
     {
         return ! is_null($this->variables);
     }
@@ -327,7 +329,7 @@ class Email extends Model
      *
      * @return Carbon
      */
-    public function getScheduledDateAsCarbon()
+    public function getScheduledDateAsCarbon(): Carbon
     {
         if ($this->scheduled_at instanceof Carbon) {
             return $this->scheduled_at;
@@ -339,9 +341,9 @@ class Email extends Model
     /**
      * Get the send date for this e-mail.
      *
-     * @return string
+     * @return string|null
      */
-    public function getSendDate()
+    public function getSendDate(): ?string
     {
         return $this->sent_at;
     }
@@ -349,9 +351,9 @@ class Email extends Model
     /**
      * Get the send error.
      *
-     * @return string
+     * @return string|string
      */
-    public function getError()
+    public function getError(): ?string
     {
         return $this->error;
     }
@@ -361,7 +363,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function hasFrom()
+    public function hasFrom(): bool
     {
         return is_array($this->from) && count($this->from) > 0;
     }
@@ -371,7 +373,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function hasCc()
+    public function hasCc(): bool
     {
         return strlen($this->getRawDatabaseValue('cc')) > 0;
     }
@@ -381,7 +383,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function hasBcc()
+    public function hasBcc(): bool
     {
         return strlen($this->getRawDatabaseValue('bcc')) > 0;
     }
@@ -391,7 +393,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function isScheduled()
+    public function isScheduled(): bool
     {
         return ! is_null($this->getScheduledDate());
     }
@@ -401,7 +403,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function isEncrypted()
+    public function isEncrypted(): bool
     {
         return (bool) $this->getRawDatabaseValue('encrypted');
     }
@@ -411,7 +413,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function isSent()
+    public function isSent(): bool
     {
         return ! is_null($this->sent_at);
     }
@@ -421,7 +423,7 @@ class Email extends Model
      *
      * @return bool
      */
-    public function hasFailed()
+    public function hasFailed(): bool
     {
         return $this->failed == 1;
     }
@@ -431,7 +433,7 @@ class Email extends Model
      *
      * @return void
      */
-    public function markAsSending()
+    public function markAsSending(): void
     {
         $this->update([
             'attempts' => $this->attempts + 1,
@@ -444,7 +446,7 @@ class Email extends Model
      *
      * @return void
      */
-    public function markAsSent()
+    public function markAsSent(): void
     {
         $now = Carbon::now()->toDateTimeString();
 
@@ -462,7 +464,7 @@ class Email extends Model
      * @param Exception $exception
      * @return void
      */
-    public function markAsFailed(Exception $exception)
+    public function markAsFailed(Exception $exception): void
     {
         $this->update([
             'sending' => 0,
@@ -476,7 +478,7 @@ class Email extends Model
      *
      * @return void
      */
-    public function send()
+    public function send(): void
     {
         (new Sender)->send($this);
     }
@@ -486,7 +488,7 @@ class Email extends Model
      *
      * @return void
      */
-    public function retry()
+    public function retry(): void
     {
         $retry = $this->replicate();
 
@@ -505,7 +507,12 @@ class Email extends Model
         $retry->save();
     }
 
-    public function getRawDatabaseValue($key = null, $default = null)
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getRawDatabaseValue(string $key = null, $default = null)
     {
         if (method_exists($this, 'getRawOriginal')) {
             return $this->getRawOriginal($key, $default);

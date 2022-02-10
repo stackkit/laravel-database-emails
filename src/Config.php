@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 class Config
@@ -9,7 +11,7 @@ class Config
      *
      * @return int
      */
-    public static function maxAttemptCount()
+    public static function maxAttemptCount(): int
     {
         return max(config('laravel-database-emails.attempts', 1), 3);
     }
@@ -19,7 +21,7 @@ class Config
      *
      * @return bool
      */
-    public static function encryptEmails()
+    public static function encryptEmails(): bool
     {
         return config('laravel-database-emails.encrypt', false);
     }
@@ -29,7 +31,7 @@ class Config
      *
      * @return bool
      */
-    public static function testing()
+    public static function testing(): bool
     {
         return (bool) config('laravel-database-emails.testing.enabled', false);
     }
@@ -39,7 +41,7 @@ class Config
      *
      * @return string
      */
-    public static function testEmailAddress()
+    public static function testEmailAddress(): string
     {
         return config('laravel-database-emails.testing.email');
     }
@@ -49,7 +51,7 @@ class Config
      *
      * @return int
      */
-    public static function cronjobEmailLimit()
+    public static function cronjobEmailLimit(): int
     {
         return config('laravel-database-emails.limit', 20);
     }
@@ -59,7 +61,7 @@ class Config
      *
      * @return bool
      */
-    public static function sendImmediately()
+    public static function sendImmediately(): bool
     {
         return (bool) config('laravel-database-emails.immediately', false);
     }

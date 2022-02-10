@@ -139,7 +139,7 @@ class ValidatorTest extends TestCase
             try {
                 $email->variables($type)->send();
                 $this->fail('Expected exception to be thrown');
-            } catch (InvalidArgumentException $e) {
+            } catch (\TypeError $e) {
                 $this->assertEquals($e->getCode(), 0);
             }
         }

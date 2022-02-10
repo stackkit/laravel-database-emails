@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Illuminate\Mail\Message;
@@ -12,7 +14,7 @@ class Sender
      *
      * @param Email $email
      */
-    public function send(Email $email)
+    public function send(Email $email): void
     {
         if ($email->isSent()) {
             return;
@@ -39,7 +41,7 @@ class Sender
      * @param  Message $message
      * @param  Email   $email
      */
-    private function buildMessage(Message $message, Email $email)
+    private function buildMessage(Message $message, Email $email): void
     {
         $message->to($email->getRecipient())
             ->cc($email->hasCc() ? $email->getCc() : [])
@@ -60,7 +62,7 @@ class Sender
             'rawAttachment' => 'attachData',
         ];
 
-        foreach ((array) $email->getAttachments() as $attachment) {
+        foreach ($email->getAttachments() as $attachment) {
             call_user_func_array([$message, $attachmentMap[$attachment['type']]], $attachment['attachment']);
         }
     }

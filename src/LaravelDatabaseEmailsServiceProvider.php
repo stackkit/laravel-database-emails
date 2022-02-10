@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Illuminate\Support\ServiceProvider;
@@ -11,7 +13,7 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->bootConfig();
         $this->bootDatabase();
@@ -56,7 +58,7 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->commands([
             SendEmailsCommand::class,

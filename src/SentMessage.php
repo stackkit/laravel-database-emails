@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Swift_Mime_SimpleMimeEntity;
@@ -16,7 +18,7 @@ class SentMessage
     public $attachments = [];
     public $headers = [];
 
-    public static function createFromSymfonyMailer(\Symfony\Component\Mime\Email $email)
+    public static function createFromSymfonyMailer(\Symfony\Component\Mime\Email $email): SentMessage
     {
         $sentMessage = new self();
 
@@ -48,7 +50,7 @@ class SentMessage
         return $sentMessage;
     }
 
-    public static function createFromSwiftMailer(\Swift_Mime_SimpleMessage $message)
+    public static function createFromSwiftMailer(\Swift_Mime_SimpleMessage $message): SentMessage
     {
         $sentMessage = new self();
 

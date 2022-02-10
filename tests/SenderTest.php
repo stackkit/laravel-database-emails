@@ -8,7 +8,6 @@ use Stackkit\LaravelDatabaseEmails\SentMessage;
 use Swift_Events_SendEvent;
 use Illuminate\Support\Facades\Mail;
 use Stackkit\LaravelDatabaseEmails\Email;
-use Symfony\Component\Mime\Part\DataPart;
 
 class SenderTest extends TestCase
 {
@@ -176,28 +175,6 @@ class SenderTest extends TestCase
     }
 
     /** @test */
-    public function attachments_are_not_added_if_the_data_is_not_valid()
-    {
-        $this->sent = [];
-        $this->composeEmail()->attach(null)->send();
-        $this->artisan('email:send');
-        $attachments = reset($this->sent)->attachments;
-        $this->assertCount(0, $attachments);
-
-        $this->sent = [];
-        $this->composeEmail()->attach(false)->send();
-        $this->artisan('email:send');
-        $attachments = reset($this->sent)->attachments;
-        $this->assertCount(0, $attachments);
-
-        $this->sent = [];
-        $this->composeEmail()->attach('')->send();
-        $this->artisan('email:send');
-        $attachments = reset($this->sent)->attachments;
-        $this->assertCount(0, $attachments);
-    }
-
-    /** @test */
     public function raw_attachments_are_added_to_the_email()
     {
         $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
@@ -247,27 +224,5 @@ class SenderTest extends TestCase
 
         $this->artisan('email:send');
         $this->assertCount(1, $this->sent);
-    }
-
-    /** @test */
-    public function raw_attachments_are_not_added_if_the_data_is_not_valid()
-    {
-        $this->sent = [];
-        $this->composeEmail()->attachData(null, 'test.png')->send();
-        $this->artisan('email:send');
-        $attachments = reset($this->sent)->attachments;
-        $this->assertCount(0, $attachments);
-
-        $this->sent = [];
-        $this->composeEmail()->attachData(false, 'test.png')->send();
-        $this->artisan('email:send');
-        $attachments = reset($this->sent)->attachments;
-        $this->assertCount(0, $attachments);
-
-        $this->sent = [];
-        $this->composeEmail()->attachData('', 'test.png')->send();
-        $this->artisan('email:send');
-        $attachments = reset($this->sent)->attachments;
-        $this->assertCount(0, $attachments);
     }
 }
