@@ -55,7 +55,7 @@ class Email extends Model
      */
     public static function compose(): EmailComposer
     {
-        return new EmailComposer(new static);
+        return new EmailComposer(new static());
     }
 
     /**
@@ -480,7 +480,7 @@ class Email extends Model
      */
     public function send(): void
     {
-        (new Sender)->send($this);
+        (new Sender())->send($this);
     }
 
     /**

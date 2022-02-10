@@ -227,7 +227,7 @@ class EmailComposer
     {
         $this->setData('mailable', $mailable);
 
-        (new MailableReader)->read($this);
+        (new MailableReader())->read($this);
 
         return $this;
     }
@@ -272,12 +272,12 @@ class EmailComposer
      */
     public function send(): Email
     {
-        (new Validator)->validate($this);
+        (new Validator())->validate($this);
 
-        (new Preparer)->prepare($this);
+        (new Preparer())->prepare($this);
 
         if (Config::encryptEmails()) {
-            (new Encrypter)->encrypt($this);
+            (new Encrypter())->encrypt($this);
         }
 
         $this->email->save();

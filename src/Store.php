@@ -16,7 +16,7 @@ class Store
      */
     public function getQueue(): Collection
     {
-        $query = new Email;
+        $query = new Email();
 
         return $query
             ->whereNull('deleted_at')
