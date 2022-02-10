@@ -2,7 +2,6 @@
 
 namespace Stackkit\LaravelDatabaseEmails;
 
-use Exception;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Mail;
 

@@ -68,7 +68,7 @@ class SendEmailsCommandTest extends TestCase
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertStringContains('RfcComplianceException', $email->fresh()->getError());
+        $this->assertStringContainsString('RfcComplianceException', $email->fresh()->getError());
     }
 
     /** @test */

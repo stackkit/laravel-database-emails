@@ -3,7 +3,6 @@
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
-use function call_user_func_array;
 use Illuminate\Container\Container;
 
 class MailableReader
