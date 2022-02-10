@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
@@ -11,7 +12,10 @@ use Illuminate\Queue\SerializesModels;
 
 class SendEmailJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public $email;
 
@@ -20,7 +24,7 @@ class SendEmailJob implements ShouldQueue
         $this->email = $email;
     }
 
-    public function handle()
+    public function handle(): void
     {
         (new Sender())->send($this->email);
     }

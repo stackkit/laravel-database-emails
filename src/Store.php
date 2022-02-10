@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Carbon\Carbon;
@@ -12,9 +14,9 @@ class Store
      *
      * @return Collection|Email[]
      */
-    public function getQueue()
+    public function getQueue(): Collection
     {
-        $query = new Email;
+        $query = new Email();
 
         return $query
             ->whereNull('deleted_at')

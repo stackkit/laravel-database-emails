@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Illuminate\Mail\Mailable;
@@ -35,7 +37,7 @@ class EmailComposer
      *
      * @return Email
      */
-    public function getEmail()
+    public function getEmail(): Email
     {
         return $this->email;
     }
@@ -45,9 +47,9 @@ class EmailComposer
      *
      * @param string $key
      * @param mixed  $value
-     * @return static
+     * @return self
      */
-    public function setData($key, $value)
+    public function setData(string $key, $value): self
     {
         $this->data[$key] = $value;
 
@@ -61,7 +63,7 @@ class EmailComposer
      * @param mixed  $default
      * @return mixed
      */
-    public function getData($key, $default = null)
+    public function getData(string $key, $default = null)
     {
         if (! is_null($default) && ! $this->hasData($key)) {
             return $default;
@@ -76,7 +78,7 @@ class EmailComposer
      * @param string $key
      * @return bool
      */
-    public function hasData($key)
+    public function hasData(string $key): bool
     {
         return isset($this->data[$key]);
     }
@@ -85,9 +87,9 @@ class EmailComposer
      * Set the e-mail label.
      *
      * @param string $label
-     * @return static
+     * @return self
      */
-    public function label($label)
+    public function label(string $label): self
     {
         return $this->setData('label', $label);
     }
@@ -95,11 +97,11 @@ class EmailComposer
     /**
      * Set the e-mail from address and aname.
      *
-     * @param array $address
-     * @param array $name
-     * @return static
+     * @param string|null $address
+     * @param string|null $name
+     * @return self
      */
-    public function from($address = null, $name = null)
+    public function from(?string $address = null, ?string $name = null): self
     {
         return $this->setData('from', compact('address', 'name'));
     }
@@ -108,9 +110,9 @@ class EmailComposer
      * Set the e-mail recipient(s).
      *
      * @param string|array $recipient
-     * @return static
+     * @return self
      */
-    public function recipient($recipient)
+    public function recipient($recipient): self
     {
         return $this->setData('recipient', $recipient);
     }
@@ -119,9 +121,9 @@ class EmailComposer
      * Define the carbon-copy address(es).
      *
      * @param string|array $cc
-     * @return static
+     * @return self
      */
-    public function cc($cc)
+    public function cc($cc): self
     {
         return $this->setData('cc', $cc);
     }
@@ -130,9 +132,9 @@ class EmailComposer
      * Define the blind carbon-copy address(es).
      *
      * @param string|array $bcc
-     * @return static
+     * @return self
      */
-    public function bcc($bcc)
+    public function bcc($bcc): self
     {
         return $this->setData('bcc', $bcc);
     }
@@ -141,9 +143,9 @@ class EmailComposer
      * Set the e-mail subject.
      *
      * @param string $subject
-     * @return static
+     * @return self
      */
-    public function subject($subject)
+    public function subject(string $subject): self
     {
         return $this->setData('subject', $subject);
     }
@@ -152,9 +154,9 @@ class EmailComposer
      * Set the e-mail view.
      *
      * @param string $view
-     * @return static
+     * @return self
      */
-    public function view($view)
+    public function view(string $view): self
     {
         return $this->setData('view', $view);
     }
@@ -163,9 +165,9 @@ class EmailComposer
      * Set the e-mail variables.
      *
      * @param array $variables
-     * @return EmailComposer
+     * @return self
      */
-    public function variables($variables)
+    public function variables(array $variables): self
     {
         return $this->setData('variables', $variables);
     }
@@ -176,7 +178,7 @@ class EmailComposer
      * @param mixed $scheduledAt
      * @return Email
      */
-    public function schedule($scheduledAt)
+    public function schedule($scheduledAt): Email
     {
         return $this->later($scheduledAt);
     }
@@ -187,7 +189,7 @@ class EmailComposer
      * @param mixed $scheduledAt
      * @return Email
      */
-    public function later($scheduledAt)
+    public function later($scheduledAt): Email
     {
         $this->setData('scheduled_at', $scheduledAt);
 
@@ -202,7 +204,7 @@ class EmailComposer
      * @param \DateTimeInterface|\DateInterval|int|null $delay
      * @return Email
      */
-    public function queue($connection = null, $queue = null, $delay = null)
+    public function queue(?string $connection = null, ?string $queue = null, $delay = null): Email
     {
         $connection = $connection ?: config('queue.default');
         $queue = $queue ?: 'default';
@@ -219,13 +221,13 @@ class EmailComposer
      * Set the Mailable.
      *
      * @param Mailable $mailable
-     * @return static
+     * @return self
      */
-    public function mailable(Mailable $mailable)
+    public function mailable(Mailable $mailable): self
     {
         $this->setData('mailable', $mailable);
 
-        (new MailableReader)->read($this);
+        (new MailableReader())->read($this);
 
         return $this;
     }
@@ -235,16 +237,10 @@ class EmailComposer
      *
      * @param string $file
      * @param array  $options
-     * @return static
+     * @return self
      */
-    public function attach($file, $options = [])
+    public function attach(string $file, array $options = []): self
     {
-        $validFileName = (is_string($file) && strlen($file) > 0);
-
-        if (! $validFileName) {
-            return $this;
-        }
-
         $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
 
         $attachments[] = compact('file', 'options');
@@ -258,16 +254,10 @@ class EmailComposer
      * @param  string $data
      * @param  string $name
      * @param  array  $options
-     * @return $this
+     * @return self
      */
-    public function attachData($data, $name, array $options = [])
+    public function attachData(string $data, string $name, array $options = []): self
     {
-        $validData = (is_string($data) && strlen($data) > 0);
-
-        if (! $validData) {
-            return $this;
-        }
-
         $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
 
         $attachments[] = compact('data', 'name', 'options');
@@ -280,14 +270,14 @@ class EmailComposer
      *
      * @return Email
      */
-    public function send()
+    public function send(): Email
     {
-        (new Validator)->validate($this);
+        (new Validator())->validate($this);
 
-        (new Preparer)->prepare($this);
+        (new Preparer())->prepare($this);
 
         if (Config::encryptEmails()) {
-            (new Encrypter)->encrypt($this);
+            (new Encrypter())->encrypt($this);
         }
 
         $this->email->save();

@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Eloquent;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -30,26 +29,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         Email::truncate();
-    }
-
-    /**
-     * Get a database connection instance.
-     *
-     * @return \Illuminate\Database\Connection
-     */
-    protected function connection()
-    {
-        return Eloquent::getConnectionResolver()->connection();
-    }
-
-    /**
-     * Get a schema builder instance.
-     *
-     * @return \Illuminate\Database\Schema\Builder
-     */
-    protected function schema()
-    {
-        return $this->connection()->getSchemaBuilder();
     }
 
     /**
@@ -136,14 +115,5 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [])
     {
         return $this->createEmail($overwrite)->queue($connection, $queue, $delay);
-    }
-
-    public function assertStringContains($needle, $haystack)
-    {
-        if (method_exists($this, 'assertStringContainsString')) {
-            $this->assertStringContainsString($needle, $haystack);
-        } else {
-            $this->assertContains($needle, $haystack);
-        }
     }
 }

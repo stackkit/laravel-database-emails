@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
-use function call_user_func_array;
 use Illuminate\Container\Container;
 
 class MailableReader
@@ -13,7 +14,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    public function read(EmailComposer $composer)
+    public function read(EmailComposer $composer): void
     {
         Container::getInstance()->call([$composer->getData('mailable'), 'build']);
 
@@ -38,7 +39,7 @@ class MailableReader
      * @param string $from
      * @return array
      */
-    private function convertMailableAddresses($from)
+    private function convertMailableAddresses($from): array
     {
         return collect($from)->map(function ($recipient) {
             return $recipient['address'];
@@ -50,7 +51,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    private function readRecipient(EmailComposer $composer)
+    private function readRecipient(EmailComposer $composer): void
     {
         $to = $this->convertMailableAddresses(
             $composer->getData('mailable')->to
@@ -64,7 +65,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    private function readFrom(EmailComposer $composer)
+    private function readFrom(EmailComposer $composer): void
     {
         $from = reset($composer->getData('mailable')->from);
 
@@ -83,7 +84,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    private function readCc(EmailComposer $composer)
+    private function readCc(EmailComposer $composer): void
     {
         $cc = $this->convertMailableAddresses(
             $composer->getData('mailable')->cc
@@ -97,7 +98,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    private function readBcc(EmailComposer $composer)
+    private function readBcc(EmailComposer $composer): void
     {
         $bcc = $this->convertMailableAddresses(
             $composer->getData('mailable')->bcc
@@ -111,7 +112,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    private function readSubject(EmailComposer $composer)
+    private function readSubject(EmailComposer $composer): void
     {
         $composer->subject($composer->getData('mailable')->subject);
     }
@@ -122,7 +123,7 @@ class MailableReader
      * @param EmailComposer $composer
      * @throws Exception
      */
-    private function readBody(EmailComposer $composer)
+    private function readBody(EmailComposer $composer): void
     {
         if (app()->version() < '5.5') {
             throw new Exception('Mailables cannot be read by Laravel 5.4 and below. Sorry.');
@@ -140,7 +141,7 @@ class MailableReader
      *
      * @param EmailComposer $composer
      */
-    private function readAttachments(EmailComposer $composer)
+    private function readAttachments(EmailComposer $composer): void
     {
         $mailable = $composer->getData('mailable');
 

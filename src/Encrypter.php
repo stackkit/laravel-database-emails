@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 class Encrypter
@@ -9,7 +11,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    public function encrypt(EmailComposer $composer)
+    public function encrypt(EmailComposer $composer): void
     {
         $this->setEncrypted($composer);
 
@@ -29,7 +31,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    private function setEncrypted(EmailComposer $composer)
+    private function setEncrypted(EmailComposer $composer): void
     {
         $composer->getEmail()->setAttribute('encrypted', 1);
     }
@@ -39,7 +41,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    private function encryptRecipients(EmailComposer $composer)
+    private function encryptRecipients(EmailComposer $composer): void
     {
         $email = $composer->getEmail();
 
@@ -55,7 +57,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    private function encryptFrom(EmailComposer $composer)
+    private function encryptFrom(EmailComposer $composer): void
     {
         $email = $composer->getEmail();
 
@@ -69,7 +71,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    private function encryptSubject(EmailComposer $composer)
+    private function encryptSubject(EmailComposer $composer): void
     {
         $email = $composer->getEmail();
 
@@ -83,7 +85,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    private function encryptVariables(EmailComposer $composer)
+    private function encryptVariables(EmailComposer $composer): void
     {
         if (! $composer->hasData('variables')) {
             return;
@@ -101,7 +103,7 @@ class Encrypter
      *
      * @param EmailComposer $composer
      */
-    private function encryptBody(EmailComposer $composer)
+    private function encryptBody(EmailComposer $composer): void
     {
         $email = $composer->getEmail();
 

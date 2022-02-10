@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Carbon\Carbon;
@@ -11,7 +13,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    public function prepare(EmailComposer $composer)
+    public function prepare(EmailComposer $composer): void
     {
         $this->prepareLabel($composer);
 
@@ -45,7 +47,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareLabel(EmailComposer $composer)
+    private function prepareLabel(EmailComposer $composer): void
     {
         if (! $composer->hasData('label')) {
             return;
@@ -61,7 +63,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareRecipient(EmailComposer $composer)
+    private function prepareRecipient(EmailComposer $composer): void
     {
         if (Config::testing()) {
             $composer->recipient(Config::testEmailAddress());
@@ -77,7 +79,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareFrom(EmailComposer $composer)
+    private function prepareFrom(EmailComposer $composer): void
     {
         $composer->getEmail()->fill([
             'from' => json_encode($composer->getData('from', '')),
@@ -89,7 +91,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareCc(EmailComposer $composer)
+    private function prepareCc(EmailComposer $composer): void
     {
         if (Config::testing()) {
             $composer->setData('cc', []);
@@ -105,7 +107,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareBcc(EmailComposer $composer)
+    private function prepareBcc(EmailComposer $composer): void
     {
         if (Config::testing()) {
             $composer->setData('bcc', []);
@@ -121,7 +123,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareSubject(EmailComposer $composer)
+    private function prepareSubject(EmailComposer $composer): void
     {
         $composer->getEmail()->fill([
             'subject' => $composer->getData('subject'),
@@ -133,7 +135,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareView(EmailComposer $composer)
+    private function prepareView(EmailComposer $composer): void
     {
         $composer->getEmail()->fill([
             'view' => $composer->getData('view'),
@@ -145,7 +147,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareVariables(EmailComposer $composer)
+    private function prepareVariables(EmailComposer $composer): void
     {
         if (! $composer->hasData('variables')) {
             return;
@@ -161,7 +163,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareBody(EmailComposer $composer)
+    private function prepareBody(EmailComposer $composer): void
     {
         // If the body was predefined (by for example a mailable), use that.
         if ($composer->hasData('body')) {
@@ -181,7 +183,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareAttachments(EmailComposer $composer)
+    private function prepareAttachments(EmailComposer $composer): void
     {
         $attachments = [];
 
@@ -209,7 +211,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareScheduled(EmailComposer $composer)
+    private function prepareScheduled(EmailComposer $composer): void
     {
         if (! $composer->hasData('scheduled_at')) {
             return;
@@ -231,7 +233,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareImmediately(EmailComposer $composer)
+    private function prepareImmediately(EmailComposer $composer): void
     {
         if (Config::sendImmediately()) {
             $composer->getEmail()->fill(['sending' => 1]);
@@ -243,7 +245,7 @@ class Preparer
      *
      * @param EmailComposer $composer
      */
-    private function prepareQueued(EmailComposer $composer)
+    private function prepareQueued(EmailComposer $composer): void
     {
         if ($composer->getData('queued', false) === true) {
             $composer->getEmail()->fill([
