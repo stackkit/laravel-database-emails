@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 6.0.0 - 2022-02-10
+
+**Added**
+
+- Added support for Laravel 9 with new Symfony Mailer instead of SwiftMail.
+
+**Changed**
+
+- Dropped support for Laravel 5.6, 5.7 and 5.8.
+
 ## 5.0.0 - 2021-12-05
 
 **Added**
