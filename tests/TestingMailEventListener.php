@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Stackkit\LaravelDatabaseEmails\SentMessage;
 use Swift_Events_EventListener;
 
 class TestingMailEventListener implements Swift_Events_EventListener
@@ -14,8 +15,8 @@ class TestingMailEventListener implements Swift_Events_EventListener
         $this->test = $test;
     }
 
-    public function beforeSendPerformed($event)
+    public function beforeSendPerformed(\Swift_Events_Event $event)
     {
-        $this->test->sent[] = $event;
+        $this->test->sent[] = SentMessage::createFromSwiftMailer($event->getMessage());
     }
 }

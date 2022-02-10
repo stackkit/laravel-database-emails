@@ -2,6 +2,7 @@
 
 namespace Stackkit\LaravelDatabaseEmails;
 
+use Exception;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Mail;
 
@@ -20,9 +21,15 @@ class Sender
 
         $email->markAsSending();
 
-        Mail::send([], [], function (Message $message) use ($email) {
+        $sentMessage = Mail::send([], [], function (Message $message) use ($email) {
             $this->buildMessage($message, $email);
         });
+
+        // This is used so we can assert things on the sent message in Laravel 9+ since we cannot use
+        // the Swift Mailer plugin anymore. So this is purely used for in the PHPUnit tests.
+        if (version_compare(app()->version(), '9.0.0', '>=') && !is_null($sentMessage)) {
+            event(new MessageSent($sentMessage));
+        }
 
         $email->markAsSent();
     }
@@ -39,8 +46,15 @@ class Sender
             ->cc($email->hasCc() ? $email->getCc() : [])
             ->bcc($email->hasBcc() ? $email->getBcc() : [])
             ->subject($email->getSubject())
-            ->from($email->getFromAddress(), $email->getFromName())
-            ->setBody($email->getBody(), 'text/html');
+            ->from($email->getFromAddress(), $email->getFromName());
+
+        if (version_compare(app()->version(), '9.0.0', '>=')) {
+            // Symfony Mailer
+            $message->html($email->getBody());
+        } else {
+            // SwiftMail
+            $message->setBody($email->getBody(), 'text/html');
+        }
 
         $attachmentMap = [
             'attachment'    => 'attach',
