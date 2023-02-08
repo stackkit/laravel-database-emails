@@ -26,10 +26,27 @@
         }
     },
     "require": {
-        "ext-json": "*"
+        "ext-json": "*",
+        "illuminate/support": "^8.0|^9.0|^10.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.2",
-        "orchestra/testbench": "^3.5 || ^3.6 || ^3.7 || ^3.8 || ^4.0 || ^5.0"
+        "orchestra/testbench": "^6.0 || ^7.0 || ^8.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "l10": [
+            "composer require laravel/framework:10.* orchestra/testbench:8.* --no-interaction --no-update",
+            "composer update --prefer-stable --prefer-dist --no-interaction --no-suggest"
+        ],
+        "l9": [
+            "composer require laravel/framework:9.* orchestra/testbench:7.* --no-interaction --no-update",
+            "composer update --prefer-stable --prefer-dist --no-interaction --no-suggest"
+        ],
+        "l8": [
+            "composer require laravel/framework:8.* orchestra/testbench:6.* --no-interaction --no-update",
+            "composer update --prefer-stable --prefer-dist --no-interaction --no-suggest"
+        ]
     }
 }

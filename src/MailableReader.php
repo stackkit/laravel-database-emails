@@ -125,10 +125,6 @@ class MailableReader
      */
     private function readBody(EmailComposer $composer): void
     {
-        if (app()->version() < '5.5') {
-            throw new Exception('Mailables cannot be read by Laravel 5.4 and below. Sorry.');
-        }
-
         $composer->setData('view', '');
 
         $mailable = $composer->getData('mailable');
