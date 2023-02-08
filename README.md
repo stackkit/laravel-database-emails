@@ -19,7 +19,7 @@ We feel the package is currently feature complete, but feel free to send a pull 
 
 # Requirements
 
-This package requires Laravel 8.0 or higher.
+This package requires Laravel 6.0 or higher.
 
 Please check the [Laravel support policy](https://laravel.com/docs/master/releases#support-policy) table for supported Laravel and PHP versions.
 
