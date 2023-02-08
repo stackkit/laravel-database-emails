@@ -21,14 +21,7 @@ We feel the package is currently feature complete, but feel free to send a pull 
 
 This package requires Laravel 6.0 or higher.
 
-Please check the table below for supported Laravel and PHP versions:
-
-|Laravel Version| PHP Version |
-|---|---|
-| 6.x | 7.2 or 7.3 or 7.4 or 8.0
-| 7.x | 7.2 or 7.3 or 7.4 or 8.0
-| 8.x | 7.3 or 7.4 or 8.0 or 8.1
-| 9.x | 8.0 or 8.1
+Please check the [Laravel support policy](https://laravel.com/docs/master/releases#support-policy) table for supported Laravel and PHP versions.
 
 # Installation
 

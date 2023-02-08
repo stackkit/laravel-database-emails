@@ -11,33 +11,22 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.1, 8.0, 7.4, 7.3, 7.2]
-        laravel: [9.*, 8.*, 7.*, 6.*]
         os: [ubuntu-latest]
-        include:
-          - laravel: 9.*
-            testbench: 7.*
-          - laravel: 8.*
-            testbench: 6.*
-          - laravel: 7.*
-            testbench: 5.*
-          - laravel: 6.*
-            testbench: 4.*
-        exclude:
-          - laravel: 9.*
-            php: 7.2
-          - laravel: 9.*
-            php: 7.3
-          - laravel: 9.*
-            php: 7.4
-          - laravel: 8.*
-            php: 7.2
-          - laravel: 6.*
-            php: 8.1
-          - laravel: 7.*
-            php: 8.1
+        payload:
+          - { laravel: '10.*', php: '8.2', 'testbench': '8.*'}
+          - { laravel: '10.*', php: '8.1', 'testbench': '8.*'}
+          - { laravel: '9.*', php: '8.2', 'testbench': '7.*'}
+          - { laravel: '9.*', php: '8.1', 'testbench': '7.*'}
+          - { laravel: '9.*', php: '8.0', 'testbench': '7.*'}
+          - { laravel: '8.*', php: '8.1', 'testbench': '6.*'}
+          - { laravel: '8.*', php: '8.0', 'testbench': '6.*'}
+          - { laravel: '8.*', php: '7.4', 'testbench': '6.*'}
+          - { laravel: '7.*', php: '8.0', 'testbench': '5.*' }
+          - { laravel: '7.*', php: '7.4', 'testbench': '5.*' }
+          - { laravel: '6.*', php: '8.0', 'testbench': '4.*' }
+          - { laravel: '6.*', php: '7.4', 'testbench': '4.*' }
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }}
 
     services:
       mysql:
@@ -54,19 +43,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ matrix.payload.php }}
           extensions: mbstring, dom, fileinfo, mysql
           coverage: none
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
+          composer require "laravel/framework:${{ matrix.payload.laravel }}" "orchestra/testbench:${{ matrix.payload.testbench }}" --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction
       - name: Execute tests
         env:
           CI_DB_DRIVER: mysql
