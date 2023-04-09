@@ -6,6 +6,7 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
 use Illuminate\Container\Container;
+use ReflectionObject;
 
 class MailableReader
 {
@@ -16,7 +17,14 @@ class MailableReader
      */
     public function read(EmailComposer $composer): void
     {
-        Container::getInstance()->call([$composer->getData('mailable'), 'build']);
+        if (method_exists($composer->getData('mailable'), 'prepareMailableForDelivery')) {
+            $reflected = (new ReflectionObject($composer->getData('mailable')));
+            $method = $reflected->getMethod('prepareMailableForDelivery');
+            $method->setAccessible(true);
+            $method->invoke($composer->getData('mailable'));
+        } else {
+            Container::getInstance()->call([$composer->getData('mailable'), 'build']);
+        }
 
         $this->readRecipient($composer);
 
