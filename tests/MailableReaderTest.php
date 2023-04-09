@@ -3,21 +3,34 @@
 namespace Tests;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class MailableReaderTest extends TestCase
 {
+    private function mailable(): Mailable
+    {
+        if (version_compare(app()->version(), '10.0.0', '>=')) {
+            return new Laravel10TestMailable();
+        }
+
+        return new TestMailable();
+    }
+
     /** @test */
     public function it_extracts_the_recipient()
     {
         $composer = Email::compose()
-            ->mailable(new TestMailable());
+            ->mailable($this->mailable());
 
         $this->assertEquals(['john@doe.com'], $composer->getData('recipient'));
 
         $composer = Email::compose()
             ->mailable(
-                (new TestMailable())->to(['jane@doe.com'])
+                $this->mailable()->to(['jane@doe.com'])
             );
 
         $this->assertCount(2, $composer->getData('recipient'));
@@ -28,7 +41,7 @@ class MailableReaderTest extends TestCase
     /** @test */
     public function it_extracts_cc_addresses()
     {
-        $composer = Email::compose()->mailable(new TestMailable());
+        $composer = Email::compose()->mailable($this->mailable());
 
         $this->assertEquals(['john+cc@doe.com', 'john+cc2@doe.com'], $composer->getData('cc'));
     }
@@ -36,7 +49,7 @@ class MailableReaderTest extends TestCase
     /** @test */
     public function it_extracts_bcc_addresses()
     {
-        $composer = Email::compose()->mailable(new TestMailable());
+        $composer = Email::compose()->mailable($this->mailable());
 
         $this->assertEquals(['john+bcc@doe.com', 'john+bcc2@doe.com'], $composer->getData('bcc'));
     }
@@ -44,7 +57,7 @@ class MailableReaderTest extends TestCase
     /** @test */
     public function it_extracts_the_subject()
     {
-        $composer = Email::compose()->mailable(new TestMailable());
+        $composer = Email::compose()->mailable($this->mailable());
 
         $this->assertEquals('Your order has shipped!', $composer->getData('subject'));
     }
@@ -52,7 +65,7 @@ class MailableReaderTest extends TestCase
     /** @test */
     public function it_extracts_the_body()
     {
-        $composer = Email::compose()->mailable(new TestMailable());
+        $composer = Email::compose()->mailable($this->mailable());
 
         $this->assertEquals("Name: John Doe\n", $composer->getData('body'));
     }
@@ -60,7 +73,7 @@ class MailableReaderTest extends TestCase
     /** @test */
     public function it_extracts_attachments()
     {
-        $email = Email::compose()->mailable(new TestMailable())->send();
+        $email = Email::compose()->mailable($this->mailable())->send();
 
         $attachments = $email->getAttachments();
 
@@ -78,7 +91,7 @@ class MailableReaderTest extends TestCase
     public function it_extracts_the_from_address_and_or_name()
     {
         $email = Email::compose()->mailable(
-            (new TestMailable())
+            ($this->mailable())
                 ->from('marick@dolphiq.nl', 'Marick')
         )->send();
 
@@ -87,7 +100,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals('Marick', $email->getFromName());
 
         $email = Email::compose()->mailable(
-            (new TestMailable())
+            ($this->mailable())
                 ->from('marick@dolphiq.nl')
         )->send();
 
@@ -96,7 +109,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals(config('mail.from.name'), $email->getFromName());
 
         $email = Email::compose()->mailable(
-            (new TestMailable())
+            ($this->mailable())
                 ->from(null, 'Marick')
         )->send();
 
@@ -130,5 +143,43 @@ class TestMailable extends Mailable
             ])
             ->attachData('<p>Thanks for your oder</p>', 'order.html')
             ->view('tests::dummy', ['name' => 'John Doe']);
+    }
+}
+
+class Laravel10TestMailable extends Mailable
+{
+    public function content(): Content
+    {
+        $content = new Content(
+            'tests::dummy'
+        );
+
+        $content->with('name', 'John Doe');
+
+        return $content;
+    }
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            null,
+            [
+                new Address('john@doe.com', 'John Doe')
+            ],
+            ['john+cc@doe.com', 'john+cc2@doe.com'],
+            ['john+bcc@doe.com', 'john+bcc2@doe.com'],
+            [],
+            'Your order has shipped!'
+        );
+    }
+
+    public function attachments(): array
+    {
+        return [
+            Attachment::fromPath(__DIR__ . '/files/pdf-sample.pdf')->withMime('application/pdf'),
+            Attachment::fromData(function () {
+                return '<p>Thanks for your oder</p>';
+            }, 'order.html')
+        ];
     }
 }
