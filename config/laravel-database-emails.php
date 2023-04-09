@@ -51,7 +51,7 @@ return [
     | Cronjob Limit
     |--------------------------------------------------------------------------
     |
-    | Limit the number of e-mails that should be sent at a time. Please ajust this
+    | Limit the number of e-mails that should be sent at a time. Please adjust this
     | configuration based on the number of e-mails you expect to send and
     | the throughput of your e-mail sending provider.
     |
@@ -79,7 +79,7 @@ return [
     |
     | This option allows you to use:
     | `php artisan vendor:publish --tag=laravel-database-emails-migrations` to push migrations
-    | to your app's folder so you're free to modify before migrating.
+    | to your app's folder, so you're free to modify before migrating.
     |
     */
 
