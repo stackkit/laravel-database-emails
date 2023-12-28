@@ -118,6 +118,15 @@ use Stackkit\LaravelDatabaseEmails\Email;
 
 Email::compose()
     ->replyTo(['john@doe.com', 'jane@doe.com']);
+
+Email::compose()
+    ->replyTo(new Address('john@doe.com', 'John Doe'));
+
+Email::compose()
+    ->replyTo([
+        new Address('john@doe.com', 'John Doe'),
+        new Address('jane@doe.com', 'Jane Doe'),
+    ]);
 ```
 
 ### Using mailables
