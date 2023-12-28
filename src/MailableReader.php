@@ -153,7 +153,7 @@ class MailableReader
 
         $mailable = $composer->getData('mailable');
 
-        $composer->setData('body', view($mailable->view, $mailable->buildViewData()));
+        $composer->setData('body', view($mailable->view, $mailable->buildViewData())->render());
     }
 
     /**
