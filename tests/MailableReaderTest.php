@@ -177,7 +177,7 @@ class Laravel10TestMailable extends Mailable
             ],
             ['john+cc@doe.com', 'john+cc2@doe.com'],
             ['john+bcc@doe.com', 'john+bcc2@doe.com'],
-            ['replyto@example.com', 'replyto2@example.com'],
+            ['replyto@example.com', new Address('replyto2@example.com')],
             'Your order has shipped!'
         );
     }
