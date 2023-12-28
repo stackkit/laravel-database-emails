@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
+use Closure;
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 
 /**
  * @property $id
@@ -34,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
 class Email extends Model
 {
     use HasEncryptedAttributes;
+    use Prunable;
 
     /**
      * The table in which the e-mails are stored.
@@ -48,6 +52,8 @@ class Email extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public static ?Closure $pruneQuery = null;
 
     /**
      * Compose a new e-mail.
@@ -550,5 +556,26 @@ class Email extends Model
         }
 
         return $this->getOriginal($key, $default);
+    }
+
+    /**
+     * @param Closure $closure
+     * @return void
+     */
+    public static function pruneWhen(Closure $closure)
+    {
+        static::$pruneQuery = $closure;
+    }
+
+    /**
+     * @return Builder
+     */
+    public function prunable()
+    {
+        if (static::$pruneQuery) {
+            return (static::$pruneQuery)($this);
+        }
+
+        return $this->where('created_at', '<', now()->subMonths(6));
     }
 }
