@@ -109,6 +109,17 @@ Email::compose()
     ->bcc(['john@doe.com', 'jane@doe.com']);
 ```
 
+### Reply-To
+
+```php
+<?php
+
+use Stackkit\LaravelDatabaseEmails\Email;
+
+Email::compose()
+    ->replyTo(['john@doe.com', 'jane@doe.com']);
+```
+
 ### Using mailables
 
 You may also pass a mailable to the e-mail composer.

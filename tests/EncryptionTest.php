@@ -47,6 +47,18 @@ class EncryptionTest extends TestCase
     }
 
     /** @test */
+    public function reply_to_should_be_encrypted_and_decrypted()
+    {
+        $email = $this->sendEmail([
+            'reply_to'  => $replyTo = ['john+1@doe.com', 'john+2@doe.com'],
+        ]);
+
+        $this->assertEquals($replyTo, decrypt($email->getRawDatabaseValue('reply_to')));
+
+        $this->assertEquals($replyTo, $email->getReplyTo());
+    }
+
+    /** @test */
     public function the_subject_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);

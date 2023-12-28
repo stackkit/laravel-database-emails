@@ -82,6 +82,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'recipient' => 'john@doe.com',
             'cc'        => null,
             'bcc'       => null,
+            'reply_to'  => null,
             'subject'   => 'test',
             'view'      => 'tests::dummy',
             'variables' => ['name' => 'John Doe'],
@@ -92,6 +93,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             ->recipient($params['recipient'])
             ->cc($params['cc'])
             ->bcc($params['bcc'])
+            ->replyTo($params['reply_to'])
             ->subject($params['subject'])
             ->view($params['view'])
             ->variables($params['variables']);

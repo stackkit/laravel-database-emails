@@ -140,6 +140,17 @@ class EmailComposer
     }
 
     /**
+     * Define the reply-to address(es).
+     *
+     * @param string|array $replyTo
+     * @return self
+     */
+    public function replyTo($replyTo): self
+    {
+        return $this->setData('reply_to', $replyTo);
+    }
+
+    /**
      * Set the e-mail subject.
      *
      * @param string $subject

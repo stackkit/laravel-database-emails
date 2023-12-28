@@ -25,6 +25,8 @@ class Preparer
 
         $this->prepareBcc($composer);
 
+        $this->prepareReplyTo($composer);
+
         $this->prepareSubject($composer);
 
         $this->prepareView($composer);
@@ -115,6 +117,18 @@ class Preparer
 
         $composer->getEmail()->fill([
             'bcc' => json_encode($composer->getData('bcc', [])),
+        ]);
+    }
+
+    /**
+     * Prepare the reply-to for database storage.
+     *
+     * @param EmailComposer $composer
+     */
+    private function prepareReplyTo(EmailComposer $composer): void
+    {
+        $composer->getEmail()->fill([
+            'reply_to' => json_encode($composer->getData('reply_to', [])),
         ]);
     }
 

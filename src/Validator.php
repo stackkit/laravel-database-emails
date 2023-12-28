@@ -7,6 +7,7 @@ namespace Stackkit\LaravelDatabaseEmails;
 use Exception;
 use Carbon\Carbon;
 use InvalidArgumentException;
+use const FILTER_VALIDATE_EMAIL;
 
 class Validator
 {
@@ -32,6 +33,8 @@ class Validator
         $this->validateCc($composer);
 
         $this->validateBcc($composer);
+
+        $this->validateReplyTo($composer);
 
         $this->validateSubject($composer);
 
@@ -114,6 +117,25 @@ class Validator
         foreach ((array) $composer->getData('bcc') as $bcc) {
             if (! filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidargumentException('E-mail address [' . $bcc . '] is invalid');
+            }
+        }
+    }
+
+    /**
+     * Validate the reply-to addresses.
+     *
+     * @param EmailComposer $composer
+     * @throws InvalidArgumentException
+     */
+    private function validateReplyTo(EmailComposer $composer): void
+    {
+        if (! $composer->hasData('reply_to')) {
+            return;
+        }
+
+        foreach ((array) $composer->getData('reply_to') as $replyTo) {
+            if (! filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidargumentException('E-mail address [' . $replyTo . '] is invalid');
             }
         }
     }

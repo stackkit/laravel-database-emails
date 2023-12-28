@@ -34,6 +34,8 @@ class MailableReader
 
         $this->readBcc($composer);
 
+        $this->readReplyTo($composer);
+
         $this->readSubject($composer);
 
         $this->readBody($composer);
@@ -113,6 +115,20 @@ class MailableReader
         );
 
         $composer->bcc($bcc);
+    }
+
+    /**
+     * Read the mailable reply-to to the email composer.
+     *
+     * @param EmailComposer $composer
+     */
+    private function readReplyTo(EmailComposer $composer): void
+    {
+        $replyTo = $this->convertMailableAddresses(
+            $composer->getData('mailable')->replyTo
+        );
+
+        $composer->replyTo($replyTo);
     }
 
     /**

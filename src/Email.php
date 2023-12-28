@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property $from
  * @property $cc
  * @property $bcc
+ * @property $reply_to
  * @property $subject
  * @property $view
  * @property $variables
@@ -188,6 +189,26 @@ class Email extends Model
     public function getBccAttribute()
     {
         return $this->bcc;
+    }
+
+    /**
+     * Get the e-mail reply-to addresses.
+     *
+     * @return array|string
+     */
+    public function getReplyTo()
+    {
+        return $this->reply_to;
+    }
+
+    /**
+     * Get the e-mail reply-to addresses.
+     *
+     * @return array|string
+     */
+    public function getReplyToAttribute()
+    {
+        return $this->reply_to;
     }
 
     /**
@@ -386,6 +407,16 @@ class Email extends Model
     public function hasBcc(): bool
     {
         return strlen($this->getRawDatabaseValue('bcc')) > 0;
+    }
+
+    /**
+     * Determine if the e-mail should sent with reply-to.
+     *
+     * @return bool
+     */
+    public function hasReplyTo(): bool
+    {
+        return strlen($this->getRawDatabaseValue('reply_to') ?: '') > 0;
     }
 
     /**

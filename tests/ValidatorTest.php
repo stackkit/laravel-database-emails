@@ -81,6 +81,21 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
+    public function reply_to_must_contain_valid_email_addresses()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('E-mail address [not-a-valid-email-address] is invalid');
+
+        Email::compose()
+            ->recipient('john@doe.com')
+            ->replyTo([
+                'jane@doe.com',
+                'not-a-valid-email-address',
+            ])
+            ->send();
+    }
+
+    /** @test */
     public function a_subject_is_required()
     {
         $this->expectException(InvalidArgumentException::class);

@@ -13,6 +13,7 @@ class SentMessage
     public $to = [];
     public $cc = [];
     public $bcc = [];
+    public $replyTo = [];
     public $subject = '';
     public $body = '';
     public $attachments = [];
@@ -38,6 +39,10 @@ class SentMessage
             $sentMessage->bcc[$address->getAddress()] = $address->getName();
         }
 
+        foreach ($email->getReplyTo() as $address) {
+            $sentMessage->replyTo[$address->getAddress()] = $address->getName();
+        }
+
         $sentMessage->subject = $email->getSubject();
         $sentMessage->body = $email->getHtmlBody();
         $sentMessage->attachments = array_map(function (DataPart $dataPart) {
@@ -58,6 +63,7 @@ class SentMessage
         $sentMessage->to = $message->getTo();
         $sentMessage->cc = $message->getCc();
         $sentMessage->bcc = $message->getBcc();
+        $sentMessage->replyTo = $message->getReplyTo();
         $sentMessage->subject = $message->getSubject();
         $sentMessage->body = $message->getBody();
         $sentMessage->attachments = array_map(function(Swift_Mime_SimpleMimeEntity $entity) {

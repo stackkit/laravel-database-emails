@@ -17,6 +17,8 @@ class Encrypter
 
         $this->encryptRecipients($composer);
 
+        $this->encryptReplyTo($composer);
+
         $this->encryptFrom($composer);
 
         $this->encryptSubject($composer);
@@ -34,6 +36,20 @@ class Encrypter
     private function setEncrypted(EmailComposer $composer): void
     {
         $composer->getEmail()->setAttribute('encrypted', 1);
+    }
+
+    /**
+     * Encrypt the e-mail reply-to.
+     *
+     * @param EmailComposer $composer
+     */
+    private function encryptReplyTo(EmailComposer $composer): void
+    {
+        $email = $composer->getEmail();
+
+        $email->fill([
+            'reply_to' => $composer->hasData('reply_to') ? encrypt($email->reply_to) : '',
+        ]);
     }
 
     /**

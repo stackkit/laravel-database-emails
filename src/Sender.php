@@ -46,6 +46,7 @@ class Sender
         $message->to($email->getRecipient())
             ->cc($email->hasCc() ? $email->getCc() : [])
             ->bcc($email->hasBcc() ? $email->getBcc() : [])
+            ->replyTo($email->hasReplyTo() ? $email->getReplyTo() : [])
             ->subject($email->getSubject())
             ->from($email->getFromAddress(), $email->getFromName());
 

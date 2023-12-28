@@ -45,6 +45,20 @@ class DatabaseInteractionTest extends TestCase
     }
 
     /** @test */
+    public function reply_to_should_be_saved_correctly()
+    {
+        $email = $this->sendEmail([
+            'reply_to' => $replyTo = [
+                'john@doe.com',
+            ],
+        ]);
+
+        $this->assertEquals(json_encode($replyTo), DB::table('emails')->find(1)->reply_to);
+        $this->assertTrue($email->hasReplyTo());
+        $this->assertEquals(['john@doe.com'], $email->getReplyTo());
+    }
+
+    /** @test */
     public function subject_should_be_saved_correclty()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
