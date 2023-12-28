@@ -6,6 +6,8 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Mail\Mailables\Address;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use const FILTER_VALIDATE_EMAIL;
 
@@ -133,7 +135,11 @@ class Validator
             return;
         }
 
-        foreach ((array) $composer->getData('reply_to') as $replyTo) {
+        foreach (Arr::wrap($composer->getData('reply_to')) as $replyTo) {
+            if ($replyTo instanceof Address) {
+                $replyTo = $replyTo->address;
+            }
+
             if (! filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
                 throw new InvalidargumentException('E-mail address [' . $replyTo . '] is invalid');
             }
