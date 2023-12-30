@@ -55,6 +55,14 @@ class MailableReaderTest extends TestCase
     }
 
     /** @test */
+    public function it_extracts_reply_to_addresses()
+    {
+        $composer = Email::compose()->mailable($this->mailable());
+
+        $this->assertEquals(['replyto@example.com', 'replyto2@example.com'], $composer->getData('reply_to'));
+    }
+
+    /** @test */
     public function it_extracts_the_subject()
     {
         $composer = Email::compose()->mailable($this->mailable());
@@ -137,6 +145,7 @@ class TestMailable extends Mailable
         return $this->to('john@doe.com')
             ->cc(['john+cc@doe.com', 'john+cc2@doe.com'])
             ->bcc(['john+bcc@doe.com', 'john+bcc2@doe.com'])
+            ->replyTo(['replyto@example.com', 'replyto2@example.com'])
             ->subject('Your order has shipped!')
             ->attach(__DIR__ . '/files/pdf-sample.pdf', [
                 'mime' => 'application/pdf',
@@ -168,7 +177,7 @@ class Laravel10TestMailable extends Mailable
             ],
             ['john+cc@doe.com', 'john+cc2@doe.com'],
             ['john+bcc@doe.com', 'john+bcc2@doe.com'],
-            [],
+            ['replyto@example.com', new Address('replyto2@example.com')],
             'Your order has shipped!'
         );
     }

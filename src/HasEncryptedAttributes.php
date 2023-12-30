@@ -18,6 +18,7 @@ trait HasEncryptedAttributes
         'from',
         'cc',
         'bcc',
+        'reply_to',
         'subject',
         'variables',
         'body',
@@ -33,6 +34,7 @@ trait HasEncryptedAttributes
         'from',
         'cc',
         'bcc',
+        'reply_to',
         'variables',
     ];
 

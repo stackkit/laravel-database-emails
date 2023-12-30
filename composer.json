@@ -54,6 +54,9 @@
         "l6": [
             "composer require laravel/framework:8.* orchestra/testbench:6.* --no-interaction --no-update",
             "composer update --prefer-stable --prefer-dist --no-interaction"
+        ],
+        "test": [
+            "CI_DB_DRIVER=sqlite CI_DB_DATABASE=:memory: phpunit"
         ]
     }
 }

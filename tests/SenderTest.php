@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Event;
 use Stackkit\LaravelDatabaseEmails\MessageSent;
 use Stackkit\LaravelDatabaseEmails\SentMessage;
@@ -224,5 +225,54 @@ class SenderTest extends TestCase
 
         $this->artisan('email:send');
         $this->assertCount(1, $this->sent);
+    }
+
+    /** @test */
+    public function it_adds_the_reply_to_addresses()
+    {
+        $this->sendEmail(['reply_to' => 'replyto@test.com']);
+        $this->artisan('email:send');
+        $replyTo = reset($this->sent)->replyTo;
+        $this->assertCount(1, $replyTo);
+        $this->assertArrayHasKey('replyto@test.com', $replyTo);
+
+        $this->sent = [];
+        $this->sendEmail(['reply_to' => ['replyto1@test.com', 'replyto2@test.com']]);
+        $this->artisan('email:send');
+        $replyTo = reset($this->sent)->replyTo;
+        $this->assertCount(2, $replyTo);
+        $this->assertArrayHasKey('replyto1@test.com', $replyTo);
+        $this->assertArrayHasKey('replyto2@test.com', $replyTo);
+
+        if (! class_exists(Address::class)) {
+            return;
+        }
+
+        $this->sent = [];
+        $this->sendEmail([
+            'reply_to' => new Address('replyto@test.com', 'NoReplyTest'),
+        ]);
+        $this->artisan('email:send');
+        $replyTo = reset($this->sent)->replyTo;
+        $this->assertCount(1, $replyTo);
+        $this->assertSame(['replyto@test.com' => 'NoReplyTest'], $replyTo);
+
+        $this->sent = [];
+        $this->sendEmail([
+            'reply_to' => [
+                new Address('replyto@test.com', 'NoReplyTest'),
+                new Address('replyto2@test.com', 'NoReplyTest2'),
+            ],
+        ]);
+        $this->artisan('email:send');
+        $replyTo = reset($this->sent)->replyTo;
+        $this->assertCount(2, $replyTo);
+        $this->assertSame(
+            [
+                'replyto@test.com' => 'NoReplyTest',
+                'replyto2@test.com' => 'NoReplyTest2',
+            ],
+            $replyTo
+        );
     }
 }

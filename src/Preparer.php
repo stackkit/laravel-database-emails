@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Carbon\Carbon;
+use Illuminate\Mail\Mailables\Address;
 
 class Preparer
 {
@@ -24,6 +25,8 @@ class Preparer
         $this->prepareCc($composer);
 
         $this->prepareBcc($composer);
+
+        $this->prepareReplyTo($composer);
 
         $this->prepareSubject($composer);
 
@@ -115,6 +118,33 @@ class Preparer
 
         $composer->getEmail()->fill([
             'bcc' => json_encode($composer->getData('bcc', [])),
+        ]);
+    }
+
+    /**
+     * Prepare the reply-to for database storage.
+     *
+     * @param EmailComposer $composer
+     */
+    private function prepareReplyTo(EmailComposer $composer): void
+    {
+        $value = $composer->getData('reply_to', []);
+
+        if (! is_array($value)) {
+            $value = [$value];
+        }
+
+        foreach ($value as $i => $v) {
+            if ($v instanceof Address) {
+                $value[$i] = [
+                    'address' => $v->address,
+                    'name' => $v->name,
+                ];
+            }
+        }
+
+        $composer->getEmail()->fill([
+            'reply_to' => json_encode($value),
         ]);
     }
 

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
+use Closure;
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 
 /**
  * @property $id
@@ -15,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property $from
  * @property $cc
  * @property $bcc
+ * @property $reply_to
  * @property $subject
  * @property $view
  * @property $variables
@@ -33,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
 class Email extends Model
 {
     use HasEncryptedAttributes;
+    use Prunable;
 
     /**
      * The table in which the e-mails are stored.
@@ -47,6 +52,8 @@ class Email extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public static ?Closure $pruneQuery = null;
 
     /**
      * Compose a new e-mail.
@@ -188,6 +195,26 @@ class Email extends Model
     public function getBccAttribute()
     {
         return $this->bcc;
+    }
+
+    /**
+     * Get the e-mail reply-to addresses.
+     *
+     * @return array|string
+     */
+    public function getReplyTo()
+    {
+        return $this->reply_to;
+    }
+
+    /**
+     * Get the e-mail reply-to addresses.
+     *
+     * @return array|string
+     */
+    public function getReplyToAttribute()
+    {
+        return $this->reply_to;
     }
 
     /**
@@ -389,6 +416,16 @@ class Email extends Model
     }
 
     /**
+     * Determine if the e-mail should sent with reply-to.
+     *
+     * @return bool
+     */
+    public function hasReplyTo(): bool
+    {
+        return strlen($this->getRawDatabaseValue('reply_to') ?: '') > 0;
+    }
+
+    /**
      * Determine if the e-mail is scheduled to be sent later.
      *
      * @return bool
@@ -519,5 +556,26 @@ class Email extends Model
         }
 
         return $this->getOriginal($key, $default);
+    }
+
+    /**
+     * @param Closure $closure
+     * @return void
+     */
+    public static function pruneWhen(Closure $closure)
+    {
+        static::$pruneQuery = $closure;
+    }
+
+    /**
+     * @return Builder
+     */
+    public function prunable()
+    {
+        if (static::$pruneQuery) {
+            return (static::$pruneQuery)($this);
+        }
+
+        return $this->where('created_at', '<', now()->subMonths(6));
     }
 }

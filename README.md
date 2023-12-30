@@ -109,6 +109,26 @@ Email::compose()
     ->bcc(['john@doe.com', 'jane@doe.com']);
 ```
 
+### Reply-To
+
+```php
+<?php
+
+use Stackkit\LaravelDatabaseEmails\Email;
+
+Email::compose()
+    ->replyTo(['john@doe.com', 'jane@doe.com']);
+
+Email::compose()
+    ->replyTo(new Address('john@doe.com', 'John Doe'));
+
+Email::compose()
+    ->replyTo([
+        new Address('john@doe.com', 'John Doe'),
+        new Address('jane@doe.com', 'Jane Doe'),
+    ]);
+```
+
 ### Using mailables
 
 You may also pass a mailable to the e-mail composer.
@@ -231,4 +251,29 @@ To enable, set the following environment variable:
 
 ```
 LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY=true
+```
+
+### Pruning models
+
+```php
+use Stackkit\LaravelDatabaseEmails\Email;
+
+$schedule->command('model:prune', [
+    '--model' => [Email::class],
+])->everyMinute();
+```
+
+By default, e-mails are pruned when they are older than 6 months.
+
+You may change that by adding the following to the AppServiceProvider.php:
+
+```php
+use Stackkit\LaravelDatabaseEmails\Email;
+
+public function register(): void
+{
+    Email::pruneWhen(function (Email $email) {
+        return $email->where(...);
+    });
+}
 ```

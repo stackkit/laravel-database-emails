@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Illuminate\Mail\Mailables\Address;
+
 class EncryptionTest extends TestCase
 {
     public function setUp(): void
@@ -44,6 +46,37 @@ class EncryptionTest extends TestCase
 
         $this->assertEquals($cc, $email->getCc());
         $this->assertEquals($bcc, $email->getBcc());
+    }
+
+    /** @test */
+    public function reply_to_should_be_encrypted_and_decrypted()
+    {
+        $email = $this->sendEmail([
+            'reply_to'  => $replyTo = ['john+1@doe.com', 'john+2@doe.com'],
+        ]);
+        $this->assertEquals($replyTo, decrypt($email->getRawDatabaseValue('reply_to')));
+        $this->assertEquals($replyTo, $email->getReplyTo());
+
+        if (! class_exists(Address::class)) {
+            return;
+        }
+
+        // Test with a single Address object...
+        $email = $this->sendEmail([
+            'reply_to'  => new Address('john+1@doe.com', 'John Doe'),
+        ]);
+        $this->assertEquals([['address' => 'john+1@doe.com', 'name' => 'John Doe']], decrypt($email->getRawDatabaseValue('reply_to')));
+        $this->assertEquals([['address' => 'john+1@doe.com', 'name' => 'John Doe']], $email->getReplyTo());
+
+        // Address with an array of Address objects...
+        $email = $this->sendEmail([
+            'reply_to'  => [
+                new Address('john+1@doe.com', 'John Doe'),
+                new Address('jane+1@doe.com', 'Jane Doe'),
+            ],
+        ]);
+        $this->assertSame([['address' => 'john+1@doe.com', 'name' => 'John Doe'], ['address' => 'jane+1@doe.com', 'name' => 'Jane Doe']], decrypt($email->getRawDatabaseValue('reply_to')));
+        $this->assertSame([['address' => 'john+1@doe.com', 'name' => 'John Doe'], ['address' => 'jane+1@doe.com', 'name' => 'Jane Doe']], $email->getReplyTo());
     }
 
     /** @test */
