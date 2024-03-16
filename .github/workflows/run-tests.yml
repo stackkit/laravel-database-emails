@@ -62,23 +62,22 @@ jobs:
     needs: access_check
     strategy:
       matrix:
+        db: [ 'mysql', 'sqlite' ]
         payload:
-          - { laravel: '11.*', php: '8.3', 'testbench': '9.*' }
-          - { laravel: '11.*', php: '8.2', 'testbench': '9.*' }
-          - { laravel: '10.*', php: '8.3', 'testbench': '8.*' }
-          - { laravel: '10.*', php: '8.2', 'testbench': '8.*' }
-          - { laravel: '10.*', php: '8.1', 'testbench': '8.*' }
+          - { laravel: '11.*', php: '8.3', 'testbench': '9.*', collision: '8.*' }
+          - { laravel: '11.*', php: '8.2', 'testbench': '9.*', collision: '8.*' }
+          - { laravel: '10.*', php: '8.3', 'testbench': '8.*', collision: '7.*' }
+          - { laravel: '10.*', php: '8.2', 'testbench': '8.*', collision: '7.*' }
+          - { laravel: '10.*', php: '8.1', 'testbench': '8.*', collision: '7.*' }
 
-    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }}
+    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }} - DB ${{ matrix.db }}
 
     services:
       mysql:
         image: mysql:8
         env:
-          MYSQL_USER: root
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_PASSWORD:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
           MYSQL_DATABASE: test
         ports:
           - 3307:3306
@@ -97,9 +96,23 @@ jobs:
           extensions: mbstring, dom, fileinfo, mysql
           coverage: none
 
+      - name: Set up MySQL and PostgreSQL
+        run: |
+          MYSQL_PORT=3307 POSTGRES_PORT=5432 docker compose up ${{ matrix.db }} -d
+
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.payload.laravel }}" "orchestra/testbench:${{ matrix.payload.testbench }}" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.payload.laravel }}" "orchestra/testbench:${{ matrix.payload.testbench }}" "nunomaduro/collision:${{ matrix.payload.collision }}" --no-interaction --no-update
           composer update --prefer-stable --prefer-dist --no-interaction
+          if [ "${{ matrix.db }}" = "mysql" ]; then
+            while ! mysqladmin ping --host=127.0.0.1 --user=test --port=3307 --password=test --silent; do
+              echo "Waiting for MySQL..."
+              sleep 1
+            done
+          else
+            echo "Not waiting for MySQL."
+          fi
       - name: Execute tests
+        env:
+          DB_DRIVER: ${{ matrix.db }}
         run: composer test
