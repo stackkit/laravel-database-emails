@@ -87,7 +87,9 @@ jobs:
 
       - name: Set up MySQL and PostgreSQL
         run: |
-          MYSQL_PORT=3307 POSTGRES_PORT=5432 docker compose up ${{ matrix.db }} -d
+            if [ "${{ matrix.db }}" != "sqlite" ]; then
+                MYSQL_PORT=3307 POSTGRES_PORT=5432 docker compose up ${{ matrix.db }} -d
+            fi
 
       - name: Install dependencies
         run: |
