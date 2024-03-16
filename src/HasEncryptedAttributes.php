@@ -48,6 +48,10 @@ trait HasEncryptedAttributes
     {
         $value = $this->attributes[$key];
 
+        if (is_resource($value)) {
+            $value = stream_get_contents($value);
+        }
+
         if ($this->isEncrypted() && in_array($key, $this->encrypted)) {
             try {
                 $value = decrypt($value);

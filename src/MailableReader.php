@@ -6,6 +6,9 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use ReflectionObject;
 
 class MailableReader
@@ -15,6 +18,26 @@ class MailableReader
      */
     public function read(EmailComposer $composer): void
     {
+        if ($composer->envelope && $composer->content) {
+            $composer->setData('mailable', new class($composer) extends Mailable {
+                public function __construct(private EmailComposer $composer)
+                {
+                    //
+                }
+
+                public function content(): Content
+                {
+                    return $this->composer->content;
+                }
+
+                public function envelope(): Envelope
+                {
+                    return $this->composer->envelope;
+                }
+            });
+        }
+
+
         if (method_exists($composer->getData('mailable'), 'prepareMailableForDelivery')) {
             $reflected = (new ReflectionObject($composer->getData('mailable')));
             $method = $reflected->getMethod('prepareMailableForDelivery');

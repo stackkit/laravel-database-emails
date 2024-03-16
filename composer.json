@@ -30,7 +30,8 @@
     },
     "require": {
         "ext-json": "*",
-        "laravel/framework": "^10.0|^11.0"
+        "laravel/framework": "^10.0|^11.0",
+        "doctrine/dbal": "^3.8"
     },
     "require-dev": {
         "mockery/mockery": "^1.2",

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 
 class EmailComposer
 {
@@ -22,12 +25,37 @@ class EmailComposer
      */
     protected $data = [];
 
+    public ?Envelope $envelope = null;
+    public ?Content $content = null;
+
     /**
      * Create a new EmailComposer instance.
      */
     public function __construct(Email $email)
     {
         $this->email = $email;
+    }
+
+    public function envelope(Envelope $envelope): self
+    {
+        $this->envelope = $envelope;
+
+        if ($this->content) {
+            (new MailableReader())->read($this);
+        }
+
+        return $this;
+    }
+
+    public function content(Content $content): self
+    {
+        $this->content = $content;
+
+        if ($this->envelope) {
+            (new MailableReader())->read($this);
+        }
+
+        return $this;
     }
 
     /**
