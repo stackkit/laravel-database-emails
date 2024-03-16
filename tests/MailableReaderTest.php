@@ -13,10 +13,6 @@ class MailableReaderTest extends TestCase
 {
     private function mailable(): Mailable
     {
-        if (version_compare(app()->version(), '10.0.0', '>=')) {
-            return new Laravel10TestMailable();
-        }
-
         return new TestMailable();
     }
 
@@ -121,41 +117,11 @@ class MailableReaderTest extends TestCase
                 ->from(null, 'Marick')
         )->send();
 
-        // 8.x no longer accepts an empty address.
-        // https://github.com/laravel/framework/pull/39035
-        if (version_compare(app()->version(), '8.0.0', '>=')) {
-            $this->assertFalse($email->hasFrom());
-        } else {
-            $this->assertTrue($email->hasFrom());
-            $this->assertEquals(config('mail.from.address'), $email->getFromAddress());
-            $this->assertEquals('Marick', $email->getFromName());
-        }
+        $this->assertFalse($email->hasFrom());
     }
 }
 
 class TestMailable extends Mailable
-{
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->to('john@doe.com')
-            ->cc(['john+cc@doe.com', 'john+cc2@doe.com'])
-            ->bcc(['john+bcc@doe.com', 'john+bcc2@doe.com'])
-            ->replyTo(['replyto@example.com', 'replyto2@example.com'])
-            ->subject('Your order has shipped!')
-            ->attach(__DIR__ . '/files/pdf-sample.pdf', [
-                'mime' => 'application/pdf',
-            ])
-            ->attachData('<p>Thanks for your oder</p>', 'order.html')
-            ->view('tests::dummy', ['name' => 'John Doe']);
-    }
-}
-
-class Laravel10TestMailable extends Mailable
 {
     public function content(): Content
     {

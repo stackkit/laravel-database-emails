@@ -26,9 +26,8 @@ class Sender
             $this->buildMessage($message, $email);
         });
 
-        // This is used so we can assert things on the sent message in Laravel 9+ since we cannot use
-        // the Swift Mailer plugin anymore. So this is purely used for in the PHPUnit tests.
-        if (version_compare(app()->version(), '9.0.0', '>=') && !is_null($sentMessage)) {
+        // $sentMessage is null when mocking (Mail::shouldReceive('send')->once())
+        if (!is_null($sentMessage)) {
             event(new MessageSent($sentMessage));
         }
 
@@ -50,13 +49,7 @@ class Sender
             ->subject($email->getSubject())
             ->from($email->getFromAddress(), $email->getFromName());
 
-        if (version_compare(app()->version(), '9.0.0', '>=')) {
-            // Symfony Mailer
-            $message->html($email->getBody());
-        } else {
-            // SwiftMail
-            $message->setBody($email->getBody(), 'text/html');
-        }
+        $message->html($email->getBody());
 
         $attachmentMap = [
             'attachment'    => 'attach',

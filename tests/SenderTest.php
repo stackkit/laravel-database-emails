@@ -6,28 +6,23 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Event;
 use Stackkit\LaravelDatabaseEmails\MessageSent;
 use Stackkit\LaravelDatabaseEmails\SentMessage;
-use Swift_Events_SendEvent;
 use Illuminate\Support\Facades\Mail;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class SenderTest extends TestCase
 {
-    /** @var Swift_Events_SendEvent[] */
+    /** @var array<SentMessage> */
     public $sent = [];
 
     public function setUp(): void
     {
         parent::setUp();
 
-        if (version_compare(app()->version(), '9.0.0', '>=')) {
-            Event::listen(MessageSent::class, function (MessageSent $event) {
-                $this->sent[] = SentMessage::createFromSymfonyMailer(
-                    $event->message->getSymfonySentMessage()->getOriginalMessage()
-                );
-            });
-        } else {
-            Mail::getSwiftMailer()->registerPlugin(new TestingMailEventListener($this));
-        }
+        Event::listen(MessageSent::class, function (MessageSent $event) {
+            $this->sent[] = SentMessage::createFromSymfonyMailer(
+                $event->message->getSymfonySentMessage()->getOriginalMessage()
+            );
+        });
     }
 
     /** @test */
