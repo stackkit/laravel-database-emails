@@ -2,11 +2,17 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Stackkit\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $invalid;
+
+    use LazilyRefreshDatabase;
 
     public function setUp(): void
     {
@@ -31,20 +37,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
         Email::truncate();
     }
 
-    /**
-     * Get package providers.  At a minimum this is the package being tested, but also
-     * would include packages upon which our package depends, e.g. Cartalyst/Sentry
-     * In a normal app environment these would be added to the 'providers' array in
-     * the config/app.php file.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     *
-     * @return array
-     */
     protected function getPackageProviders($app)
     {
         return [
-            \Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
+            LaravelDatabaseEmailsServiceProvider::class,
         ];
     }
 
@@ -61,15 +57,25 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('laravel-database-emails.testing.email', 'test@email.com');
 
         $app['config']->set('database.default', 'testbench');
+        $driver = env('DB_DRIVER', 'sqlite');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => getenv('CI_DB_DRIVER'),
-            'host'     => getenv('CI_DB_HOST'),
-            'port'     => getenv('CI_DB_PORT'),
-            'database' => getenv('CI_DB_DATABASE'),
-            'username' => getenv('CI_DB_USERNAME'),
-            'password' => getenv('CI_DB_PASSWORD'),
-            'prefix'   => '',
-            'strict' => true,
+            'driver' => $driver,
+            ...match($driver) {
+                'sqlite' => [
+                    'database' => ':memory:',
+                ],
+                'mysql' => [
+                    'host' => '127.0.0.1',
+                    'port' => 3307,
+                ],
+                'pgsql' => [
+                    'host' => '127.0.0.1',
+                    'port' => 5432,
+                ],
+            },
+            'database' => 'test',
+            'username' => 'test',
+            'password' => 'test',
         ]);
 
         $app['config']->set('mail.driver', 'log');

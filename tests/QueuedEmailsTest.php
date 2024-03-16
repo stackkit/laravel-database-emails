@@ -9,14 +9,11 @@ use Illuminate\Support\Facades\Mail;
 
 class QueuedEmailsTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     #[Test]
     public function queueing_an_email_will_leave_sending_on_false()
     {
+        Queue::fake();
+
         $email = $this->queueEmail();
 
         $this->assertEquals(0, $email->sending);
@@ -25,6 +22,8 @@ class QueuedEmailsTest extends TestCase
     #[Test]
     public function queueing_an_email_will_set_the_queued_at_column()
     {
+        Queue::fake();
+
         $email = $this->queueEmail();
 
         $this->assertNotNull($email->queued_at);
