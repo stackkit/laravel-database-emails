@@ -13,26 +13,17 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         payload:
+          - { laravel: '11.*', php: '8.3', 'testbench': '9.*' }
+          - { laravel: '11.*', php: '8.2', 'testbench': '9.*' }
           - { laravel: '10.*', php: '8.3', 'testbench': '8.*'}
           - { laravel: '10.*', php: '8.2', 'testbench': '8.*'}
           - { laravel: '10.*', php: '8.1', 'testbench': '8.*'}
-          - { laravel: '9.*', php: '8.3', 'testbench': '7.*'}
-          - { laravel: '9.*', php: '8.2', 'testbench': '7.*'}
-          - { laravel: '9.*', php: '8.1', 'testbench': '7.*'}
-          - { laravel: '9.*', php: '8.0', 'testbench': '7.*'}
-          - { laravel: '8.*', php: '8.1', 'testbench': '6.*'}
-          - { laravel: '8.*', php: '8.0', 'testbench': '6.*'}
-          - { laravel: '8.*', php: '7.4', 'testbench': '6.*'}
-          - { laravel: '7.*', php: '8.0', 'testbench': '5.*' }
-          - { laravel: '7.*', php: '7.4', 'testbench': '5.*' }
-          - { laravel: '6.*', php: '8.0', 'testbench': '4.*' }
-          - { laravel: '6.*', php: '7.4', 'testbench': '4.*' }
 
     name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }}
 
     services:
       mysql:
-        image: mysql:5.7.27
+        image: mysql:8
         env:
           MYSQL_USER: root
           MYSQL_ROOT_PASSWORD: root
@@ -66,4 +57,4 @@ jobs:
           CI_DB_DATABASE: test
           CI_DB_USERNAME: root
           CI_DB_PASSWORD: root
-        run: vendor/bin/phpunit
+        run: composer test
