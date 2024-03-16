@@ -29,7 +29,7 @@ class DatabaseInteractionTest extends TestCase
     public function cc_and_bcc_should_be_saved_correctly()
     {
         $email = $this->sendEmail([
-            'cc'  => $cc = [
+            'cc' => $cc = [
                 'john@doe.com',
             ],
             'bcc' => $bcc = [
@@ -199,7 +199,7 @@ class DatabaseInteractionTest extends TestCase
     public function attachments_should_be_saved_correctly()
     {
         $email = $this->composeEmail()
-            ->attach(__DIR__ . '/files/pdf-sample.pdf')
+            ->attach(__DIR__.'/files/pdf-sample.pdf')
             ->send();
 
         $this->assertCount(1, $email->getAttachments());
@@ -207,23 +207,23 @@ class DatabaseInteractionTest extends TestCase
         $attachment = $email->getAttachments()[0];
 
         $this->assertEquals('attachment', $attachment['type']);
-        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $attachment['attachment']['file']);
+        $this->assertEquals(__DIR__.'/files/pdf-sample.pdf', $attachment['attachment']['file']);
 
         $email = $this->composeEmail()
-            ->attach(__DIR__ . '/files/pdf-sample.pdf')
-            ->attach(__DIR__ . '/files/pdf-sample-2.pdf')
+            ->attach(__DIR__.'/files/pdf-sample.pdf')
+            ->attach(__DIR__.'/files/pdf-sample-2.pdf')
             ->send();
 
         $this->assertCount(2, $email->getAttachments());
 
-        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $email->getAttachments()[0]['attachment']['file']);
-        $this->assertEquals(__DIR__ . '/files/pdf-sample-2.pdf', $email->getAttachments()[1]['attachment']['file']);
+        $this->assertEquals(__DIR__.'/files/pdf-sample.pdf', $email->getAttachments()[0]['attachment']['file']);
+        $this->assertEquals(__DIR__.'/files/pdf-sample-2.pdf', $email->getAttachments()[1]['attachment']['file']);
     }
 
     #[Test]
     public function in_memory_attachments_should_be_saved_correctly()
     {
-        $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
+        $rawData = file_get_contents(__DIR__.'/files/pdf-sample.pdf');
 
         $email = $this->composeEmail()
             ->attachData($rawData, 'generated.pdf', [

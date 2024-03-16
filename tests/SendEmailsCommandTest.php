@@ -123,8 +123,8 @@ class SendEmailsCommandTest extends TestCase
         $email = $this->sendEmail();
 
         $email->update([
-            'failed'   => true,
-            'error'    => 'Simulating some random error',
+            'failed' => true,
+            'error' => 'Simulating some random error',
             'attempts' => 1,
         ]);
 

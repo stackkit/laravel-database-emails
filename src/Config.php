@@ -8,8 +8,6 @@ class Config
 {
     /**
      * Get the maximum number of times an e-mail may be attempted to be sent.
-     *
-     * @return int
      */
     public static function maxAttemptCount(): int
     {
@@ -18,8 +16,6 @@ class Config
 
     /**
      * Determine if newly created e-mails should be encrypted.
-     *
-     * @return bool
      */
     public static function encryptEmails(): bool
     {
@@ -28,8 +24,6 @@ class Config
 
     /**
      * Determine if newly created e-mails should be sent to the test e-mail address.
-     *
-     * @return bool
      */
     public static function testing(): bool
     {
@@ -38,8 +32,6 @@ class Config
 
     /**
      * Get the test e-mail address.
-     *
-     * @return string
      */
     public static function testEmailAddress(): string
     {
@@ -48,8 +40,6 @@ class Config
 
     /**
      * Get the number of e-mails the cronjob may send at a time.
-     *
-     * @return int
      */
     public static function cronjobEmailLimit(): int
     {
@@ -58,8 +48,6 @@ class Config
 
     /**
      * Determine if e-mails should be sent immediately.
-     *
-     * @return bool
      */
     public static function sendImmediately(): bool
     {

@@ -8,8 +8,6 @@ class Encrypter
 {
     /**
      * Encrypt the given e-mail.
-     *
-     * @param EmailComposer $composer
      */
     public function encrypt(EmailComposer $composer): void
     {
@@ -30,8 +28,6 @@ class Encrypter
 
     /**
      * Mark the e-mail as encrypted.
-     *
-     * @param EmailComposer $composer
      */
     private function setEncrypted(EmailComposer $composer): void
     {
@@ -40,8 +36,6 @@ class Encrypter
 
     /**
      * Encrypt the e-mail reply-to.
-     *
-     * @param EmailComposer $composer
      */
     private function encryptReplyTo(EmailComposer $composer): void
     {
@@ -54,8 +48,6 @@ class Encrypter
 
     /**
      * Encrypt the e-mail addresses of the recipients.
-     *
-     * @param EmailComposer $composer
      */
     private function encryptRecipients(EmailComposer $composer): void
     {
@@ -63,15 +55,13 @@ class Encrypter
 
         $email->fill([
             'recipient' => encrypt($email->recipient),
-            'cc'        => $composer->hasData('cc') ? encrypt($email->cc) : '',
-            'bcc'       => $composer->hasData('bcc') ? encrypt($email->bcc) : '',
+            'cc' => $composer->hasData('cc') ? encrypt($email->cc) : '',
+            'bcc' => $composer->hasData('bcc') ? encrypt($email->bcc) : '',
         ]);
     }
 
     /**
      * Encrypt the e-mail addresses for the from field.
-     *
-     * @param EmailComposer $composer
      */
     private function encryptFrom(EmailComposer $composer): void
     {
@@ -84,8 +74,6 @@ class Encrypter
 
     /**
      * Encrypt the e-mail subject.
-     *
-     * @param EmailComposer $composer
      */
     private function encryptSubject(EmailComposer $composer): void
     {
@@ -98,8 +86,6 @@ class Encrypter
 
     /**
      * Encrypt the e-mail variables.
-     *
-     * @param EmailComposer $composer
      */
     private function encryptVariables(EmailComposer $composer): void
     {
@@ -116,8 +102,6 @@ class Encrypter
 
     /**
      * Encrypt the e-mail body.
-     *
-     * @param EmailComposer $composer
      */
     private function encryptBody(EmailComposer $composer): void
     {

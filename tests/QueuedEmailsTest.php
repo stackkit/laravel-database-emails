@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\SendEmailJob;
-use Illuminate\Support\Facades\Mail;
 
 class QueuedEmailsTest extends TestCase
 {

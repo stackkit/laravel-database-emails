@@ -4,11 +4,11 @@ namespace Tests;
 
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\Test;
+use Stackkit\LaravelDatabaseEmails\Email;
 use Stackkit\LaravelDatabaseEmails\MessageSent;
 use Stackkit\LaravelDatabaseEmails\SentMessage;
-use Illuminate\Support\Facades\Mail;
-use Stackkit\LaravelDatabaseEmails\Email;
 
 class SenderTest extends TestCase
 {
@@ -162,7 +162,7 @@ class SenderTest extends TestCase
     public function attachments_are_added_to_the_email()
     {
         $this->composeEmail()
-            ->attach(__DIR__ . '/files/pdf-sample.pdf')
+            ->attach(__DIR__.'/files/pdf-sample.pdf')
             ->send();
         $this->artisan('email:send');
 
@@ -174,7 +174,7 @@ class SenderTest extends TestCase
     #[Test]
     public function raw_attachments_are_added_to_the_email()
     {
-        $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
+        $rawData = file_get_contents(__DIR__.'/files/pdf-sample.pdf');
 
         $this->composeEmail()
             ->attachData($rawData, 'hello-ci.pdf', [

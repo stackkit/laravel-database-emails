@@ -41,7 +41,7 @@ trait HasEncryptedAttributes
     /**
      * Get an attribute from the model.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return mixed
      */
     public function getAttribute($key)

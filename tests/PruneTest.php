@@ -13,11 +13,11 @@ class PruneTest extends TestCase
     {
         $email = $this->sendEmail();
 
-        Carbon::setTestNow($email->created_at . ' + 6 months');
+        Carbon::setTestNow($email->created_at.' + 6 months');
         $this->artisan('model:prune', ['--model' => [Email::class]]);
         $this->assertInstanceOf(Email::class, $email->fresh());
 
-        Carbon::setTestNow($email->created_at . ' + 6 months + 1 day');
+        Carbon::setTestNow($email->created_at.' + 6 months + 1 day');
 
         // Ensure the email object has to be passed manually, otherwise we are acidentally
         // deleting everyone's e-mails...
@@ -38,11 +38,11 @@ class PruneTest extends TestCase
 
         $email = $this->sendEmail();
 
-        Carbon::setTestNow($email->created_at . ' + 3 months');
+        Carbon::setTestNow($email->created_at.' + 3 months');
         $this->artisan('model:prune', ['--model' => [Email::class]]);
         $this->assertInstanceOf(Email::class, $email->fresh());
 
-        Carbon::setTestNow($email->created_at . ' + 3 months + 1 day');
+        Carbon::setTestNow($email->created_at.' + 3 months + 1 day');
         $this->artisan('model:prune', ['--model' => [Email::class]]);
         $this->assertNull($email->fresh());
     }

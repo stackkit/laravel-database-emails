@@ -11,8 +11,6 @@ class Preparer
 {
     /**
      * Prepare the given e-mail for database storage.
-     *
-     * @param EmailComposer $composer
      */
     public function prepare(EmailComposer $composer): void
     {
@@ -47,8 +45,6 @@ class Preparer
 
     /**
      * Prepare the label for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareLabel(EmailComposer $composer): void
     {
@@ -63,8 +59,6 @@ class Preparer
 
     /**
      * Prepare the recipient for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareRecipient(EmailComposer $composer): void
     {
@@ -79,8 +73,6 @@ class Preparer
 
     /**
      * Prepare the from values for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareFrom(EmailComposer $composer): void
     {
@@ -91,8 +83,6 @@ class Preparer
 
     /**
      * Prepare the carbon copies for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareCc(EmailComposer $composer): void
     {
@@ -107,8 +97,6 @@ class Preparer
 
     /**
      * Prepare the carbon copies for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareBcc(EmailComposer $composer): void
     {
@@ -123,8 +111,6 @@ class Preparer
 
     /**
      * Prepare the reply-to for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareReplyTo(EmailComposer $composer): void
     {
@@ -150,8 +136,6 @@ class Preparer
 
     /**
      * Prepare the subject for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareSubject(EmailComposer $composer): void
     {
@@ -162,8 +146,6 @@ class Preparer
 
     /**
      * Prepare the view for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareView(EmailComposer $composer): void
     {
@@ -174,8 +156,6 @@ class Preparer
 
     /**
      * Prepare the variables for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareVariables(EmailComposer $composer): void
     {
@@ -190,8 +170,6 @@ class Preparer
 
     /**
      * Prepare the e-mail body for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareBody(EmailComposer $composer): void
     {
@@ -210,8 +188,6 @@ class Preparer
 
     /**
      * Prepare the e-mail attachments.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareAttachments(EmailComposer $composer): void
     {
@@ -219,14 +195,14 @@ class Preparer
 
         foreach ((array) $composer->getData('attachments', []) as $attachment) {
             $attachments[] = [
-                'type'       => 'attachment',
+                'type' => 'attachment',
                 'attachment' => $attachment,
             ];
         }
 
         foreach ((array) $composer->getData('rawAttachments', []) as $rawAttachment) {
             $attachments[] = [
-                'type'       => 'rawAttachment',
+                'type' => 'rawAttachment',
                 'attachment' => $rawAttachment,
             ];
         }
@@ -238,8 +214,6 @@ class Preparer
 
     /**
      * Prepare the scheduled date for database storage.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareScheduled(EmailComposer $composer): void
     {
@@ -260,8 +234,6 @@ class Preparer
 
     /**
      * Prepare the e-mail so it can be sent immediately.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareImmediately(EmailComposer $composer): void
     {
@@ -272,8 +244,6 @@ class Preparer
 
     /**
      * Prepare the queued date.
-     *
-     * @param EmailComposer $composer
      */
     private function prepareQueued(EmailComposer $composer): void
     {
@@ -283,5 +253,4 @@ class Preparer
             ]);
         }
     }
-
 }

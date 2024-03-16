@@ -24,8 +24,6 @@ class EmailComposer
 
     /**
      * Create a new EmailComposer instance.
-     *
-     * @param Email $email
      */
     public function __construct(Email $email)
     {
@@ -34,8 +32,6 @@ class EmailComposer
 
     /**
      * Get the e-mail that is being composed.
-     *
-     * @return Email
      */
     public function getEmail(): Email
     {
@@ -45,9 +41,7 @@ class EmailComposer
     /**
      * Set a data value.
      *
-     * @param string $key
-     * @param mixed  $value
-     * @return self
+     * @param  mixed  $value
      */
     public function setData(string $key, $value): self
     {
@@ -59,8 +53,7 @@ class EmailComposer
     /**
      * Get a data value.
      *
-     * @param string $key
-     * @param mixed  $default
+     * @param  mixed  $default
      * @return mixed
      */
     public function getData(string $key, $default = null)
@@ -74,9 +67,6 @@ class EmailComposer
 
     /**
      * Determine if the given data value was set.
-     *
-     * @param string $key
-     * @return bool
      */
     public function hasData(string $key): bool
     {
@@ -85,9 +75,6 @@ class EmailComposer
 
     /**
      * Set the e-mail label.
-     *
-     * @param string $label
-     * @return self
      */
     public function label(string $label): self
     {
@@ -96,10 +83,6 @@ class EmailComposer
 
     /**
      * Set the e-mail from address and aname.
-     *
-     * @param string|null $address
-     * @param string|null $name
-     * @return self
      */
     public function from(?string $address = null, ?string $name = null): self
     {
@@ -109,8 +92,7 @@ class EmailComposer
     /**
      * Set the e-mail recipient(s).
      *
-     * @param string|array $recipient
-     * @return self
+     * @param  string|array  $recipient
      */
     public function recipient($recipient): self
     {
@@ -120,8 +102,7 @@ class EmailComposer
     /**
      * Define the carbon-copy address(es).
      *
-     * @param string|array $cc
-     * @return self
+     * @param  string|array  $cc
      */
     public function cc($cc): self
     {
@@ -131,8 +112,7 @@ class EmailComposer
     /**
      * Define the blind carbon-copy address(es).
      *
-     * @param string|array $bcc
-     * @return self
+     * @param  string|array  $bcc
      */
     public function bcc($bcc): self
     {
@@ -142,8 +122,7 @@ class EmailComposer
     /**
      * Define the reply-to address(es).
      *
-     * @param string|array $replyTo
-     * @return self
+     * @param  string|array  $replyTo
      */
     public function replyTo($replyTo): self
     {
@@ -152,9 +131,6 @@ class EmailComposer
 
     /**
      * Set the e-mail subject.
-     *
-     * @param string $subject
-     * @return self
      */
     public function subject(string $subject): self
     {
@@ -163,9 +139,6 @@ class EmailComposer
 
     /**
      * Set the e-mail view.
-     *
-     * @param string $view
-     * @return self
      */
     public function view(string $view): self
     {
@@ -174,9 +147,6 @@ class EmailComposer
 
     /**
      * Set the e-mail variables.
-     *
-     * @param array $variables
-     * @return self
      */
     public function variables(array $variables): self
     {
@@ -186,8 +156,7 @@ class EmailComposer
     /**
      * Schedule the e-mail.
      *
-     * @param mixed $scheduledAt
-     * @return Email
+     * @param  mixed  $scheduledAt
      */
     public function schedule($scheduledAt): Email
     {
@@ -197,8 +166,7 @@ class EmailComposer
     /**
      * Schedule the e-mail.
      *
-     * @param mixed $scheduledAt
-     * @return Email
+     * @param  mixed  $scheduledAt
      */
     public function later($scheduledAt): Email
     {
@@ -210,10 +178,7 @@ class EmailComposer
     /**
      * Queue the e-mail.
      *
-     * @param string|null $connection
-     * @param string|null $queue
-     * @param \DateTimeInterface|\DateInterval|int|null $delay
-     * @return Email
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      */
     public function queue(?string $connection = null, ?string $queue = null, $delay = null): Email
     {
@@ -230,9 +195,6 @@ class EmailComposer
 
     /**
      * Set the Mailable.
-     *
-     * @param Mailable $mailable
-     * @return self
      */
     public function mailable(Mailable $mailable): self
     {
@@ -245,10 +207,6 @@ class EmailComposer
 
     /**
      * Attach a file to the e-mail.
-     *
-     * @param string $file
-     * @param array  $options
-     * @return self
      */
     public function attach(string $file, array $options = []): self
     {
@@ -261,11 +219,6 @@ class EmailComposer
 
     /**
      * Attach in-memory data as an attachment.
-     *
-     * @param  string $data
-     * @param  string $name
-     * @param  array  $options
-     * @return self
      */
     public function attachData(string $data, string $name, array $options = []): self
     {
@@ -278,8 +231,6 @@ class EmailComposer
 
     /**
      * Send the e-mail.
-     *
-     * @return Email
      */
     public function send(): Email
     {

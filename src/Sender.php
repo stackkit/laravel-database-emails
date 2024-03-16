@@ -11,8 +11,6 @@ class Sender
 {
     /**
      * Send the given e-mail.
-     *
-     * @param Email $email
      */
     public function send(Email $email): void
     {
@@ -27,7 +25,7 @@ class Sender
         });
 
         // $sentMessage is null when mocking (Mail::shouldReceive('send')->once())
-        if (!is_null($sentMessage)) {
+        if (! is_null($sentMessage)) {
             event(new MessageSent($sentMessage));
         }
 
@@ -36,9 +34,6 @@ class Sender
 
     /**
      * Build the e-mail message.
-     *
-     * @param  Message $message
-     * @param  Email   $email
      */
     private function buildMessage(Message $message, Email $email): void
     {
@@ -52,7 +47,7 @@ class Sender
         $message->html($email->getBody());
 
         $attachmentMap = [
-            'attachment'    => 'attach',
+            'attachment' => 'attach',
             'rawAttachment' => 'attachData',
         ];
 

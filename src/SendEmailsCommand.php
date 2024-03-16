@@ -33,8 +33,6 @@ class SendEmailsCommand extends Command
 
     /**
      * Create a new SendEmailsCommand instance.
-     *
-     * @param Store $store
      */
     public function __construct(Store $store)
     {
@@ -45,8 +43,6 @@ class SendEmailsCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -77,9 +73,6 @@ class SendEmailsCommand extends Command
 
     /**
      * Output a table with the cronjob result.
-     *
-     * @param Collection $emails
-     * @return void
      */
     protected function result(Collection $emails): void
     {

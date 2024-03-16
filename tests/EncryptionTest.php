@@ -38,7 +38,7 @@ class EncryptionTest extends TestCase
     public function cc_and_bb_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail([
-            'cc'  => $cc = ['john+1@doe.com', 'john+2@doe.com'],
+            'cc' => $cc = ['john+1@doe.com', 'john+2@doe.com'],
             'bcc' => $bcc = ['jane+1@doe.com', 'jane+2@doe.com'],
         ]);
 
@@ -53,7 +53,7 @@ class EncryptionTest extends TestCase
     public function reply_to_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail([
-            'reply_to'  => $replyTo = ['john+1@doe.com', 'john+2@doe.com'],
+            'reply_to' => $replyTo = ['john+1@doe.com', 'john+2@doe.com'],
         ]);
         $this->assertEquals($replyTo, decrypt($email->getRawDatabaseValue('reply_to')));
         $this->assertEquals($replyTo, $email->getReplyTo());
@@ -64,14 +64,14 @@ class EncryptionTest extends TestCase
 
         // Test with a single Address object...
         $email = $this->sendEmail([
-            'reply_to'  => new Address('john+1@doe.com', 'John Doe'),
+            'reply_to' => new Address('john+1@doe.com', 'John Doe'),
         ]);
         $this->assertEquals([['address' => 'john+1@doe.com', 'name' => 'John Doe']], decrypt($email->getRawDatabaseValue('reply_to')));
         $this->assertEquals([['address' => 'john+1@doe.com', 'name' => 'John Doe']], $email->getReplyTo());
 
         // Address with an array of Address objects...
         $email = $this->sendEmail([
-            'reply_to'  => [
+            'reply_to' => [
                 new Address('john+1@doe.com', 'John Doe'),
                 new Address('jane+1@doe.com', 'Jane Doe'),
             ],
@@ -125,7 +125,7 @@ class EncryptionTest extends TestCase
 
         $expect = [
             'address' => 'marick@dolphiq.nl',
-            'name'    => 'Marick',
+            'name' => 'Marick',
         ];
 
         $this->assertEquals($expect, decrypt($email->getRawDatabaseValue('from')));

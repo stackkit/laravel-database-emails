@@ -85,7 +85,7 @@ class MailableReaderTest extends TestCase
         $this->assertCount(2, $attachments);
 
         $this->assertEquals('attachment', $attachments[0]['type']);
-        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $attachments[0]['attachment']['file']);
+        $this->assertEquals(__DIR__.'/files/pdf-sample.pdf', $attachments[0]['attachment']['file']);
 
         $this->assertEquals('rawAttachment', $attachments[1]['type']);
         $this->assertEquals('order.html', $attachments[1]['attachment']['name']);
@@ -140,7 +140,7 @@ class TestMailable extends Mailable
         return new Envelope(
             null,
             [
-                new Address('john@doe.com', 'John Doe')
+                new Address('john@doe.com', 'John Doe'),
             ],
             ['john+cc@doe.com', 'john+cc2@doe.com'],
             ['john+bcc@doe.com', 'john+bcc2@doe.com'],
@@ -152,10 +152,10 @@ class TestMailable extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromPath(__DIR__ . '/files/pdf-sample.pdf')->withMime('application/pdf'),
+            Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf')->withMime('application/pdf'),
             Attachment::fromData(function () {
                 return '<p>Thanks for your oder</p>';
-            }, 'order.html')
+            }, 'order.html'),
         ];
     }
 }

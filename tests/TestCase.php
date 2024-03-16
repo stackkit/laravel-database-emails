@@ -2,9 +2,7 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Stackkit\LaravelDatabaseEmails\Email;
 use Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider;
 
@@ -30,9 +28,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
             },
         ];
 
-        view()->addNamespace('tests', __DIR__ . '/views');
+        view()->addNamespace('tests', __DIR__.'/views');
 
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         Email::truncate();
     }
@@ -47,7 +45,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -60,7 +58,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $driver = env('DB_DRIVER', 'sqlite');
         $app['config']->set('database.connections.testbench', [
             'driver' => $driver,
-            ...match($driver) {
+            ...match ($driver) {
                 'sqlite' => [
                     'database' => ':memory:',
                 ],
@@ -84,13 +82,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function createEmail($overwrite = [])
     {
         $params = array_merge([
-            'label'     => 'welcome',
+            'label' => 'welcome',
             'recipient' => 'john@doe.com',
-            'cc'        => null,
-            'bcc'       => null,
-            'reply_to'  => null,
-            'subject'   => 'test',
-            'view'      => 'tests::dummy',
+            'cc' => null,
+            'bcc' => null,
+            'reply_to' => null,
+            'subject' => 'test',
+            'view' => 'tests::dummy',
             'variables' => ['name' => 'John Doe'],
         ], $overwrite);
 

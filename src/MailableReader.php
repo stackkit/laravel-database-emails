@@ -12,8 +12,6 @@ class MailableReader
 {
     /**
      * Read the mailable and pass the data to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     public function read(EmailComposer $composer): void
     {
@@ -46,8 +44,7 @@ class MailableReader
     /**
      * Convert the mailable addresses array into a array with only e-mails.
      *
-     * @param string $from
-     * @return array
+     * @param  string  $from
      */
     private function convertMailableAddresses($from): array
     {
@@ -58,8 +55,6 @@ class MailableReader
 
     /**
      * Read the mailable recipient to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readRecipient(EmailComposer $composer): void
     {
@@ -72,14 +67,12 @@ class MailableReader
 
     /**
      * Read the mailable from field to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readFrom(EmailComposer $composer): void
     {
         $from = reset($composer->getData('mailable')->from);
 
-        if (!$from) {
+        if (! $from) {
             return;
         }
 
@@ -91,8 +84,6 @@ class MailableReader
 
     /**
      * Read the mailable cc to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readCc(EmailComposer $composer): void
     {
@@ -105,8 +96,6 @@ class MailableReader
 
     /**
      * Read the mailable bcc to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readBcc(EmailComposer $composer): void
     {
@@ -119,8 +108,6 @@ class MailableReader
 
     /**
      * Read the mailable reply-to to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readReplyTo(EmailComposer $composer): void
     {
@@ -133,8 +120,6 @@ class MailableReader
 
     /**
      * Read the mailable subject to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readSubject(EmailComposer $composer): void
     {
@@ -144,7 +129,6 @@ class MailableReader
     /**
      * Read the mailable body to the email composer.
      *
-     * @param EmailComposer $composer
      * @throws Exception
      */
     private function readBody(EmailComposer $composer): void
@@ -158,8 +142,6 @@ class MailableReader
 
     /**
      * Read the mailable attachments to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readAttachments(EmailComposer $composer): void
     {

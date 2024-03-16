@@ -10,13 +10,21 @@ use Symfony\Component\Mime\Part\DataPart;
 class SentMessage
 {
     public $from = [];
+
     public $to = [];
+
     public $cc = [];
+
     public $bcc = [];
+
     public $replyTo = [];
+
     public $subject = '';
+
     public $body = '';
+
     public $attachments = [];
+
     public $headers = [];
 
     public static function createFromSymfonyMailer(Email $email): SentMessage
