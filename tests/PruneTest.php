@@ -2,13 +2,13 @@
 
 namespace Tests;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class PruneTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function by_default_mails_are_pruned_after_6_months()
     {
         $email = $this->sendEmail();
@@ -29,7 +29,7 @@ class PruneTest extends TestCase
         $this->assertNull($email->fresh());
     }
 
-    /** @test */
+    #[Test]
     public function can_change_when_emails_are_pruned()
     {
         Email::pruneWhen(function (Email $email) {

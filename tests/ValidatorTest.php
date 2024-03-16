@@ -4,11 +4,12 @@ namespace Tests;
 
 use Carbon;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class ValidatorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function a_label_cannot_contain_more_than_255_characters()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -18,7 +19,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function a_recipient_is_required()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -28,7 +29,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function a_recipient_cannot_be_empty()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -39,7 +40,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function the_recipient_email_must_be_valid()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -50,7 +51,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function cc_must_contain_valid_email_addresses()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -65,7 +66,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function bcc_must_contain_valid_email_addresses()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -80,7 +81,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function reply_to_must_contain_valid_email_addresses()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -95,7 +96,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function a_subject_is_required()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -106,7 +107,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function a_view_is_required()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -118,7 +119,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function the_view_must_exist()
     {
         // this view exists, if error thrown -> fail test
@@ -142,7 +143,7 @@ class ValidatorTest extends TestCase
             ->send();
     }
 
-    /** @test */
+    #[Test]
     public function variables_must_be_defined_as_an_array()
     {
         $email = Email::compose()
@@ -168,7 +169,7 @@ class ValidatorTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function the_scheduled_date_must_be_a_carbon_instance_or_a_valid_date()
     {
         // invalid

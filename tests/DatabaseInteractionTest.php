@@ -4,10 +4,11 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 
 class DatabaseInteractionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function label_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['label' => 'welcome-email']);
@@ -16,7 +17,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('welcome-email', $email->getLabel());
     }
 
-    /** @test */
+    #[Test]
     public function recipient_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
@@ -24,7 +25,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('john@doe.com', $email->getRecipient());
     }
 
-    /** @test */
+    #[Test]
     public function cc_and_bcc_should_be_saved_correctly()
     {
         $email = $this->sendEmail([
@@ -44,7 +45,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals(['jane@doe.com'], $email->getBcc());
     }
 
-    /** @test */
+    #[Test]
     public function reply_to_should_be_saved_correctly()
     {
         $email = $this->sendEmail([
@@ -58,7 +59,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals(['john@doe.com'], $email->getReplyTo());
     }
 
-    /** @test */
+    #[Test]
     public function subject_should_be_saved_correclty()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
@@ -67,7 +68,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('test subject', $email->getSubject());
     }
 
-    /** @test */
+    #[Test]
     public function view_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['view' => 'tests::dummy']);
@@ -76,7 +77,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('tests::dummy', $email->getView());
     }
 
-    /** @test */
+    #[Test]
     public function encrypted_should_be_saved_correctly()
     {
         $email = $this->sendEmail();
@@ -92,7 +93,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertTrue($email->isEncrypted());
     }
 
-    /** @test */
+    #[Test]
     public function scheduled_date_should_be_saved_correctly()
     {
         $email = $this->sendEmail();
@@ -105,7 +106,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('2019-01-15 01:02:03', $email->getScheduledDate());
     }
 
-    /** @test */
+    #[Test]
     public function the_body_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
@@ -116,7 +117,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertSame($expectedBody, $email->getBody());
     }
 
-    /** @test */
+    #[Test]
     public function from_should_be_saved_correctly()
     {
         $email = $this->composeEmail()->send();
@@ -132,7 +133,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('Marick', $email->getFromName());
     }
 
-    /** @test */
+    #[Test]
     public function variables_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'John Doe']]);
@@ -141,7 +142,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals(['name' => 'John Doe'], $email->getVariables());
     }
 
-    /** @test */
+    #[Test]
     public function the_sent_date_should_be_null()
     {
         $email = $this->sendEmail();
@@ -150,7 +151,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertNull($email->getSendDate());
     }
 
-    /** @test */
+    #[Test]
     public function failed_should_be_zero()
     {
         $email = $this->sendEmail();
@@ -159,7 +160,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertFalse($email->hasFailed());
     }
 
-    /** @test */
+    #[Test]
     public function attempts_should_be_zero()
     {
         $email = $this->sendEmail();
@@ -168,7 +169,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals(0, $email->getAttempts());
     }
 
-    /** @test */
+    #[Test]
     public function the_scheduled_date_should_be_saved_correctly()
     {
         Carbon::setTestNow(Carbon::now());
@@ -181,7 +182,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals($scheduledFor, $email->getScheduledDate());
     }
 
-    /** @test */
+    #[Test]
     public function recipient_should_be_swapped_for_test_address_when_in_testing_mode()
     {
         $this->app['config']->set('laravel-database-emails.testing.enabled', function () {
@@ -194,7 +195,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals('test@address.com', $email->getRecipient());
     }
 
-    /** @test */
+    #[Test]
     public function attachments_should_be_saved_correctly()
     {
         $email = $this->composeEmail()
@@ -219,7 +220,7 @@ class DatabaseInteractionTest extends TestCase
         $this->assertEquals(__DIR__ . '/files/pdf-sample-2.pdf', $email->getAttachments()[1]['attachment']['file']);
     }
 
-    /** @test */
+    #[Test]
     public function in_memory_attachments_should_be_saved_correctly()
     {
         $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');

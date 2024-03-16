@@ -5,11 +5,12 @@ namespace Tests;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\Store;
 
 class SendEmailsCommandTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function an_email_should_be_marked_as_sent()
     {
         $email = $this->sendEmail();
@@ -19,7 +20,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertNotNull($email->fresh()->getSendDate());
     }
 
-    /** @test */
+    #[Test]
     public function the_number_of_attempts_should_be_incremented()
     {
         $email = $this->sendEmail();
@@ -31,7 +32,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertEquals(1, $email->fresh()->getAttempts());
     }
 
-    /** @test */
+    #[Test]
     public function an_email_should_not_be_sent_once_it_is_marked_as_sent()
     {
         $email = $this->sendEmail();
@@ -46,7 +47,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertEquals($firstSend, $email->fresh()->getSendDate());
     }
 
-    /** @test */
+    #[Test]
     public function an_email_should_not_be_sent_if_it_is_queued()
     {
         Queue::fake();
@@ -58,7 +59,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertNull($email->fresh()->getSendDate());
     }
 
-    /** @test */
+    #[Test]
     public function if_an_email_fails_to_be_sent_it_should_be_logged_in_the_database()
     {
         $email = $this->sendEmail();
@@ -71,7 +72,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertStringContainsString('RfcComplianceException', $email->fresh()->getError());
     }
 
-    /** @test */
+    #[Test]
     public function the_number_of_emails_sent_per_minute_should_be_limited()
     {
         for ($i = 1; $i <= 30; $i++) {
@@ -85,7 +86,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertEquals(5, DB::table('emails')->whereNull('sent_at')->count());
     }
 
-    /** @test */
+    #[Test]
     public function an_email_should_never_be_sent_before_its_scheduled_date()
     {
         $email = $this->scheduleEmail(Carbon::now()->addHour(1));
@@ -101,7 +102,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertNotNull($email->getSendDate());
     }
 
-    /** @test */
+    #[Test]
     public function emails_will_be_sent_until_max_try_count_has_been_reached()
     {
         $this->app['config']['mail.driver'] = 'does-not-exist';
@@ -116,7 +117,7 @@ class SendEmailsCommandTest extends TestCase
         $this->assertCount(0, (new Store)->getQueue());
     }
 
-    /** @test */
+    #[Test]
     public function the_failed_status_and_error_is_cleared_if_a_previously_failed_email_is_sent_succesfully()
     {
         $email = $this->sendEmail();

@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\MessageSent;
 use Stackkit\LaravelDatabaseEmails\SentMessage;
 use Illuminate\Support\Facades\Mail;
@@ -25,7 +26,7 @@ class SenderTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_sends_an_email()
     {
         $this->sendEmail();
@@ -35,7 +36,7 @@ class SenderTest extends TestCase
         $this->artisan('email:send');
     }
 
-    /** @test */
+    #[Test]
     public function the_email_has_a_correct_from_email_and_from_name()
     {
         $this->app['config']->set('mail.from.address', 'testfromaddress@gmail.com');
@@ -76,7 +77,7 @@ class SenderTest extends TestCase
         $this->assertEquals('Marick', $from[key($from)]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sends_emails_to_the_correct_recipients()
     {
         $this->sendEmail(['recipient' => 'john@doe.com']);
@@ -94,7 +95,7 @@ class SenderTest extends TestCase
         $this->assertArrayHasKey('john+2@doe.com', $to);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_the_cc_addresses()
     {
         $this->sendEmail(['cc' => 'cc@test.com']);
@@ -112,7 +113,7 @@ class SenderTest extends TestCase
         $this->assertArrayHasKey('cc+2@test.com', $cc);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_the_bcc_addresses()
     {
         $this->sendEmail(['bcc' => 'bcc@test.com']);
@@ -130,7 +131,7 @@ class SenderTest extends TestCase
         $this->assertArrayHasKey('bcc+2@test.com', $bcc);
     }
 
-    /** @test */
+    #[Test]
     public function the_email_has_the_correct_subject()
     {
         $this->sendEmail(['subject' => 'Hello World']);
@@ -142,7 +143,7 @@ class SenderTest extends TestCase
         $this->assertEquals('Hello World', $subject);
     }
 
-    /** @test */
+    #[Test]
     public function the_email_has_the_correct_body()
     {
         $this->sendEmail(['variables' => ['name' => 'John Doe']]);
@@ -157,7 +158,7 @@ class SenderTest extends TestCase
         $this->assertEquals(view('tests::dummy'), $body);
     }
 
-    /** @test */
+    #[Test]
     public function attachments_are_added_to_the_email()
     {
         $this->composeEmail()
@@ -170,7 +171,7 @@ class SenderTest extends TestCase
         $this->assertCount(1, $attachments);
     }
 
-    /** @test */
+    #[Test]
     public function raw_attachments_are_added_to_the_email()
     {
         $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
@@ -191,7 +192,7 @@ class SenderTest extends TestCase
         $this->assertTrue(md5($attachment['body']) == md5($rawData));
     }
 
-    /** @test */
+    #[Test]
     public function old_json_encoded_attachments_can_still_be_read()
     {
         $email = $this->sendEmail();
@@ -206,7 +207,7 @@ class SenderTest extends TestCase
         $this->assertEquals([4, 5, 6], $email->fresh()->getAttachments());
     }
 
-    /** @test */
+    #[Test]
     public function emails_can_be_sent_immediately()
     {
         $this->app['config']->set('laravel-database-emails.immediately', false);
@@ -222,7 +223,7 @@ class SenderTest extends TestCase
         $this->assertCount(1, $this->sent);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_the_reply_to_addresses()
     {
         $this->sendEmail(['reply_to' => 'replyto@test.com']);

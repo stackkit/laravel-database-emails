@@ -7,6 +7,7 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class MailableReaderTest extends TestCase
@@ -16,7 +17,7 @@ class MailableReaderTest extends TestCase
         return new TestMailable();
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_the_recipient()
     {
         $composer = Email::compose()
@@ -34,7 +35,7 @@ class MailableReaderTest extends TestCase
         $this->assertContains('jane@doe.com', $composer->getData('recipient'));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_cc_addresses()
     {
         $composer = Email::compose()->mailable($this->mailable());
@@ -42,7 +43,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals(['john+cc@doe.com', 'john+cc2@doe.com'], $composer->getData('cc'));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_bcc_addresses()
     {
         $composer = Email::compose()->mailable($this->mailable());
@@ -50,7 +51,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals(['john+bcc@doe.com', 'john+bcc2@doe.com'], $composer->getData('bcc'));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_reply_to_addresses()
     {
         $composer = Email::compose()->mailable($this->mailable());
@@ -58,7 +59,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals(['replyto@example.com', 'replyto2@example.com'], $composer->getData('reply_to'));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_the_subject()
     {
         $composer = Email::compose()->mailable($this->mailable());
@@ -66,7 +67,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals('Your order has shipped!', $composer->getData('subject'));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_the_body()
     {
         $composer = Email::compose()->mailable($this->mailable());
@@ -74,7 +75,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals("Name: John Doe\n", $composer->getData('body'));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_attachments()
     {
         $email = Email::compose()->mailable($this->mailable())->send();
@@ -91,7 +92,7 @@ class MailableReaderTest extends TestCase
         $this->assertEquals('<p>Thanks for your oder</p>', $attachments[1]['attachment']['data']);
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_the_from_address_and_or_name()
     {
         $email = Email::compose()->mailable(

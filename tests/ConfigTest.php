@@ -2,11 +2,12 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\Config;
 
 class ConfigTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function test_max_attempt_count()
     {
         $this->assertEquals(3, Config::maxAttemptCount());
@@ -16,7 +17,7 @@ class ConfigTest extends TestCase
         $this->assertEquals(5, Config::maxAttemptCount());
     }
 
-    /** @test */
+    #[Test]
     public function test_encrypt_emails()
     {
         $this->assertFalse(Config::encryptEmails());
@@ -26,7 +27,7 @@ class ConfigTest extends TestCase
         $this->assertTrue(Config::encryptEmails());
     }
 
-    /** @test */
+    #[Test]
     public function test_testing()
     {
         $this->assertFalse(Config::testing());
@@ -36,7 +37,7 @@ class ConfigTest extends TestCase
         $this->assertTrue(Config::testing());
     }
 
-    /** @test */
+    #[Test]
     public function test_test_email_address()
     {
         $this->assertEquals('test@email.com', Config::testEmailAddress());
@@ -46,7 +47,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('test+update@email.com', Config::testEmailAddress());
     }
 
-    /** @test */
+    #[Test]
     public function test_cronjob_email_limit()
     {
         $this->assertEquals(20, Config::cronjobEmailLimit());

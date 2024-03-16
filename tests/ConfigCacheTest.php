@@ -2,18 +2,19 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Throwable;
 
 class ConfigCacheTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function the_configuration_file_can_be_cached()
     {
         $failed = false;
 
         try {
             serialize(require __DIR__ . '/../config/laravel-database-emails.php');
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $failed = true;
         }
 

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Mail\Mailables\Address;
+use PHPUnit\Framework\Attributes\Test;
 
 class EncryptionTest extends TestCase
 {
@@ -15,7 +16,7 @@ class EncryptionTest extends TestCase
         $this->sendEmail();
     }
 
-    /** @test */
+    #[Test]
     public function an_email_should_be_marked_as_encrypted()
     {
         $email = $this->sendEmail();
@@ -23,7 +24,7 @@ class EncryptionTest extends TestCase
         $this->assertTrue($email->isEncrypted());
     }
 
-    /** @test */
+    #[Test]
     public function the_recipient_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
@@ -33,7 +34,7 @@ class EncryptionTest extends TestCase
         $this->assertEquals('john@doe.com', $email->getRecipient());
     }
 
-    /** @test */
+    #[Test]
     public function cc_and_bb_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail([
@@ -48,7 +49,7 @@ class EncryptionTest extends TestCase
         $this->assertEquals($bcc, $email->getBcc());
     }
 
-    /** @test */
+    #[Test]
     public function reply_to_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail([
@@ -79,7 +80,7 @@ class EncryptionTest extends TestCase
         $this->assertSame([['address' => 'john+1@doe.com', 'name' => 'John Doe'], ['address' => 'jane+1@doe.com', 'name' => 'Jane Doe']], $email->getReplyTo());
     }
 
-    /** @test */
+    #[Test]
     public function the_subject_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
@@ -89,7 +90,7 @@ class EncryptionTest extends TestCase
         $this->assertEquals('test subject', $email->getSubject());
     }
 
-    /** @test */
+    #[Test]
     public function the_variables_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
@@ -105,7 +106,7 @@ class EncryptionTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function the_body_should_be_encrypted_and_decrypted()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
@@ -117,7 +118,7 @@ class EncryptionTest extends TestCase
         $this->assertEquals($expectedBody, $email->getBody());
     }
 
-    /** @test */
+    #[Test]
     public function from_should_be_encrypted_and_decrypted()
     {
         $email = $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
