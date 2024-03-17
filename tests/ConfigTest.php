@@ -18,16 +18,6 @@ class ConfigTest extends TestCase
     }
 
     #[Test]
-    public function test_encrypt_emails()
-    {
-        $this->assertFalse(Config::encryptEmails());
-
-        $this->app['config']->set('laravel-database-emails.encrypt', true);
-
-        $this->assertTrue(Config::encryptEmails());
-    }
-
-    #[Test]
     public function test_testing()
     {
         $this->assertFalse(Config::testing());

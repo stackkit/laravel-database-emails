@@ -6,10 +6,10 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Carbon\Carbon;
 use Closure;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
+use Throwable;
 
 /**
  * @property $id
@@ -28,7 +28,6 @@ use Illuminate\Database\Eloquent\Prunable;
  * @property $sending
  * @property $failed
  * @property $error
- * @property $encrypted
  * @property $queued_at
  * @property $scheduled_at
  * @property $sent_at
@@ -36,8 +35,18 @@ use Illuminate\Database\Eloquent\Prunable;
  */
 class Email extends Model
 {
-    use HasEncryptedAttributes;
     use Prunable;
+
+    protected $casts = [
+        'failed' => 'boolean',
+        'recipient' => 'json',
+        'from' => 'json',
+        'cc' => 'json',
+        'bcc' => 'json',
+        'reply_to' => 'json',
+        'variables' => 'json',
+        'attachments' => 'json',
+    ];
 
     /**
      * The table in which the e-mails are stored.
@@ -64,63 +73,11 @@ class Email extends Model
     }
 
     /**
-     * Get the e-mail id.
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the e-mail label.
-     */
-    public function getLabel(): ?string
-    {
-        return $this->label;
-    }
-
-    /**
-     * Get the e-mail recipient.
-     *
-     * @return string|array
-     */
-    public function getRecipient()
-    {
-        return $this->recipient;
-    }
-
-    /**
-     * Get the e-mail recipient.
-     *
-     * @return string|array
-     */
-    public function getRecipientAttribute()
-    {
-        return $this->recipient;
-    }
-
-    /**
-     * Get the e-mail from.
-     */
-    public function getFrom(): ?array
-    {
-        return $this->from;
-    }
-
-    /**
-     * Get the e-mail from.
-     */
-    public function getFromAttribute(): ?array
-    {
-        return $this->from;
-    }
-
-    /**
      * Get the e-mail from address.
      */
     public function getFromAddress(): ?string
     {
-        return $this->from['address'] ?? config('mail.from.address');
+        return $this->from['address'];
     }
 
     /**
@@ -128,263 +85,7 @@ class Email extends Model
      */
     public function getFromName(): ?string
     {
-        return $this->from['name'] ?? config('mail.from.name');
-    }
-
-    /**
-     * Get the e-mail recipient(s) as string.
-     */
-    public function getRecipientsAsString(): string
-    {
-        $glue = ', ';
-
-        return implode($glue, (array) $this->recipient);
-    }
-
-    /**
-     * Get the e-mail CC addresses.
-     *
-     * @return array|string
-     */
-    public function getCc()
-    {
-        return $this->cc;
-    }
-
-    /**
-     * Get the e-mail CC addresses.
-     *
-     * @return array|string
-     */
-    public function getCcAttribute()
-    {
-        return $this->cc;
-    }
-
-    /**
-     * Get the e-mail BCC addresses.
-     *
-     * @return array|string
-     */
-    public function getBcc()
-    {
-        return $this->bcc;
-    }
-
-    /**
-     * Get the e-mail BCC addresses.
-     *
-     * @return array|string
-     */
-    public function getBccAttribute()
-    {
-        return $this->bcc;
-    }
-
-    /**
-     * Get the e-mail reply-to addresses.
-     *
-     * @return array|string
-     */
-    public function getReplyTo()
-    {
-        return $this->reply_to;
-    }
-
-    /**
-     * Get the e-mail reply-to addresses.
-     *
-     * @return array|string
-     */
-    public function getReplyToAttribute()
-    {
-        return $this->reply_to;
-    }
-
-    /**
-     * Get the e-mail subject.
-     */
-    public function getSubject(): string
-    {
-        return $this->subject;
-    }
-
-    /**
-     * Get the e-mail subject.
-     */
-    public function getSubjectAttribute(): string
-    {
-        return $this->subject;
-    }
-
-    /**
-     * Get the e-mail view.
-     */
-    public function getView(): string
-    {
-        return $this->view;
-    }
-
-    /**
-     * Get the e-mail variables.
-     */
-    public function getVariables(): ?array
-    {
-        return $this->variables;
-    }
-
-    /**
-     * Get the e-mail variables.
-     */
-    public function getVariablesAttribute(): ?array
-    {
-        return $this->variables;
-    }
-
-    /**
-     * Get the e-mail body.
-     */
-    public function getBody(): string
-    {
-        return $this->body;
-    }
-
-    /**
-     * Get the e-mail body.
-     */
-    public function getBodyAttribute(): string
-    {
-        return $this->body;
-    }
-
-    /**
-     * Get the e-mail attachments.
-     */
-    public function getAttachments(): array
-    {
-        return $this->attachments;
-    }
-
-    /**
-     * Get the number of times this e-mail was attempted to send.
-     */
-    public function getAttempts(): int
-    {
-        return $this->attempts;
-    }
-
-    /**
-     * Get the queued date.
-     */
-    public function getQueuedDate(): ?string
-    {
-        return $this->queued_at;
-    }
-
-    /**
-     * Get the queued date as a Carbon instance.
-     */
-    public function getQueuedDateAsCarbon(): Carbon
-    {
-        if ($this->queued_at instanceof Carbon) {
-            return $this->queued_at;
-        }
-
-        return Carbon::parse($this->queued_at);
-    }
-
-    /**
-     * Get the scheduled date.
-     */
-    public function getScheduledDate(): ?string
-    {
-        return $this->scheduled_at;
-    }
-
-    /**
-     * Determine if the e-mail has variables defined.
-     */
-    public function hasVariables(): bool
-    {
-        return ! is_null($this->variables);
-    }
-
-    /**
-     * Get the scheduled date as a Carbon instance.
-     */
-    public function getScheduledDateAsCarbon(): Carbon
-    {
-        if ($this->scheduled_at instanceof Carbon) {
-            return $this->scheduled_at;
-        }
-
-        return Carbon::parse($this->scheduled_at);
-    }
-
-    /**
-     * Get the send date for this e-mail.
-     */
-    public function getSendDate(): ?string
-    {
-        return $this->sent_at;
-    }
-
-    /**
-     * Get the send error.
-     *
-     * @return string|string
-     */
-    public function getError(): ?string
-    {
-        return $this->error;
-    }
-
-    /**
-     * Determine if the e-mail should be sent with custom from values.
-     */
-    public function hasFrom(): bool
-    {
-        return is_array($this->from) && count($this->from) > 0;
-    }
-
-    /**
-     * Determine if the e-mail should be sent as a carbon copy.
-     */
-    public function hasCc(): bool
-    {
-        return strlen($this->getRawDatabaseValue('cc')) > 0;
-    }
-
-    /**
-     * Determine if the e-mail should be sent as a blind carbon copy.
-     */
-    public function hasBcc(): bool
-    {
-        return strlen($this->getRawDatabaseValue('bcc')) > 0;
-    }
-
-    /**
-     * Determine if the e-mail should sent with reply-to.
-     */
-    public function hasReplyTo(): bool
-    {
-        return strlen($this->getRawDatabaseValue('reply_to') ?: '') > 0;
-    }
-
-    /**
-     * Determine if the e-mail is scheduled to be sent later.
-     */
-    public function isScheduled(): bool
-    {
-        return ! is_null($this->getScheduledDate());
-    }
-
-    /**
-     * Determine if the e-mail is encrypted.
-     */
-    public function isEncrypted(): bool
-    {
-        return (bool) $this->getRawDatabaseValue('encrypted');
+        return $this->from['name'];
     }
 
     /**
@@ -432,7 +133,7 @@ class Email extends Model
     /**
      * Mark the e-mail as failed.
      */
-    public function markAsFailed(Exception $exception): void
+    public function markAsFailed(Throwable $exception): void
     {
         $this->update([
             'sending' => 0,
@@ -469,19 +170,6 @@ class Email extends Model
         );
 
         $retry->save();
-    }
-
-    /**
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function getRawDatabaseValue(?string $key = null, $default = null)
-    {
-        if (method_exists($this, 'getRawOriginal')) {
-            return $this->getRawOriginal($key, $default);
-        }
-
-        return $this->getOriginal($key, $default);
     }
 
     /**

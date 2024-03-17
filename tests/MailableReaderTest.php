@@ -4,10 +4,10 @@ namespace Tests;
 
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use PHPUnit\Framework\Attributes\Test;
+use Stackkit\LaravelDatabaseEmails\Attachment;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class MailableReaderTest extends TestCase
@@ -23,16 +23,16 @@ class MailableReaderTest extends TestCase
         $composer = Email::compose()
             ->mailable($this->mailable());
 
-        $this->assertEquals(['john@doe.com'], $composer->getData('recipient'));
+        $this->assertEquals(['john@doe.com' => 'John Doe'], $composer->getEmail()->recipient);
 
         $composer = Email::compose()
             ->mailable(
                 $this->mailable()->to(['jane@doe.com'])
             );
 
-        $this->assertCount(2, $composer->getData('recipient'));
-        $this->assertContains('john@doe.com', $composer->getData('recipient'));
-        $this->assertContains('jane@doe.com', $composer->getData('recipient'));
+        $this->assertCount(2, $composer->getEmail()->recipient);
+        $this->assertArrayHasKey('john@doe.com', $composer->getEmail()->recipient);
+        $this->assertArrayHasKey('jane@doe.com', $composer->getEmail()->recipient);
     }
 
     #[Test]
@@ -40,7 +40,7 @@ class MailableReaderTest extends TestCase
     {
         $composer = Email::compose()->mailable($this->mailable());
 
-        $this->assertEquals(['john+cc@doe.com', 'john+cc2@doe.com'], $composer->getData('cc'));
+        $this->assertEquals(['john+cc@doe.com' => null, 'john+cc2@doe.com' => null], $composer->getEmail()->cc);
     }
 
     #[Test]
@@ -48,7 +48,7 @@ class MailableReaderTest extends TestCase
     {
         $composer = Email::compose()->mailable($this->mailable());
 
-        $this->assertEquals(['john+bcc@doe.com', 'john+bcc2@doe.com'], $composer->getData('bcc'));
+        $this->assertEquals(['john+bcc@doe.com' => null, 'john+bcc2@doe.com' => null], $composer->getEmail()->bcc);
     }
 
     #[Test]
@@ -56,7 +56,7 @@ class MailableReaderTest extends TestCase
     {
         $composer = Email::compose()->mailable($this->mailable());
 
-        $this->assertEquals(['replyto@example.com', 'replyto2@example.com'], $composer->getData('reply_to'));
+        $this->assertEquals(['replyto@example.com' => null, 'replyto2@example.com' => null], $composer->getEmail()->reply_to);
     }
 
     #[Test]
@@ -64,7 +64,7 @@ class MailableReaderTest extends TestCase
     {
         $composer = Email::compose()->mailable($this->mailable());
 
-        $this->assertEquals('Your order has shipped!', $composer->getData('subject'));
+        $this->assertEquals('Your order has shipped!', $composer->getEmail()->subject);
     }
 
     #[Test]
@@ -72,7 +72,7 @@ class MailableReaderTest extends TestCase
     {
         $composer = Email::compose()->mailable($this->mailable());
 
-        $this->assertEquals("Name: John Doe\n", $composer->getData('body'));
+        $this->assertEquals("Name: John Doe\n", $composer->getEmail()->body);
     }
 
     #[Test]
@@ -80,16 +80,11 @@ class MailableReaderTest extends TestCase
     {
         $email = Email::compose()->mailable($this->mailable())->send();
 
-        $attachments = $email->getAttachments();
+        $attachments = $email->attachments;
 
         $this->assertCount(2, $attachments);
 
-        $this->assertEquals('attachment', $attachments[0]['type']);
-        $this->assertEquals(__DIR__.'/files/pdf-sample.pdf', $attachments[0]['attachment']['file']);
-
-        $this->assertEquals('rawAttachment', $attachments[1]['type']);
-        $this->assertEquals('order.html', $attachments[1]['attachment']['name']);
-        $this->assertEquals('<p>Thanks for your oder</p>', $attachments[1]['attachment']['data']);
+        $this->assertEquals(__DIR__.'/files/pdf-sample.pdf', $attachments[0]['path']);
     }
 
     #[Test]
@@ -100,7 +95,7 @@ class MailableReaderTest extends TestCase
                 ->from('marick@dolphiq.nl', 'Marick')
         )->send();
 
-        $this->assertTrue($email->hasFrom());
+        $this->assertTrue((bool) $email->from);
         $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
         $this->assertEquals('Marick', $email->getFromName());
 
@@ -109,16 +104,17 @@ class MailableReaderTest extends TestCase
                 ->from('marick@dolphiq.nl')
         )->send();
 
-        $this->assertTrue($email->hasFrom());
+        $this->assertTrue((bool) $email->from);
         $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
-        $this->assertEquals(config('mail.from.name'), $email->getFromName());
+        $this->assertEquals(null, $email->getFromName());
 
         $email = Email::compose()->mailable(
             ($this->mailable())
-                ->from(null, 'Marick')
+                ->from('marick@dolphiq.nl', 'Marick')
         )->send();
 
-        $this->assertFalse($email->hasFrom());
+        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
+        $this->assertEquals('Marick', $email->getFromName());
     }
 }
 
@@ -153,9 +149,7 @@ class TestMailable extends Mailable
     {
         return [
             Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf')->withMime('application/pdf'),
-            Attachment::fromData(function () {
-                return '<p>Thanks for your oder</p>';
-            }, 'order.html'),
+            Attachment::fromStorageDisk(__DIR__.'/files/pdf-sample.pdf', 'my-local-disk')->withMime('application/pdf'),
         ];
     }
 }

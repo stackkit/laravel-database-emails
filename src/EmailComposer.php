@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
+use Closure;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Support\Carbon;
 
 class EmailComposer
 {
@@ -26,7 +27,10 @@ class EmailComposer
     protected $data = [];
 
     public ?Envelope $envelope = null;
+
     public ?Content $content = null;
+
+    public ?array $attachments = null;
 
     /**
      * Create a new EmailComposer instance.
@@ -36,24 +40,41 @@ class EmailComposer
         $this->email = $email;
     }
 
-    public function envelope(Envelope $envelope): self
+    public function envelope(null|Envelope|Closure $envelope = null): self
     {
-        $this->envelope = $envelope;
+        if ($envelope instanceof Closure) {
+            $this->envelope = $envelope($this->envelope ?: new Envelope());
 
-        if ($this->content) {
-            (new MailableReader())->read($this);
+            return $this;
         }
+
+        $this->envelope = $envelope;
 
         return $this;
     }
 
-    public function content(Content $content): self
+    public function content(null|Content|Closure $content = null): self
     {
+        if ($content instanceof Closure) {
+            $this->content = $content($this->content ?: new Content());
+
+            return $this;
+        }
+
         $this->content = $content;
 
-        if ($this->envelope) {
-            (new MailableReader())->read($this);
+        return $this;
+    }
+
+    public function attachments(null|array|Closure $attachments = null): self
+    {
+        if ($attachments instanceof Closure) {
+            $this->attachments = $attachments($this->attachments ?: []);
+
+            return $this;
         }
+
+        $this->attachments = $attachments;
 
         return $this;
     }
@@ -106,89 +127,9 @@ class EmailComposer
      */
     public function label(string $label): self
     {
-        return $this->setData('label', $label);
-    }
+        $this->email->label = $label;
 
-    /**
-     * Set the e-mail from address and aname.
-     */
-    public function from(?string $address = null, ?string $name = null): self
-    {
-        return $this->setData('from', compact('address', 'name'));
-    }
-
-    /**
-     * Set the e-mail recipient(s).
-     *
-     * @param  string|array  $recipient
-     */
-    public function recipient($recipient): self
-    {
-        return $this->setData('recipient', $recipient);
-    }
-
-    /**
-     * Define the carbon-copy address(es).
-     *
-     * @param  string|array  $cc
-     */
-    public function cc($cc): self
-    {
-        return $this->setData('cc', $cc);
-    }
-
-    /**
-     * Define the blind carbon-copy address(es).
-     *
-     * @param  string|array  $bcc
-     */
-    public function bcc($bcc): self
-    {
-        return $this->setData('bcc', $bcc);
-    }
-
-    /**
-     * Define the reply-to address(es).
-     *
-     * @param  string|array  $replyTo
-     */
-    public function replyTo($replyTo): self
-    {
-        return $this->setData('reply_to', $replyTo);
-    }
-
-    /**
-     * Set the e-mail subject.
-     */
-    public function subject(string $subject): self
-    {
-        return $this->setData('subject', $subject);
-    }
-
-    /**
-     * Set the e-mail view.
-     */
-    public function view(string $view): self
-    {
-        return $this->setData('view', $view);
-    }
-
-    /**
-     * Set the e-mail variables.
-     */
-    public function variables(array $variables): self
-    {
-        return $this->setData('variables', $variables);
-    }
-
-    /**
-     * Schedule the e-mail.
-     *
-     * @param  mixed  $scheduledAt
-     */
-    public function schedule($scheduledAt): Email
-    {
-        return $this->later($scheduledAt);
+        return $this;
     }
 
     /**
@@ -198,7 +139,7 @@ class EmailComposer
      */
     public function later($scheduledAt): Email
     {
-        $this->setData('scheduled_at', $scheduledAt);
+        $this->email->scheduled_at = Carbon::parse($scheduledAt);
 
         return $this->send();
     }
@@ -212,6 +153,8 @@ class EmailComposer
     {
         $connection = $connection ?: config('queue.default');
         $queue = $queue ?: 'default';
+
+        $this->email->queued_at = now();
 
         $this->setData('queued', true);
         $this->setData('connection', $connection);
@@ -236,38 +179,41 @@ class EmailComposer
     /**
      * Attach a file to the e-mail.
      */
-    public function attach(string $file, array $options = []): self
-    {
-        $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
-
-        $attachments[] = compact('file', 'options');
-
-        return $this->setData('attachments', $attachments);
-    }
-
-    /**
-     * Attach in-memory data as an attachment.
-     */
-    public function attachData(string $data, string $name, array $options = []): self
-    {
-        $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
-
-        $attachments[] = compact('data', 'name', 'options');
-
-        return $this->setData('rawAttachments', $attachments);
-    }
+    //    public function attach(string $file, array $options = []): self
+    //    {
+    //        $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
+    //
+    //        $attachments[] = compact('file', 'options');
+    //
+    //        return $this->setData('attachments', $attachments);
+    //    }
+    //
+    //    /**
+    //     * Attach in-memory data as an attachment.
+    //     */
+    //    public function attachData(string $data, string $name, array $options = []): self
+    //    {
+    //        $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
+    //
+    //        $attachments[] = compact('data', 'name', 'options');
+    //
+    //        return $this->setData('rawAttachments', $attachments);
+    //    }
 
     /**
      * Send the e-mail.
      */
     public function send(): Email
     {
-        (new Validator())->validate($this);
+        if ($this->envelope && $this->content) {
+            (new MailableReader())->read($this);
+        }
 
-        (new Preparer())->prepare($this);
-
-        if (Config::encryptEmails()) {
-            (new Encrypter())->encrypt($this);
+        if (! $this->email->from) {
+            $this->email->from = [
+                'address' => config('mail.from.address'),
+                'name' => config('mail.from.name'),
+            ];
         }
 
         $this->email->save();

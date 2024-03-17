@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
-use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
+use Throwable;
 
 class SendEmailsCommand extends Command
 {
@@ -61,7 +62,7 @@ class SendEmailsCommand extends Command
 
             try {
                 $email->send();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $email->markAsFailed($e);
             }
         }
@@ -82,10 +83,10 @@ class SendEmailsCommand extends Command
 
         $this->table($headers, $emails->map(function (Email $email) {
             return [
-                $email->getId(),
-                $email->getRecipientsAsString(),
-                $email->getSubject(),
-                $email->hasFailed() ? 'Failed' : 'OK',
+                $email->id,
+                implode(',', array_column(Arr::wrap($email->recipient), 'recipient')),
+                $email->subject,
+                $email->failed ? 'Failed' : 'OK',
             ];
         }));
     }

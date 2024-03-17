@@ -17,7 +17,7 @@ class SendEmailsCommandTest extends TestCase
 
         $this->artisan('email:send');
 
-        $this->assertNotNull($email->fresh()->getSendDate());
+        $this->assertNotNull($email->fresh()->sent_at);
     }
 
     #[Test]
@@ -25,11 +25,11 @@ class SendEmailsCommandTest extends TestCase
     {
         $email = $this->sendEmail();
 
-        $this->assertEquals(0, $email->fresh()->getAttempts());
+        $this->assertEquals(0, $email->fresh()->attempts);
 
         $this->artisan('email:send');
 
-        $this->assertEquals(1, $email->fresh()->getAttempts());
+        $this->assertEquals(1, $email->fresh()->attempts);
     }
 
     #[Test]
@@ -39,12 +39,12 @@ class SendEmailsCommandTest extends TestCase
 
         $this->artisan('email:send');
 
-        $this->assertNotNull($firstSend = $email->fresh()->getSendDate());
+        $this->assertNotNull($firstSend = $email->fresh()->sent_at);
 
         $this->artisan('email:send');
 
-        $this->assertEquals(1, $email->fresh()->getAttempts());
-        $this->assertEquals($firstSend, $email->fresh()->getSendDate());
+        $this->assertEquals(1, $email->fresh()->attempts);
+        $this->assertEquals($firstSend, $email->fresh()->sent_at);
     }
 
     #[Test]
@@ -56,7 +56,7 @@ class SendEmailsCommandTest extends TestCase
 
         $this->artisan('email:send');
 
-        $this->assertNull($email->fresh()->getSendDate());
+        $this->assertNull($email->fresh()->sent_at);
     }
 
     #[Test]
@@ -64,12 +64,12 @@ class SendEmailsCommandTest extends TestCase
     {
         $email = $this->sendEmail();
 
-        $email->update(['recipient' => 'asdf']);
+        $email->update(['recipient' => ['asdf' => null]]);
 
         $this->artisan('email:send');
 
         $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertStringContainsString('RfcComplianceException', $email->fresh()->getError());
+        $this->assertStringContainsString('RfcComplianceException', $email->fresh()->error);
     }
 
     #[Test]
@@ -92,14 +92,14 @@ class SendEmailsCommandTest extends TestCase
         $email = $this->scheduleEmail(Carbon::now()->addHour(1));
         $this->artisan('email:send');
         $email = $email->fresh();
-        $this->assertEquals(0, $email->getAttempts());
-        $this->assertNull($email->getSendDate());
+        $this->assertEquals(0, $email->attempts);
+        $this->assertNull($email->sent_at);
 
         $email->update(['scheduled_at' => Carbon::now()->toDateTimeString()]);
         $this->artisan('email:send');
         $email = $email->fresh();
-        $this->assertEquals(1, $email->getAttempts());
-        $this->assertNotNull($email->getSendDate());
+        $this->assertEquals(1, $email->attempts);
+        $this->assertNotNull($email->sent_at);
     }
 
     #[Test]
@@ -128,12 +128,12 @@ class SendEmailsCommandTest extends TestCase
             'attempts' => 1,
         ]);
 
-        $this->assertTrue($email->fresh()->hasFailed());
-        $this->assertEquals('Simulating some random error', $email->fresh()->getError());
+        $this->assertTrue($email->fresh()->failed);
+        $this->assertEquals('Simulating some random error', $email->fresh()->error);
 
         $this->artisan('email:send');
 
-        $this->assertFalse($email->fresh()->hasFailed());
-        $this->assertEmpty($email->fresh()->getError());
+        $this->assertFalse($email->fresh()->failed);
+        $this->assertEmpty($email->fresh()->error);
     }
 }

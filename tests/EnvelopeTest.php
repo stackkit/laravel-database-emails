@@ -17,7 +17,7 @@ class EnvelopeTest extends TestCase
                 (new Envelope())
                     ->subject('Hey')
                     ->from('asdf@gmail.com')
-                    ->to('johndoe@example.com', 'janedoe@example.com')
+                    ->to(['johndoe@example.com', 'janedoe@example.com'])
             )
             ->content(
                 (new Content())
@@ -26,7 +26,9 @@ class EnvelopeTest extends TestCase
             )
             ->send();
 
-        $this->assertEquals(['johndoe@example.com'], $email->recipient);
+        $this->assertEquals([
+            'johndoe@example.com' => null,
+            'janedoe@example.com' => null,
+        ], $email->recipient);
     }
-
 }

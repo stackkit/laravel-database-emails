@@ -15,14 +15,6 @@ class Config
     }
 
     /**
-     * Determine if newly created e-mails should be encrypted.
-     */
-    public static function encryptEmails(): bool
-    {
-        return config('laravel-database-emails.encrypt', false);
-    }
-
-    /**
      * Determine if newly created e-mails should be sent to the test e-mail address.
      */
     public static function testing(): bool

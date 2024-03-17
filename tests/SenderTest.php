@@ -6,6 +6,8 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
+use Stackkit\LaravelDatabaseEmails\Attachment;
 use Stackkit\LaravelDatabaseEmails\Email;
 use Stackkit\LaravelDatabaseEmails\MessageSent;
 use Stackkit\LaravelDatabaseEmails\SentMessage;
@@ -54,7 +56,7 @@ class SenderTest extends TestCase
         // custom from...
         $this->sent = [];
 
-        $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
+        $this->composeEmail(['from' => new Address('marick@dolphiq.nl', 'Marick')])->send();
         $this->artisan('email:send');
         $from = reset($this->sent)->from;
         $this->assertEquals('marick@dolphiq.nl', key($from));
@@ -62,19 +64,11 @@ class SenderTest extends TestCase
 
         // only address
         $this->sent = [];
-        $this->composeEmail()->from('marick@dolphiq.nl')->send();
+        $this->composeEmail(['from' => 'marick@dolphiq.nl'])->send();
         $this->artisan('email:send');
         $from = reset($this->sent)->from;
         $this->assertEquals('marick@dolphiq.nl', key($from));
-        $this->assertEquals(config('mail.from.name'), $from[key($from)]);
-
-        // only name
-        $this->sent = [];
-        $this->composeEmail()->from(null, 'Marick')->send();
-        $this->artisan('email:send');
-        $from = reset($this->sent)->from;
-        $this->assertEquals(config('mail.from.address'), key($from));
-        $this->assertEquals('Marick', $from[key($from)]);
+        $this->assertEquals(null, $from[key($from)]);
     }
 
     #[Test]
@@ -162,49 +156,31 @@ class SenderTest extends TestCase
     public function attachments_are_added_to_the_email()
     {
         $this->composeEmail()
-            ->attach(__DIR__.'/files/pdf-sample.pdf')
-            ->send();
-        $this->artisan('email:send');
-
-        $attachments = reset($this->sent)->attachments;
-
-        $this->assertCount(1, $attachments);
-    }
-
-    #[Test]
-    public function raw_attachments_are_added_to_the_email()
-    {
-        $rawData = file_get_contents(__DIR__.'/files/pdf-sample.pdf');
-
-        $this->composeEmail()
-            ->attachData($rawData, 'hello-ci.pdf', [
-                'mime' => 'application/pdf',
+            ->attachments([
+                Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
+                Attachment::fromPath(__DIR__.'/files/my-file.txt')->as('Test123 file'),
             ])
             ->send();
         $this->artisan('email:send');
 
         $attachments = reset($this->sent)->attachments;
-        $attachment = reset($attachments);
 
-        $this->assertCount(1, $attachments);
-        $this->assertStringContainsString('hello-ci.pdf', $attachment['disposition']);
-        $this->assertStringContainsString('application/pdf', $attachment['disposition']);
-        $this->assertTrue(md5($attachment['body']) == md5($rawData));
+        $this->assertCount(2, $attachments);
+        $this->assertEquals('Test123'."\n", $attachments[1]['body']);
+        $this->assertEquals('text/plain disposition: attachment filename: Test123 file', $attachments[1]['disposition']);
     }
 
     #[Test]
-    public function old_json_encoded_attachments_can_still_be_read()
+    public function raw_attachments_are_not_added_to_the_email()
     {
-        $email = $this->sendEmail();
-        $email->attachments = json_encode([1, 2, 3]);
-        $email->save();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Raw attachments are not supported in the database email driver.');
 
-        $this->assertEquals([1, 2, 3], $email->fresh()->getAttachments());
-
-        $email->attachments = serialize([4, 5, 6]);
-        $email->save();
-
-        $this->assertEquals([4, 5, 6], $email->fresh()->getAttachments());
+        $this->composeEmail()
+            ->attachments([
+                Attachment::fromData(fn () => 'test', 'test.txt'),
+            ])
+            ->send();
     }
 
     #[Test]
@@ -239,10 +215,6 @@ class SenderTest extends TestCase
         $this->assertCount(2, $replyTo);
         $this->assertArrayHasKey('replyto1@test.com', $replyTo);
         $this->assertArrayHasKey('replyto2@test.com', $replyTo);
-
-        if (! class_exists(Address::class)) {
-            return;
-        }
 
         $this->sent = [];
         $this->sendEmail([
