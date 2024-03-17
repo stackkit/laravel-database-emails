@@ -102,19 +102,16 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         return Email::compose()
             ->label($params['label'])
-            ->envelope(
-                (new Envelope())
-                    ->to($params['recipient'])
-                    ->when($params['cc'], fn ($envelope) => $envelope->cc($params['cc']))
-                    ->when($params['bcc'], fn ($envelope) => $envelope->bcc($params['bcc']))
-                    ->when($params['reply_to'], fn ($envelope) => $envelope->replyTo($params['reply_to']))
-                    ->when($params['from'], fn (Envelope $envelope) => $envelope->from($params['from']))
-                    ->subject($params['subject'])
-            )
-            ->content(
-                (new Content())
-                    ->view($params['view'])
-                    ->with($params['variables'])
+            ->envelope(fn (Envelope $envelope) => $envelope
+                ->to($params['recipient'])
+                ->when($params['cc'], fn ($envelope) => $envelope->cc($params['cc']))
+                ->when($params['bcc'], fn ($envelope) => $envelope->bcc($params['bcc']))
+                ->when($params['reply_to'], fn ($envelope) => $envelope->replyTo($params['reply_to']))
+                ->when($params['from'], fn (Envelope $envelope) => $envelope->from($params['from']))
+                ->subject($params['subject']))
+            ->content(fn (Content $content) => $content
+                ->view($params['view'])
+                ->with($params['variables'])
             );
     }
 

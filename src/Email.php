@@ -7,8 +7,8 @@ namespace Stackkit\LaravelDatabaseEmails;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Prunable;
 use Throwable;
 
 /**
@@ -35,7 +35,7 @@ use Throwable;
  */
 class Email extends Model
 {
-    use Prunable;
+    use MassPrunable;
 
     protected $casts = [
         'failed' => 'boolean',
