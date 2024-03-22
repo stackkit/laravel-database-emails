@@ -6,6 +6,7 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Closure;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -102,6 +103,13 @@ class EmailComposer
         });
     }
 
+    public function model(Model $model)
+    {
+        $this->setData('model', $model);
+
+        return $this;
+    }
+
     /**
      * Get the e-mail that is being composed.
      */
@@ -110,11 +118,6 @@ class EmailComposer
         return $this->email;
     }
 
-    /**
-     * Set a data value.
-     *
-     * @param  mixed  $value
-     */
     public function setData(string $key, $value): self
     {
         $this->data[$key] = $value;
@@ -122,12 +125,6 @@ class EmailComposer
         return $this;
     }
 
-    /**
-     * Get a data value.
-     *
-     * @param  mixed  $default
-     * @return mixed
-     */
     public function getData(string $key, $default = null)
     {
         if (! is_null($default) && ! $this->hasData($key)) {
@@ -137,17 +134,11 @@ class EmailComposer
         return $this->data[$key];
     }
 
-    /**
-     * Determine if the given data value was set.
-     */
     public function hasData(string $key): bool
     {
         return isset($this->data[$key]);
     }
 
-    /**
-     * Set the e-mail label.
-     */
     public function label(string $label): self
     {
         $this->email->label = $label;
@@ -155,11 +146,6 @@ class EmailComposer
         return $this;
     }
 
-    /**
-     * Schedule the e-mail.
-     *
-     * @param  mixed  $scheduledAt
-     */
     public function later($scheduledAt): Email
     {
         $this->email->scheduled_at = Carbon::parse($scheduledAt);
@@ -167,11 +153,6 @@ class EmailComposer
         return $this->send();
     }
 
-    /**
-     * Queue the e-mail.
-     *
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
-     */
     public function queue(?string $connection = null, ?string $queue = null, $delay = null): Email
     {
         $connection = $connection ?: config('queue.default');
@@ -187,9 +168,6 @@ class EmailComposer
         return $this->send();
     }
 
-    /**
-     * Set the Mailable.
-     */
     public function mailable(Mailable $mailable): self
     {
         $this->setData('mailable', $mailable);
@@ -199,33 +177,6 @@ class EmailComposer
         return $this;
     }
 
-    /**
-     * Attach a file to the e-mail.
-     */
-    //    public function attach(string $file, array $options = []): self
-    //    {
-    //        $attachments = $this->hasData('attachments') ? $this->getData('attachments') : [];
-    //
-    //        $attachments[] = compact('file', 'options');
-    //
-    //        return $this->setData('attachments', $attachments);
-    //    }
-    //
-    //    /**
-    //     * Attach in-memory data as an attachment.
-    //     */
-    //    public function attachData(string $data, string $name, array $options = []): self
-    //    {
-    //        $attachments = $this->hasData('rawAttachments') ? $this->getData('rawAttachments') : [];
-    //
-    //        $attachments[] = compact('data', 'name', 'options');
-    //
-    //        return $this->setData('rawAttachments', $attachments);
-    //    }
-
-    /**
-     * Send the e-mail.
-     */
     public function send(): Email
     {
         if ($this->envelope && $this->content) {

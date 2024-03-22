@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Mail;
 
 class Sender
 {
-    /**
-     * Send the given e-mail.
-     */
     public function send(Email $email): void
     {
         if ($email->isSent()) {
@@ -25,17 +22,11 @@ class Sender
             $this->buildMessage($message, $email);
         });
 
-        // $sentMessage is null when mocking (Mail::shouldReceive('send')->once())
-        if (! is_null($sentMessage)) {
-            event(new MessageSent($sentMessage));
-        }
+        event(new MessageSent($sentMessage));
 
         $email->markAsSent();
     }
 
-    /**
-     * Build the e-mail message.
-     */
     private function buildMessage(Message $message, Email $email): void
     {
         $message->to($email->recipient)

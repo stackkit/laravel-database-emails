@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ChangeBinaryToText extends Migration
+class CreateNewTable extends Migration
 {
     /**
      * Run the migrations.
@@ -31,6 +31,7 @@ class ChangeBinaryToText extends Migration
             $table->text('error')->nullable();
             $table->json('attachments')->nullable();
             $table->json('from')->nullable();
+            $table->nullableMorphs('model');
             $table->json('reply_to')->nullable();
             $table->timestamp('queued_at')->nullable();
             $table->timestamp('scheduled_at')->nullable();

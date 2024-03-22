@@ -65,6 +65,8 @@ class MailableReader
         $this->readBody($composer);
 
         $this->readAttachments($composer);
+
+        $this->readModel($composer);
     }
 
     /**
@@ -174,6 +176,13 @@ class MailableReader
 
             return $attachment['file']->toArray();
         }, $mailable->attachments);
+    }
+
+    public function readModel(EmailComposer $composer): void
+    {
+        if ($composer->hasData('model')) {
+            $composer->getEmail()->model()->associate($composer->getData('model'));
+        }
     }
 
     private function prepareAddressForDatabaseStorage(array $addresses): array

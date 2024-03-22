@@ -1,21 +1,12 @@
 <p align="center">
-  <img src="/logo.png">
-</p>
-<p align="center">
 <img src="https://github.com/stackkit/laravel-database-emails/workflows/Run%20tests/badge.svg?branch=master" alt="Build Status">
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/license.svg" alt="License"></a>
 </p>
 
-# Package Documentation
+# Introduction
 
 This package allows you to store and send e-mails using a database. 
-
-## Contribution
-
-The package is MIT licenced, meaning it's open source and you are free to copy or fork it and modify it any way you wish.
-
-We feel the package is currently feature complete, but feel free to send a pull request or help improve existing code.
 
 # Requirements
 
@@ -187,6 +178,17 @@ Email::compose()
 <small>
 Note: `fromData()` and `fromStorage()` are not supported as the work with raw data.
 </small>
+
+### Attaching models to e-mails
+
+You may attach models to your e-mails.
+
+```php
+
+Email::compose()
+    ->model(User::find(1));
+
+```
 
 ### Scheduling
 

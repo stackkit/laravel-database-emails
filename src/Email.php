@@ -9,6 +9,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Throwable;
 
 /**
@@ -79,11 +80,9 @@ class Email extends Model
 
     public function markAsSent(): void
     {
-        $now = Carbon::now()->toDateTimeString();
-
         $this->update([
             'sending' => 0,
-            'sent_at' => $now,
+            'sent_at' => now(),
             'failed' => 0,
             'error' => '',
         ]);
@@ -115,5 +114,10 @@ class Email extends Model
         }
 
         return $this->where('created_at', '<', now()->subMonths(6));
+    }
+
+    public function model(): MorphTo
+    {
+        return $this->morphTo();
     }
 }
