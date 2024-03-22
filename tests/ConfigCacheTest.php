@@ -13,7 +13,7 @@ class ConfigCacheTest extends TestCase
         $failed = false;
 
         try {
-            serialize(require __DIR__.'/../config/laravel-database-emails.php');
+            serialize(require __DIR__.'/../config/database-emails.php');
         } catch (Throwable) {
             $failed = true;
         }

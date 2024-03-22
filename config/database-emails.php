@@ -17,18 +17,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Encryption
-    |--------------------------------------------------------------------------
-    |
-    | Here you may enable encryption for all e-mails. The e-mail will be encrypted according
-    | your application's configuration (OpenSSL AES-256-CBC by default).
-    |
-    */
-
-    'encrypt' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Test E-mail
     |--------------------------------------------------------------------------
     |
@@ -40,9 +28,9 @@ return [
 
     'testing' => [
 
-        'email' => 'test@email.com',
+        'email' => env('DATABASE_EMAILS_TESTING_EMAIL'),
 
-        'enabled' => env('LARAVEL_DATABASE_EMAILS_TESTING_ENABLED', true),
+        'enabled' => env('DATABASE_EMAILS_TESTING_ENABLED', false),
 
     ],
 
@@ -57,7 +45,7 @@ return [
     |
     */
 
-    'limit' => 20,
+    'limit' => env('DATABASE_EMAILS_LIMIT', 20),
 
     /*
     |--------------------------------------------------------------------------
@@ -70,18 +58,5 @@ return [
     |
     */
 
-    'immediately' => env('LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY', false),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Manual migrations
-    |--------------------------------------------------------------------------
-    |
-    | This option allows you to use:
-    | `php artisan vendor:publish --tag=laravel-database-emails-migrations` to push migrations
-    | to your app's folder, so you're free to modify before migrating.
-    |
-    */
-
-    'manual_migrations' => (bool) env('LARAVEL_DATABASE_EMAILS_MANUAL_MIGRATIONS', false),
+    'immediately' => env('DATABASE_EMAILS_IMMEDIATELY', false),
 ];

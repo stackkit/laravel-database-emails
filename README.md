@@ -19,9 +19,7 @@ We feel the package is currently feature complete, but feel free to send a pull 
 
 # Requirements
 
-This package requires Laravel 6.0 or higher.
-
-Please check the [Laravel support policy](https://laravel.com/docs/master/releases#support-policy) table for supported Laravel and PHP versions.
+This package requires Laravel 10 or 11.
 
 # Installation
 
@@ -34,7 +32,8 @@ composer require stackkit/laravel-database-emails
 Publish the configuration files.
 
 ```bash
-php artisan vendor:publish --tag=laravel-database-emails-config
+php artisan vendor:publish --tag=database-emails-config
+php artisan vendor:publish --tag=database-emails-migrations
 ```
 
 Create the database table required for this package.
@@ -65,68 +64,89 @@ protected function schedule(Schedule $schedule)
 
 ### Send an email
 
+E-mails are composed the same way mailables are created.
+
 ```php
 <?php
 
 use Stackkit\LaravelDatabaseEmails\Email;
+use Illuminate\Mail\Mailables\Content;
+use Stackkit\LaravelDatabaseEmails\Attachment;
+use Illuminate\Mail\Mailables\Envelope;
 
 Email::compose()
-    ->label('welcome')
-    ->recipient('john@doe.com')
-    ->subject('This is a test')
-    ->view('emails.welcome')
-    ->variables([
-        'name' => 'John Doe',
+    ->content(fn (Content $content) => $content
+        ->view('tests::dummy')
+        ->with(['name' => 'John Doe'])
+    )
+    ->envelope(fn (Envelope $envelope) => $envelope
+        ->subject('Hello')
+        ->from('johndoe@example.com', 'John Doe')
+        ->to('janedoe@example.com', 'Jane Doe')
+    )
+    ->attachments([
+        Attachment::fromStorageDisk('s3', '/invoices/john-doe/march-2024.pdf'),
     ])
+    ->send();
+])
+```
+
+### Sending emails to users in your application
+
+```php
+<?php
+Email::compose()
+    ->user($user)
     ->send();
 ```
 
-### Specify multiple recipients
+By default, the `name` column will be used to set the recipient's name. If you wish to use another column, you should implement the `preferredEmailName` method in your model.
 
 ```php
 <?php
 
-use Stackkit\LaravelDatabaseEmails\Email;
+use Illuminate\Database\Eloquent\Model;
 
-Email::compose()
-    ->recipient([
-        'john@doe.com',
-        'jane@doe.com'
-    ]);
+class User extends Model
+{
+    public function preferredEmailName(): string
+    {
+        return $this->first_name;
+    }
+}
 ```
 
-### CC and BCC
+By default, the `email` column will be used to set the recipient's e-mail address. If you wish to use another column, you should implement the `preferredEmailAddress` method in your model.
 
 ```php
 <?php
 
-use Stackkit\LaravelDatabaseEmails\Email;
+use Illuminate\Database\Eloquent\Model;
 
-Email::compose()
-    ->cc('john@doe.com')
-    ->cc(['john@doe.com', 'jane@doe.com'])
-    ->bcc('john@doe.com')
-    ->bcc(['john@doe.com', 'jane@doe.com']);
+class User extends Model
+{
+    public function preferredEmailAddress(): string
+    {
+        return $this->work_email;
+    }
+}
 ```
 
-### Reply-To
+By default, the app locale will be used to set the recipient's locale. If you wish to use another column, you should implement the `preferredEmailLocale` method in your model.
 
 ```php
 <?php
 
-use Stackkit\LaravelDatabaseEmails\Email;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
-Email::compose()
-    ->replyTo(['john@doe.com', 'jane@doe.com']);
-
-Email::compose()
-    ->replyTo(new Address('john@doe.com', 'John Doe'));
-
-Email::compose()
-    ->replyTo([
-        new Address('john@doe.com', 'John Doe'),
-        new Address('jane@doe.com', 'Jane Doe'),
-    ]);
+class User extends Model implements HasLocalePreference
+{
+    public function preferredLocale(): string
+    {
+        return $this->locale;
+    }
+}
 ```
 
 ### Using mailables
@@ -145,36 +165,28 @@ Email::compose()
 
 ### Attachments
 
-```php
-<?php
+To start attaching files to your e-mails, you may use the `attach` method like you normally would in Laravel.
+However, you will have to use this package's `Attachment` class.
 
-use Stackkit\LaravelDatabaseEmails\Email;
-
-Email::compose()
-    ->attach('/path/to/file');
-```
-
-Or for in-memory attachments:
 
 ```php
 <?php
 
 use Stackkit\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\Attachment;
 
 Email::compose()
-    ->attachData('<p>Your order has shipped!</p>', 'order.html');
+    ->attachments([
+        Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
+        Attachment::fromPath(__DIR__.'/files/my-file.txt')->as('Test123 file'),
+        Attachment::fromStorageDisk('my-custom-disk', 'test.txt'),
+    ])
+    ->send();
 ```
 
-### Custom Sender
-
-```php
-<?php
-
-use Stackkit\LaravelDatabaseEmails\Email;
-
-Email::compose()
-    ->from('john@doe.com', 'John Doe');
-```
+<small>
+Note: `fromData()` and `fromStorage()` are not supported as the work with raw data.
+</small>
 
 ### Scheduling
 
@@ -188,27 +200,6 @@ use Stackkit\LaravelDatabaseEmails\Email;
 Email::compose()
     ->later('+2 hours');
 ```
-
-### Encryption (Optional)
-
-If you wish to encrypt your e-mails, please enable the `encrypt` option in the configuration file. This is disabled by default. Encryption and decryption will be handled by Laravel's built-in encryption mechanism. Please note that by encrypting the e-mail it takes more disk space.
-
-```text
-Without encryption
-
-7    bytes (label)
-16   bytes (recipient)
-20   bytes (subject)
-48   bytes (view name)
-116  bytes (variables)
-1874 bytes (e-mail content)
-4    bytes (attempts, sending, failed, encrypted)
-57   bytes (created_at, updated_at, deleted_at)
-... x 10.000 rows = ± 21.55 MB
-
-With encryption the table size is ± 50.58 MB.
-```
-
 
 ### Queueing e-mails
 
@@ -235,22 +226,41 @@ Email::compose()
     ->queue(null, null, now()->addMinutes(10));
 ```
 
-### Test mode (Optional)
+If you need more flexibility over how to queued mails are retried, please implement your own email job.
+
+Within the job you can send the mail like this:
+
+```php
+use Stackkit\LaravelDatabaseEmails\Sender;
+
+(new Sender)->send($email);
+```
+
+### Test mode
 
 When enabled, all newly created e-mails will be sent to the specified test e-mail address. This is turned off by default.
 
+```
+DATABASE_EMAILS_TESTING_ENABLED=true
+DATABASE_EMAILS_TESTING_EMAIL=your-test-recipient@example.com
+```
+
 ### E-mails to send per minute
 
-To configure how many e-mails should be sent each command, please check the `limit` option. The default is `20` e-mails every command.
+To configure how many e-mails should be sent each command.
 
-### Send e-mails immediately (Optional)
+```
+DATABASE_EMAILS_LIMIT=20
+```
+
+### Send e-mails immediately
 
 Useful during development when Laravel Scheduler is not running
 
 To enable, set the following environment variable:
 
 ```
-LARAVEL_DATABASE_EMAILS_SEND_IMMEDIATELY=true
+DATABASE_EMAILS_IMMEDIATELY=true
 ```
 
 ### Pruning models

@@ -159,15 +159,17 @@ class SenderTest extends TestCase
             ->attachments([
                 Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
                 Attachment::fromPath(__DIR__.'/files/my-file.txt')->as('Test123 file'),
+                Attachment::fromStorageDisk('my-custom-disk', 'test.txt'),
             ])
             ->send();
         $this->artisan('email:send');
 
         $attachments = reset($this->sent)->attachments;
 
-        $this->assertCount(2, $attachments);
+        $this->assertCount(3, $attachments);
         $this->assertEquals('Test123'."\n", $attachments[1]['body']);
         $this->assertEquals('text/plain disposition: attachment filename: Test123 file', $attachments[1]['disposition']);
+        $this->assertEquals("my file from public disk\n", $attachments[2]['body']);
     }
 
     #[Test]
@@ -186,12 +188,12 @@ class SenderTest extends TestCase
     #[Test]
     public function emails_can_be_sent_immediately()
     {
-        $this->app['config']->set('laravel-database-emails.immediately', false);
+        $this->app['config']->set('database-emails.immediately', false);
         $this->sendEmail();
         $this->assertCount(0, $this->sent);
         Email::truncate();
 
-        $this->app['config']->set('laravel-database-emails.immediately', true);
+        $this->app['config']->set('database-emails.immediately', true);
         $this->sendEmail();
         $this->assertCount(1, $this->sent);
 

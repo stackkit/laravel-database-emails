@@ -79,7 +79,7 @@ class SendEmailsCommandTest extends TestCase
             $this->sendEmail();
         }
 
-        $this->app['config']['laravel-database-emails.limit'] = 25;
+        $this->app['config']['database-emails.limit'] = 25;
 
         $this->artisan('email:send');
 

@@ -17,34 +17,34 @@ class Attachment
         //
     }
 
-    public static function fromPath($path)
+    public static function fromPath(string $path): self
     {
         return new static($path);
     }
 
-    public static function fromData()
+    public static function fromData(): void
     {
         throw new RuntimeException('Raw attachments are not supported in the database email driver.');
     }
 
-    public static function fromStorage()
+    public static function fromStorage(): void
     {
         throw new RuntimeException('Raw attachments are not supported in the database email driver.');
     }
 
-    public static function fromStorageDisk($disk, $path)
+    public static function fromStorageDisk($disk, $path): self
     {
         return new static($path, $disk);
     }
 
-    public function as(string $name)
+    public function as(string $name): self
     {
         $this->as = $name;
 
         return $this;
     }
 
-    public function withMime(string $mime)
+    public function withMime(string $mime): self
     {
         $this->mime = $mime;
 

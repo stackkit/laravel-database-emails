@@ -96,8 +96,8 @@ class MailableReaderTest extends TestCase
         )->send();
 
         $this->assertTrue((bool) $email->from);
-        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
-        $this->assertEquals('Marick', $email->getFromName());
+        $this->assertEquals('marick@dolphiq.nl', $email->from['address']);
+        $this->assertEquals('Marick', $email->from['name']);
 
         $email = Email::compose()->mailable(
             ($this->mailable())
@@ -105,16 +105,16 @@ class MailableReaderTest extends TestCase
         )->send();
 
         $this->assertTrue((bool) $email->from);
-        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
-        $this->assertEquals(null, $email->getFromName());
+        $this->assertEquals('marick@dolphiq.nl', $email->from['address']);
+        $this->assertEquals(null, $email->from['name']);
 
         $email = Email::compose()->mailable(
             ($this->mailable())
                 ->from('marick@dolphiq.nl', 'Marick')
         )->send();
 
-        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
-        $this->assertEquals('Marick', $email->getFromName());
+        $this->assertEquals('marick@dolphiq.nl', $email->from['address']);
+        $this->assertEquals('Marick', $email->from['name']);
     }
 }
 

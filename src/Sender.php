@@ -43,7 +43,7 @@ class Sender
             ->bcc($email->bcc ?: [])
             ->replyTo($email->reply_to ?: [])
             ->subject($email->subject)
-            ->from($email->getFromAddress(), $email->getFromName())
+            ->from($email->from['address'], $email->from['name'])
             ->html($email->body);
 
         foreach ($email->attachments as $dbAttachment) {
@@ -65,16 +65,5 @@ class Sender
 
             $message->attach($attachment);
         }
-    }
-
-    public function prepAddresses(array $addresses)
-    {
-        return $addresses;
-        $new = [];
-        foreach ($addresses as $value) {
-            $new[$value['address']] = $value['name'];
-        }
-
-        return $new;
     }
 }

@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Orchestra\Testbench\Concerns\WithWorkbench;
 use Stackkit\LaravelDatabaseEmails\Email;
 use Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider;
 
@@ -13,6 +14,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected $invalid;
 
     use LazilyRefreshDatabase;
+    use WithWorkbench;
 
     public function setUp(): void
     {
@@ -52,13 +54,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('laravel-database-emails.attempts', 3);
-        $app['config']->set('laravel-database-emails.testing.enabled', false);
-        $app['config']->set('laravel-database-emails.testing.email', 'test@email.com');
+        $app['config']->set('database-emails.attempts', 3);
+        $app['config']->set('database-emails.testing.enabled', false);
+        $app['config']->set('database-emails.testing.email', 'test@email.com');
 
         $app['config']->set('filesystems.disks.my-custom-disk', [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => __DIR__.'/../workbench/storage/app/public',
         ]);
 
         $app['config']->set('database.default', 'testbench');

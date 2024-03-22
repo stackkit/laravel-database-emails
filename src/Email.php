@@ -12,26 +12,26 @@ use Illuminate\Database\Eloquent\Model;
 use Throwable;
 
 /**
- * @property $id
- * @property $label
- * @property $recipient
- * @property $from
- * @property $cc
- * @property $bcc
- * @property $reply_to
- * @property $subject
- * @property $view
- * @property $variables
- * @property $body
- * @property $attachments
- * @property $attempts
- * @property $sending
- * @property $failed
- * @property $error
- * @property $queued_at
- * @property $scheduled_at
- * @property $sent_at
- * @property $delivered_at
+ * @property int $id
+ * @property string $label
+ * @property array $recipient
+ * @property array $from
+ * @property array $cc
+ * @property array $bcc
+ * @property array $reply_to
+ * @property string $subject
+ * @property string $view
+ * @property array $variables
+ * @property string $body
+ * @property array $attachments
+ * @property int $attempts
+ * @property int $sending
+ * @property int $failed
+ * @property int $error
+ * @property ?Carbon $queued_at
+ * @property ?Carbon $scheduled_at
+ * @property ?Carbon $sent_at
+ * @property ?Carbon $delivered_at
  */
 class Email extends Model
 {
@@ -48,65 +48,27 @@ class Email extends Model
         'attachments' => 'json',
     ];
 
-    /**
-     * The table in which the e-mails are stored.
-     *
-     * @var string
-     */
     protected $table = 'emails';
 
-    /**
-     * The guarded fields.
-     *
-     * @var array
-     */
     protected $guarded = [];
 
     public static ?Closure $pruneQuery = null;
 
-    /**
-     * Compose a new e-mail.
-     */
     public static function compose(): EmailComposer
     {
         return new EmailComposer(new static());
     }
 
-    /**
-     * Get the e-mail from address.
-     */
-    public function getFromAddress(): ?string
-    {
-        return $this->from['address'];
-    }
-
-    /**
-     * Get the e-mail from address.
-     */
-    public function getFromName(): ?string
-    {
-        return $this->from['name'];
-    }
-
-    /**
-     * Determine if the e-mail is sent.
-     */
     public function isSent(): bool
     {
         return ! is_null($this->sent_at);
     }
 
-    /**
-     * Determine if the e-mail failed to be sent.
-     */
     public function hasFailed(): bool
     {
         return $this->failed == 1;
     }
 
-    /**
-     * Mark the e-mail as sending.
-     */
     public function markAsSending(): void
     {
         $this->update([
@@ -115,9 +77,6 @@ class Email extends Model
         ]);
     }
 
-    /**
-     * Mark the e-mail as sent.
-     */
     public function markAsSent(): void
     {
         $now = Carbon::now()->toDateTimeString();
@@ -130,9 +89,6 @@ class Email extends Model
         ]);
     }
 
-    /**
-     * Mark the e-mail as failed.
-     */
     public function markAsFailed(Throwable $exception): void
     {
         $this->update([
@@ -142,48 +98,17 @@ class Email extends Model
         ]);
     }
 
-    /**
-     * Send the e-mail.
-     */
     public function send(): void
     {
         (new Sender())->send($this);
     }
 
-    /**
-     * Retry sending the e-mail.
-     */
-    public function retry(): void
-    {
-        $retry = $this->replicate();
-
-        $retry->fill(
-            [
-                'id' => null,
-                'attempts' => 0,
-                'sending' => 0,
-                'failed' => 0,
-                'error' => null,
-                'sent_at' => null,
-                'delivered_at' => null,
-            ]
-        );
-
-        $retry->save();
-    }
-
-    /**
-     * @return void
-     */
-    public static function pruneWhen(Closure $closure)
+    public static function pruneWhen(Closure $closure): void
     {
         static::$pruneQuery = $closure;
     }
 
-    /**
-     * @return Builder
-     */
-    public function prunable()
+    public function prunable(): Builder
     {
         if (static::$pruneQuery) {
             return (static::$pruneQuery)($this);

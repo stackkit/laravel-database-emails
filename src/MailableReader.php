@@ -6,14 +6,15 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Error;
 use Exception;
-use Illuminate\Container\Container;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use ReflectionObject;
+use Illuminate\Support\Traits\Localizable;
 
 class MailableReader
 {
+    use Localizable;
+
     /**
      * Read the mailable and pass the data to the email composer.
      */
@@ -44,14 +45,10 @@ class MailableReader
             });
         }
 
-        if (method_exists($composer->getData('mailable'), 'prepareMailableForDelivery')) {
-            $reflected = (new ReflectionObject($composer->getData('mailable')));
-            $method = $reflected->getMethod('prepareMailableForDelivery');
-            $method->setAccessible(true);
-            $method->invoke($composer->getData('mailable'));
-        } else {
-            Container::getInstance()->call([$composer->getData('mailable'), 'build']);
-        }
+        (fn (Mailable $mailable) => $mailable->prepareMailableForDelivery())->call(
+            $composer->getData('mailable'),
+            $composer->getData('mailable'),
+        );
 
         $this->readRecipient($composer);
 
@@ -87,9 +84,9 @@ class MailableReader
      */
     private function readRecipient(EmailComposer $composer): void
     {
-        if (config('laravel-database-emails.testing.enabled')) {
+        if (config('database-emails.testing.enabled')) {
             $composer->getEmail()->recipient = [
-                config('laravel-database-emails.testing.email') => null,
+                config('database-emails.testing.email') => null,
             ];
 
             return;
@@ -154,7 +151,13 @@ class MailableReader
 
         $composer->getEmail()->view = $mailable->view;
         $composer->getEmail()->variables = $mailable->buildViewData();
-        $composer->getEmail()->body = view($mailable->view, $mailable->buildViewData())->render();
+
+        $localeToUse = $composer->locale ?? app()->currentLocale();
+
+        $this->withLocale(
+            $localeToUse,
+            fn () => $composer->getEmail()->body = view($mailable->view, $mailable->buildViewData())->render(),
+        );
     }
 
     /**

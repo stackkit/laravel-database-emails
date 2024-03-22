@@ -27,7 +27,7 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
 
         $this->publishes([
             $configDir.'laravel-database-emails.php' => config_path('laravel-database-emails.php'),
-        ], 'laravel-database-emails-config');
+        ], 'database-emails-config');
     }
 
     /**
@@ -38,13 +38,9 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
         $baseDir = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
         $migrationsDir = $baseDir.'database'.DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR;
 
-        if ($this->app['config']->get('laravel-database-emails.manual_migrations')) {
-            $this->publishes([
-                $migrationsDir => "{$this->app->databasePath()}/migrations",
-            ], 'laravel-database-emails-migrations');
-        } else {
-            $this->loadMigrationsFrom([$migrationsDir]);
-        }
+        $this->publishes([
+            $migrationsDir => "{$this->app->databasePath()}/migrations",
+        ], 'database-emails-migrations');
     }
 
     /**

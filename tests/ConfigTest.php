@@ -12,7 +12,7 @@ class ConfigTest extends TestCase
     {
         $this->assertEquals(3, Config::maxAttemptCount());
 
-        $this->app['config']->set('laravel-database-emails.attempts', 5);
+        $this->app['config']->set('database-emails.attempts', 5);
 
         $this->assertEquals(5, Config::maxAttemptCount());
     }
@@ -22,7 +22,7 @@ class ConfigTest extends TestCase
     {
         $this->assertFalse(Config::testing());
 
-        $this->app['config']->set('laravel-database-emails.testing.enabled', true);
+        $this->app['config']->set('database-emails.testing.enabled', true);
 
         $this->assertTrue(Config::testing());
     }
@@ -32,7 +32,7 @@ class ConfigTest extends TestCase
     {
         $this->assertEquals('test@email.com', Config::testEmailAddress());
 
-        $this->app['config']->set('laravel-database-emails.testing.email', 'test+update@email.com');
+        $this->app['config']->set('database-emails.testing.email', 'test+update@email.com');
 
         $this->assertEquals('test+update@email.com', Config::testEmailAddress());
     }
@@ -42,7 +42,7 @@ class ConfigTest extends TestCase
     {
         $this->assertEquals(20, Config::cronjobEmailLimit());
 
-        $this->app['config']->set('laravel-database-emails.limit', 15);
+        $this->app['config']->set('database-emails.limit', 15);
 
         $this->assertEquals(15, Config::cronjobEmailLimit());
     }

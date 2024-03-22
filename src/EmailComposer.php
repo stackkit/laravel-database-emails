@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Closure;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -31,6 +33,8 @@ class EmailComposer
     public ?Content $content = null;
 
     public ?array $attachments = null;
+
+    public ?string $locale = null;
 
     /**
      * Create a new EmailComposer instance.
@@ -77,6 +81,25 @@ class EmailComposer
         $this->attachments = $attachments;
 
         return $this;
+    }
+
+    public function user(User $user)
+    {
+        return $this->envelope(function (Envelope $envelope) use ($user) {
+            $name = method_exists($user, 'preferredEmailName')
+                ? $user->preferredEmailName()
+                : ($user->name ?? null);
+
+            $email = method_exists($user, 'preferredEmailAddress')
+                ? $user->preferredEmailAddress()
+                : $user->email;
+
+            if ($user instanceof HasLocalePreference) {
+                $this->locale = $user->preferredLocale();
+            }
+
+            return $envelope->to($email, $name);
+        });
     }
 
     /**

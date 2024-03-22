@@ -63,6 +63,8 @@ class SendEmailsCommand extends Command
             try {
                 $email->send();
             } catch (Throwable $e) {
+                report($e);
+
                 $email->markAsFailed($e);
             }
         }

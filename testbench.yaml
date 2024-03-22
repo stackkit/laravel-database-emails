@@ -17,7 +17,7 @@ workbench:
     api: false
     commands: false
     components: false
-    views: false
+    views: true
   build: []
   assets: []
   sync: []

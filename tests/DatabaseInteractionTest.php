@@ -102,16 +102,16 @@ class DatabaseInteractionTest extends TestCase
     {
         $email = $this->composeEmail()->send();
 
-        $this->assertEquals($email->from['address'], $email->getFromAddress());
-        $this->assertEquals($email->from['name'], $email->getFromName());
+        $this->assertEquals($email->from['address'], $email->from['address']);
+        $this->assertEquals($email->from['name'], $email->from['name']);
 
         $email = $this->composeEmail([
             'from' => new Address('marick@dolphiq.nl', 'Marick'),
         ])->send();
 
         $this->assertTrue((bool) $email->from);
-        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
-        $this->assertEquals('Marick', $email->getFromName());
+        $this->assertEquals('marick@dolphiq.nl', $email->from['address']);
+        $this->assertEquals('Marick', $email->from['name']);
     }
 
     #[Test]
@@ -165,10 +165,10 @@ class DatabaseInteractionTest extends TestCase
     #[Test]
     public function recipient_should_be_swapped_for_test_address_when_in_testing_mode()
     {
-        $this->app['config']->set('laravel-database-emails.testing.enabled', function () {
+        $this->app['config']->set('database-emails.testing.enabled', function () {
             return true;
         });
-        $this->app['config']->set('laravel-database-emails.testing.email', 'test@address.com');
+        $this->app['config']->set('database-emails.testing.email', 'test@address.com');
 
         $email = $this->sendEmail(['recipient' => 'jane@doe.com']);
 
@@ -182,7 +182,6 @@ class DatabaseInteractionTest extends TestCase
             ->attachments([
                 Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
                 Attachment::fromPath(__DIR__.'/files/pdf-sample2.pdf'),
-                // Attachment::fromStorage('pdf-sample.pdf'),
                 Attachment::fromStorageDisk('my-custom-disk', 'pdf-sample-2.pdf'),
             ])
             ->send();

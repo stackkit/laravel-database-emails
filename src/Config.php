@@ -11,7 +11,7 @@ class Config
      */
     public static function maxAttemptCount(): int
     {
-        return max(config('laravel-database-emails.attempts', 1), 3);
+        return max(config('database-emails.attempts', 1), 3);
     }
 
     /**
@@ -19,7 +19,7 @@ class Config
      */
     public static function testing(): bool
     {
-        return (bool) config('laravel-database-emails.testing.enabled', false);
+        return (bool) config('database-emails.testing.enabled', false);
     }
 
     /**
@@ -27,7 +27,7 @@ class Config
      */
     public static function testEmailAddress(): string
     {
-        return config('laravel-database-emails.testing.email');
+        return config('database-emails.testing.email');
     }
 
     /**
@@ -35,7 +35,7 @@ class Config
      */
     public static function cronjobEmailLimit(): int
     {
-        return config('laravel-database-emails.limit', 20);
+        return config('database-emails.limit', 20);
     }
 
     /**
@@ -43,6 +43,6 @@ class Config
      */
     public static function sendImmediately(): bool
     {
-        return (bool) config('laravel-database-emails.immediately', false);
+        return (bool) config('database-emails.immediately', false);
     }
 }

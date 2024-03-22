@@ -13,16 +13,31 @@ class ChangeBinaryToText extends Migration
      */
     public function up()
     {
-        Schema::table('emails', function (Blueprint $table) {
-            $table->text('recipient')->change();
-            $table->text('cc')->nullable()->change();
-            $table->text('bcc')->nullable()->change();
-            $table->text('subject')->change();
-            $table->text('variables')->nullable()->change();
-            $table->text('body')->change();
-            $table->text('attachments')->nullable()->change();
-            $table->text('from')->nullable()->change();
-            $table->text('reply_to')->nullable()->change();
+        Schema::rename('emails', 'emails_old');
+
+        Schema::create('emails', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('label')->nullable();
+            $table->json('recipient');
+            $table->json('cc')->nullable();
+            $table->json('bcc')->nullable();
+            $table->string('subject');
+            $table->string('view');
+            $table->json('variables')->nullable();
+            $table->text('body');
+            $table->integer('attempts')->default(0);
+            $table->boolean('sending')->default(0);
+            $table->boolean('failed')->default(0);
+            $table->text('error')->nullable();
+            $table->json('attachments')->nullable();
+            $table->json('from')->nullable();
+            $table->json('reply_to')->nullable();
+            $table->timestamp('queued_at')->nullable();
+            $table->timestamp('scheduled_at')->nullable();
+            $table->timestamp('sent_at')->nullable()->index();
+            $table->timestamp('delivered_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
