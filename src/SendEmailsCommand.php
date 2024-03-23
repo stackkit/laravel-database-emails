@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Stackkit\LaravelDatabaseEmails;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
-use Illuminate\Support\LazyCollection;
 use Throwable;
 
 class SendEmailsCommand extends Command
@@ -20,43 +18,28 @@ class SendEmailsCommand extends Command
         $emails = $store->getQueue();
 
         if ($emails->isEmpty()) {
-            $this->line('There is nothing to send.');
+            $this->components->info('There is nothing to send.');
 
             return;
         }
 
-        $progress = $this->output->createProgressBar($emails->count());
+        $this->components->info('Sending '.count($emails).' e-mail(s).');
 
         foreach ($emails as $email) {
-            $progress->advance();
+            $recipients = implode(', ', array_keys($email->recipient));
+            $line = str($email->subject)->limit(40).' - '.str($recipients)->limit(40);
 
-            rescue(
-                callback: fn () => $email->send(),
-                rescue: fn (Throwable $e) => $email->markAsFailed($e)
-            );
+            rescue(function () use ($email, $line) {
+                $email->send();
+
+                $this->components->twoColumnDetail($line, '<fg=green;options=bold>DONE</>');
+            }, function (Throwable $e) use ($email, $line) {
+                $email->markAsFailed($e);
+
+                $this->components->twoColumnDetail($line, '<fg=red;options=bold>FAIL</>');
+            });
         }
 
-        $progress->finish();
-
-        $this->result($emails);
-    }
-
-    /**
-     * Output a table with the cronjob result.
-     */
-    protected function result(LazyCollection $emails): void
-    {
-        $headers = ['ID', 'Recipient', 'Subject', 'Status'];
-
-        $this->line("\n");
-
-        $this->table($headers, $emails->map(function (Email $email) {
-            return [
-                $email->id,
-                implode(',', array_column(Arr::wrap($email->recipient), 'recipient')),
-                $email->subject,
-                $email->failed ? 'Failed' : 'OK',
-            ];
-        }));
+        $this->newLine();
     }
 }
