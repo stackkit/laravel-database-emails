@@ -4,27 +4,57 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
+use Error;
 use Exception;
-use Illuminate\Container\Container;
-use ReflectionObject;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Support\Traits\Localizable;
 
 class MailableReader
 {
+    use Localizable;
+
     /**
      * Read the mailable and pass the data to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     public function read(EmailComposer $composer): void
     {
-        if (method_exists($composer->getData('mailable'), 'prepareMailableForDelivery')) {
-            $reflected = (new ReflectionObject($composer->getData('mailable')));
-            $method = $reflected->getMethod('prepareMailableForDelivery');
-            $method->setAccessible(true);
-            $method->invoke($composer->getData('mailable'));
-        } else {
-            Container::getInstance()->call([$composer->getData('mailable'), 'build']);
+        $canBeSent = $composer->mailable || ($composer->envelope && $composer->content);
+
+        if (! $canBeSent) {
+            throw new Error('E-mail cannot be sent: no mailable or envelope and content provided.');
         }
+
+        if ($composer->envelope && $composer->content) {
+            $composer->mailable = new class($composer) extends Mailable
+            {
+                public function __construct(private EmailComposer $composer)
+                {
+                    //
+                }
+
+                public function content(): Content
+                {
+                    return $this->composer->content;
+                }
+
+                public function envelope(): Envelope
+                {
+                    return $this->composer->envelope;
+                }
+
+                public function attachments(): array
+                {
+                    return $this->composer->attachments ?? [];
+                }
+            };
+        }
+
+        (fn (Mailable $mailable) => $mailable->prepareMailableForDelivery())->call(
+            $composer->mailable,
+            $composer->mailable,
+        );
 
         $this->readRecipient($composer);
 
@@ -41,136 +71,130 @@ class MailableReader
         $this->readBody($composer);
 
         $this->readAttachments($composer);
+
+        $this->readModel($composer);
     }
 
     /**
      * Convert the mailable addresses array into a array with only e-mails.
      *
-     * @param string $from
-     * @return array
+     * @param  string  $from
      */
     private function convertMailableAddresses($from): array
     {
-        return collect($from)->map(function ($recipient) {
-            return $recipient['address'];
+        return collect($from)->mapWithKeys(function ($recipient) {
+            return [$recipient['address'] => $recipient['name']];
         })->toArray();
     }
 
     /**
      * Read the mailable recipient to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readRecipient(EmailComposer $composer): void
     {
-        $to = $this->convertMailableAddresses(
-            $composer->getData('mailable')->to
-        );
+        if (config('database-emails.testing.enabled')) {
+            $composer->email->recipient = [
+                config('database-emails.testing.email') => null,
+            ];
 
-        $composer->recipient($to);
+            return;
+        }
+
+        $composer->email->recipient = $this->prepareAddressForDatabaseStorage(
+            $composer->mailable->to);
     }
 
     /**
      * Read the mailable from field to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readFrom(EmailComposer $composer): void
     {
-        $from = reset($composer->getData('mailable')->from);
-
-        if (!$from) {
-            return;
-        }
-
-        $composer->from(
-            $from['address'],
-            $from['name']
-        );
+        $composer->email->from = head($composer->mailable->from);
     }
 
     /**
      * Read the mailable cc to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readCc(EmailComposer $composer): void
     {
-        $cc = $this->convertMailableAddresses(
-            $composer->getData('mailable')->cc
-        );
-
-        $composer->cc($cc);
+        $composer->email->cc = $this->prepareAddressForDatabaseStorage(
+            $composer->mailable->cc);
     }
 
     /**
      * Read the mailable bcc to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readBcc(EmailComposer $composer): void
     {
-        $bcc = $this->convertMailableAddresses(
-            $composer->getData('mailable')->bcc
-        );
-
-        $composer->bcc($bcc);
+        $composer->email->bcc = $this->prepareAddressForDatabaseStorage(
+            $composer->mailable->bcc);
     }
 
     /**
      * Read the mailable reply-to to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readReplyTo(EmailComposer $composer): void
     {
-        $replyTo = $this->convertMailableAddresses(
-            $composer->getData('mailable')->replyTo
-        );
-
-        $composer->replyTo($replyTo);
+        $composer->email->reply_to = $this->prepareAddressForDatabaseStorage(
+            $composer->mailable->replyTo);
     }
 
     /**
      * Read the mailable subject to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readSubject(EmailComposer $composer): void
     {
-        $composer->subject($composer->getData('mailable')->subject);
+        $composer->email->subject = $composer->mailable->subject;
     }
 
     /**
      * Read the mailable body to the email composer.
      *
-     * @param EmailComposer $composer
      * @throws Exception
      */
     private function readBody(EmailComposer $composer): void
     {
-        $composer->setData('view', '');
+        /** @var Mailable $mailable */
+        $mailable = $composer->mailable;
 
-        $mailable = $composer->getData('mailable');
+        $composer->email->view = $mailable->view;
+        $composer->email->variables = $mailable->buildViewData();
 
-        $composer->setData('body', view($mailable->view, $mailable->buildViewData())->render());
+        $localeToUse = $composer->locale ?? app()->currentLocale();
+
+        $this->withLocale(
+            $localeToUse,
+            fn () => $composer->email->body = view($mailable->view, $mailable->buildViewData())->render(),
+        );
     }
 
     /**
      * Read the mailable attachments to the email composer.
-     *
-     * @param EmailComposer $composer
      */
     private function readAttachments(EmailComposer $composer): void
     {
-        $mailable = $composer->getData('mailable');
+        $mailable = $composer->mailable;
 
-        foreach ((array) $mailable->attachments as $attachment) {
-            call_user_func_array([$composer, 'attach'], $attachment);
-        }
+        $composer->email->attachments = array_map(function (array $attachment) {
+            if (! $attachment['file'] instanceof Attachment) {
+                throw new Error('The attachment is not an instance of '.Attachment::class.'.');
+            }
 
-        foreach ((array) $mailable->rawAttachments as $rawAttachment) {
-            call_user_func_array([$composer, 'attachData'], $rawAttachment);
+            return $attachment['file']->toArray();
+        }, $mailable->attachments);
+    }
+
+    public function readModel(EmailComposer $composer): void
+    {
+        if ($composer->model) {
+            $composer->email->model()->associate($composer->model);
         }
+    }
+
+    private function prepareAddressForDatabaseStorage(array $addresses): array
+    {
+        return collect($addresses)->mapWithKeys(function ($recipient) {
+            return [$recipient['address'] => $recipient['name']];
+        })->toArray();
     }
 }

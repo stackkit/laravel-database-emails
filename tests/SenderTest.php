@@ -4,33 +4,31 @@ namespace Tests;
 
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
+use Stackkit\LaravelDatabaseEmails\Attachment;
+use Stackkit\LaravelDatabaseEmails\Email;
 use Stackkit\LaravelDatabaseEmails\MessageSent;
 use Stackkit\LaravelDatabaseEmails\SentMessage;
-use Swift_Events_SendEvent;
-use Illuminate\Support\Facades\Mail;
-use Stackkit\LaravelDatabaseEmails\Email;
 
 class SenderTest extends TestCase
 {
-    /** @var Swift_Events_SendEvent[] */
+    /** @var array<SentMessage> */
     public $sent = [];
 
     public function setUp(): void
     {
         parent::setUp();
 
-        if (version_compare(app()->version(), '9.0.0', '>=')) {
-            Event::listen(MessageSent::class, function (MessageSent $event) {
-                $this->sent[] = SentMessage::createFromSymfonyMailer(
-                    $event->message->getSymfonySentMessage()->getOriginalMessage()
-                );
-            });
-        } else {
-            Mail::getSwiftMailer()->registerPlugin(new TestingMailEventListener($this));
-        }
+        Event::listen(MessageSent::class, function (MessageSent $event) {
+            $this->sent[] = SentMessage::createFromSymfonyMailer(
+                $event->message->getSymfonySentMessage()->getOriginalMessage()
+            );
+        });
     }
 
-    /** @test */
+    #[Test]
     public function it_sends_an_email()
     {
         $this->sendEmail();
@@ -40,7 +38,7 @@ class SenderTest extends TestCase
         $this->artisan('email:send');
     }
 
-    /** @test */
+    #[Test]
     public function the_email_has_a_correct_from_email_and_from_name()
     {
         $this->app['config']->set('mail.from.address', 'testfromaddress@gmail.com');
@@ -58,7 +56,7 @@ class SenderTest extends TestCase
         // custom from...
         $this->sent = [];
 
-        $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
+        $this->composeEmail(['from' => new Address('marick@dolphiq.nl', 'Marick')])->send();
         $this->artisan('email:send');
         $from = reset($this->sent)->from;
         $this->assertEquals('marick@dolphiq.nl', key($from));
@@ -66,22 +64,14 @@ class SenderTest extends TestCase
 
         // only address
         $this->sent = [];
-        $this->composeEmail()->from('marick@dolphiq.nl')->send();
+        $this->composeEmail(['from' => 'marick@dolphiq.nl'])->send();
         $this->artisan('email:send');
         $from = reset($this->sent)->from;
         $this->assertEquals('marick@dolphiq.nl', key($from));
-        $this->assertEquals(config('mail.from.name'), $from[key($from)]);
-
-        // only name
-        $this->sent = [];
-        $this->composeEmail()->from(null, 'Marick')->send();
-        $this->artisan('email:send');
-        $from = reset($this->sent)->from;
-        $this->assertEquals(config('mail.from.address'), key($from));
-        $this->assertEquals('Marick', $from[key($from)]);
+        $this->assertEquals(null, $from[key($from)]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sends_emails_to_the_correct_recipients()
     {
         $this->sendEmail(['recipient' => 'john@doe.com']);
@@ -99,7 +89,7 @@ class SenderTest extends TestCase
         $this->assertArrayHasKey('john+2@doe.com', $to);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_the_cc_addresses()
     {
         $this->sendEmail(['cc' => 'cc@test.com']);
@@ -117,7 +107,7 @@ class SenderTest extends TestCase
         $this->assertArrayHasKey('cc+2@test.com', $cc);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_the_bcc_addresses()
     {
         $this->sendEmail(['bcc' => 'bcc@test.com']);
@@ -135,7 +125,7 @@ class SenderTest extends TestCase
         $this->assertArrayHasKey('bcc+2@test.com', $bcc);
     }
 
-    /** @test */
+    #[Test]
     public function the_email_has_the_correct_subject()
     {
         $this->sendEmail(['subject' => 'Hello World']);
@@ -147,7 +137,7 @@ class SenderTest extends TestCase
         $this->assertEquals('Hello World', $subject);
     }
 
-    /** @test */
+    #[Test]
     public function the_email_has_the_correct_body()
     {
         $this->sendEmail(['variables' => ['name' => 'John Doe']]);
@@ -162,64 +152,48 @@ class SenderTest extends TestCase
         $this->assertEquals(view('tests::dummy'), $body);
     }
 
-    /** @test */
+    #[Test]
     public function attachments_are_added_to_the_email()
     {
         $this->composeEmail()
-            ->attach(__DIR__ . '/files/pdf-sample.pdf')
-            ->send();
-        $this->artisan('email:send');
-
-        $attachments = reset($this->sent)->attachments;
-
-        $this->assertCount(1, $attachments);
-    }
-
-    /** @test */
-    public function raw_attachments_are_added_to_the_email()
-    {
-        $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
-
-        $this->composeEmail()
-            ->attachData($rawData, 'hello-ci.pdf', [
-                'mime' => 'application/pdf',
+            ->attachments([
+                Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
+                Attachment::fromPath(__DIR__.'/files/my-file.txt')->as('Test123 file'),
+                Attachment::fromStorageDisk('my-custom-disk', 'test.txt'),
             ])
             ->send();
         $this->artisan('email:send');
 
         $attachments = reset($this->sent)->attachments;
-        $attachment = reset($attachments);
 
-        $this->assertCount(1, $attachments);
-        $this->assertStringContainsString('hello-ci.pdf', $attachment['disposition']);
-        $this->assertStringContainsString('application/pdf', $attachment['disposition']);
-        $this->assertTrue(md5($attachment['body']) == md5($rawData));
+        $this->assertCount(3, $attachments);
+        $this->assertEquals('Test123'."\n", $attachments[1]['body']);
+        $this->assertEquals('text/plain disposition: attachment filename: Test123 file', $attachments[1]['disposition']);
+        $this->assertEquals("my file from public disk\n", $attachments[2]['body']);
     }
 
-    /** @test */
-    public function old_json_encoded_attachments_can_still_be_read()
+    #[Test]
+    public function raw_attachments_are_not_added_to_the_email()
     {
-        $email = $this->sendEmail();
-        $email->attachments = json_encode([1, 2, 3]);
-        $email->save();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Raw attachments are not supported in the database email driver.');
 
-        $this->assertEquals([1, 2, 3], $email->fresh()->getAttachments());
-
-        $email->attachments = serialize([4, 5, 6]);
-        $email->save();
-
-        $this->assertEquals([4, 5, 6], $email->fresh()->getAttachments());
+        $this->composeEmail()
+            ->attachments([
+                Attachment::fromData(fn () => 'test', 'test.txt'),
+            ])
+            ->send();
     }
 
-    /** @test */
+    #[Test]
     public function emails_can_be_sent_immediately()
     {
-        $this->app['config']->set('laravel-database-emails.immediately', false);
+        $this->app['config']->set('database-emails.immediately', false);
         $this->sendEmail();
         $this->assertCount(0, $this->sent);
         Email::truncate();
 
-        $this->app['config']->set('laravel-database-emails.immediately', true);
+        $this->app['config']->set('database-emails.immediately', true);
         $this->sendEmail();
         $this->assertCount(1, $this->sent);
 
@@ -227,7 +201,7 @@ class SenderTest extends TestCase
         $this->assertCount(1, $this->sent);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_the_reply_to_addresses()
     {
         $this->sendEmail(['reply_to' => 'replyto@test.com']);
@@ -243,10 +217,6 @@ class SenderTest extends TestCase
         $this->assertCount(2, $replyTo);
         $this->assertArrayHasKey('replyto1@test.com', $replyTo);
         $this->assertArrayHasKey('replyto2@test.com', $replyTo);
-
-        if (! class_exists(Address::class)) {
-            return;
-        }
 
         $this->sent = [];
         $this->sendEmail([

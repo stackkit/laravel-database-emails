@@ -4,22 +4,30 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
-use Swift_Mime_SimpleMimeEntity;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
 
 class SentMessage
 {
     public $from = [];
+
     public $to = [];
+
     public $cc = [];
+
     public $bcc = [];
+
     public $replyTo = [];
+
     public $subject = '';
+
     public $body = '';
+
     public $attachments = [];
+
     public $headers = [];
 
-    public static function createFromSymfonyMailer(\Symfony\Component\Mime\Email $email): SentMessage
+    public static function createFromSymfonyMailer(Email $email): SentMessage
     {
         $sentMessage = new self();
 
@@ -51,27 +59,6 @@ class SentMessage
                 'disposition' => $dataPart->asDebugString(),
             ];
         }, $email->getAttachments());
-
-        return $sentMessage;
-    }
-
-    public static function createFromSwiftMailer(\Swift_Mime_SimpleMessage $message): SentMessage
-    {
-        $sentMessage = new self();
-
-        $sentMessage->from = $message->getFrom();
-        $sentMessage->to = $message->getTo();
-        $sentMessage->cc = $message->getCc();
-        $sentMessage->bcc = $message->getBcc();
-        $sentMessage->replyTo = $message->getReplyTo();
-        $sentMessage->subject = $message->getSubject();
-        $sentMessage->body = $message->getBody();
-        $sentMessage->attachments = array_map(function(Swift_Mime_SimpleMimeEntity $entity) {
-            return [
-                'body' => $entity->getBody(),
-                'disposition' => $entity->getContentType() . ' ' . $entity->getHeaders()->get('content-disposition'),
-            ];
-        }, $message->getChildren());
 
         return $sentMessage;
     }

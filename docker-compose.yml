@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8
+    ports:
+      - '${MYSQL_PORT:-3307}:3306'
+    environment:
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: 'test'
+      MYSQL_DATABASE: 'test'
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+  pgsql:
+    image: postgres:14
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    environment:
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'test'

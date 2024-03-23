@@ -6,6 +6,7 @@ namespace Stackkit\LaravelDatabaseEmails;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\LazyCollection;
 
 class Store
 {
@@ -14,11 +15,11 @@ class Store
      *
      * @return Collection|Email[]
      */
-    public function getQueue(): Collection
+    public function getQueue(): LazyCollection
     {
         $query = new Email();
 
-        return $query
+        return Email::query()
             ->whereNull('deleted_at')
             ->whereNull('sent_at')
             ->whereNull('queued_at')
@@ -30,6 +31,6 @@ class Store
             ->where('attempts', '<', Config::maxAttemptCount())
             ->orderBy('created_at', 'asc')
             ->limit(Config::cronjobEmailLimit())
-            ->get();
+            ->cursor();
     }
 }

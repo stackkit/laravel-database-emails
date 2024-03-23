@@ -2,22 +2,22 @@
 
 namespace Tests;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\Email;
 
 class PruneTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function by_default_mails_are_pruned_after_6_months()
     {
         $email = $this->sendEmail();
 
-        Carbon::setTestNow($email->created_at . ' + 6 months');
+        Carbon::setTestNow($email->created_at.' + 6 months');
         $this->artisan('model:prune', ['--model' => [Email::class]]);
         $this->assertInstanceOf(Email::class, $email->fresh());
 
-        Carbon::setTestNow($email->created_at . ' + 6 months + 1 day');
+        Carbon::setTestNow($email->created_at.' + 6 months + 1 day');
 
         // Ensure the email object has to be passed manually, otherwise we are acidentally
         // deleting everyone's e-mails...
@@ -29,7 +29,7 @@ class PruneTest extends TestCase
         $this->assertNull($email->fresh());
     }
 
-    /** @test */
+    #[Test]
     public function can_change_when_emails_are_pruned()
     {
         Email::pruneWhen(function (Email $email) {
@@ -38,11 +38,11 @@ class PruneTest extends TestCase
 
         $email = $this->sendEmail();
 
-        Carbon::setTestNow($email->created_at . ' + 3 months');
+        Carbon::setTestNow($email->created_at.' + 3 months');
         $this->artisan('model:prune', ['--model' => [Email::class]]);
         $this->assertInstanceOf(Email::class, $email->fresh());
 
-        Carbon::setTestNow($email->created_at . ' + 3 months + 1 day');
+        Carbon::setTestNow($email->created_at.' + 3 months + 1 day');
         $this->artisan('model:prune', ['--model' => [Email::class]]);
         $this->assertNull($email->fresh());
     }

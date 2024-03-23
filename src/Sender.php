@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Mail;
 
 class Sender
 {
-    /**
-     * Send the given e-mail.
-     *
-     * @param Email $email
-     */
     public function send(Email $email): void
     {
         if ($email->isSent()) {
@@ -26,45 +22,39 @@ class Sender
             $this->buildMessage($message, $email);
         });
 
-        // This is used so we can assert things on the sent message in Laravel 9+ since we cannot use
-        // the Swift Mailer plugin anymore. So this is purely used for in the PHPUnit tests.
-        if (version_compare(app()->version(), '9.0.0', '>=') && !is_null($sentMessage)) {
-            event(new MessageSent($sentMessage));
-        }
+        event(new MessageSent($sentMessage));
 
         $email->markAsSent();
     }
 
-    /**
-     * Build the e-mail message.
-     *
-     * @param  Message $message
-     * @param  Email   $email
-     */
     private function buildMessage(Message $message, Email $email): void
     {
-        $message->to($email->getRecipient())
-            ->cc($email->hasCc() ? $email->getCc() : [])
-            ->bcc($email->hasBcc() ? $email->getBcc() : [])
-            ->replyTo($email->hasReplyTo() ? $email->getReplyTo() : [])
-            ->subject($email->getSubject())
-            ->from($email->getFromAddress(), $email->getFromName());
+        $message->to($email->recipient)
+            ->cc($email->cc ?: [])
+            ->bcc($email->bcc ?: [])
+            ->replyTo($email->reply_to ?: [])
+            ->subject($email->subject)
+            ->from($email->from['address'], $email->from['name'])
+            ->html($email->body);
 
-        if (version_compare(app()->version(), '9.0.0', '>=')) {
-            // Symfony Mailer
-            $message->html($email->getBody());
-        } else {
-            // SwiftMail
-            $message->setBody($email->getBody(), 'text/html');
-        }
+        foreach ($email->attachments as $dbAttachment) {
+            $attachment = match (true) {
+                isset($dbAttachment['disk']) => Attachment::fromStorageDisk(
+                    $dbAttachment['disk'],
+                    $dbAttachment['path']
+                ),
+                default => Attachment::fromPath($dbAttachment['path']),
+            };
 
-        $attachmentMap = [
-            'attachment'    => 'attach',
-            'rawAttachment' => 'attachData',
-        ];
+            if (! empty($dbAttachment['mime'])) {
+                $attachment->withMime($dbAttachment['mime']);
+            }
 
-        foreach ($email->getAttachments() as $attachment) {
-            call_user_func_array([$message, $attachmentMap[$attachment['type']]], $attachment['attachment']);
+            if (! empty($dbAttachment['as'])) {
+                $attachment->as($dbAttachment['as']);
+            }
+
+            $message->attach($attachment);
         }
     }
 }

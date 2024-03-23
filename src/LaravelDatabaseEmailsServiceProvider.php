@@ -10,8 +10,6 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
 {
     /**
      * Perform post-registration booting of services.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -21,42 +19,32 @@ class LaravelDatabaseEmailsServiceProvider extends ServiceProvider
 
     /**
      * Boot the config for the package.
-     *
-     * @return void
      */
     private function bootConfig(): void
     {
-        $baseDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
-        $configDir = $baseDir . 'config' . DIRECTORY_SEPARATOR;
+        $baseDir = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
+        $configDir = $baseDir.'config'.DIRECTORY_SEPARATOR;
 
         $this->publishes([
-            $configDir . 'laravel-database-emails.php' => config_path('laravel-database-emails.php'),
-        ], 'laravel-database-emails-config');
+            $configDir.'laravel-database-emails.php' => config_path('laravel-database-emails.php'),
+        ], 'database-emails-config');
     }
 
     /**
      * Boot the database for the package.
-     *
-     * @return void
      */
     private function bootDatabase(): void
     {
-        $baseDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
-        $migrationsDir = $baseDir . 'database' . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR;
+        $baseDir = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
+        $migrationsDir = $baseDir.'database'.DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR;
 
-        if ($this->app['config']->get('laravel-database-emails.manual_migrations')) {
-            $this->publishes([
-                $migrationsDir => "{$this->app->databasePath()}/migrations",
-            ], 'laravel-database-emails-migrations');
-        } else {
-            $this->loadMigrationsFrom([$migrationsDir]);
-        }
+        $this->publishes([
+            $migrationsDir => "{$this->app->databasePath()}/migrations",
+        ], 'database-emails-migrations');
     }
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register(): void
     {
