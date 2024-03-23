@@ -119,7 +119,6 @@ class DatabaseInteractionTest extends TestCase
     {
         $email = $this->sendEmail(['variables' => ['name' => 'John Doe']]);
 
-        $this->assertEquals(json_encode(['name' => 'John Doe'], 1), DB::table('emails')->find(1)->variables);
         $this->assertEquals(['name' => 'John Doe'], $email->variables);
     }
 

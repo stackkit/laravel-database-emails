@@ -42,7 +42,7 @@ class ComposeTest extends TestCase
         ]);
 
         $email = Email::compose()
-            ->model($user)
+            ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
             ->content(fn (Content $content) => $content->view('welcome'))
             ->send();
