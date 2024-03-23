@@ -15,19 +15,7 @@ use Illuminate\Support\Carbon;
 
 class EmailComposer
 {
-    /**
-     * The e-mail that is being composed.
-     *
-     * @var Email
-     */
-    private $email;
-
-    /**
-     * The e-email data.
-     *
-     * @var array
-     */
-    protected $data = [];
+    public ?Mailable $mailable = null;
 
     public ?Envelope $envelope = null;
 
@@ -37,12 +25,21 @@ class EmailComposer
 
     public ?string $locale = null;
 
-    /**
-     * Create a new EmailComposer instance.
-     */
-    public function __construct(Email $email)
+    public ?Model $model = null;
+
+    public ?bool $queued = null;
+
+    public ?string $connection = null;
+
+    public ?string $queue = null;
+
+    public int|Carbon|null $delay = null;
+
+    public ?string $jobClass = null;
+
+    public function __construct(public Email $email)
     {
-        $this->email = $email;
+        //
     }
 
     public function envelope(null|Envelope|Closure $envelope = null): self
@@ -105,38 +102,9 @@ class EmailComposer
 
     public function model(Model $model)
     {
-        $this->setData('model', $model);
+        $this->model = $model;
 
         return $this;
-    }
-
-    /**
-     * Get the e-mail that is being composed.
-     */
-    public function getEmail(): Email
-    {
-        return $this->email;
-    }
-
-    public function setData(string $key, $value): self
-    {
-        $this->data[$key] = $value;
-
-        return $this;
-    }
-
-    public function getData(string $key, $default = null)
-    {
-        if (! is_null($default) && ! $this->hasData($key)) {
-            return $default;
-        }
-
-        return $this->data[$key];
-    }
-
-    public function hasData(string $key): bool
-    {
-        return isset($this->data[$key]);
     }
 
     public function label(string $label): self
@@ -153,24 +121,25 @@ class EmailComposer
         return $this->send();
     }
 
-    public function queue(?string $connection = null, ?string $queue = null, $delay = null): Email
+    public function queue(?string $connection = null, ?string $queue = null, $delay = null, ?string $jobClass = null): Email
     {
         $connection = $connection ?: config('queue.default');
         $queue = $queue ?: 'default';
 
         $this->email->queued_at = now();
 
-        $this->setData('queued', true);
-        $this->setData('connection', $connection);
-        $this->setData('queue', $queue);
-        $this->setData('delay', $delay);
+        $this->queued = true;
+        $this->connection = $connection;
+        $this->queue = $queue;
+        $this->delay = $delay;
+        $this->jobClass = $jobClass;
 
         return $this->send();
     }
 
     public function mailable(Mailable $mailable): self
     {
-        $this->setData('mailable', $mailable);
+        $this->mailable = $mailable;
 
         (new MailableReader())->read($this);
 
@@ -194,17 +163,21 @@ class EmailComposer
 
         $this->email->refresh();
 
-        if ($this->getData('queued', false) === true) {
-            dispatch(new SendEmailJob($this->email))
-                ->onConnection($this->getData('connection'))
-                ->onQueue($this->getData('queue'))
-                ->delay($this->getData('delay'));
+        if (Config::sendImmediately()) {
+            $this->email->send();
 
             return $this->email;
         }
 
-        if (Config::sendImmediately()) {
-            $this->email->send();
+        if ($this->queued) {
+            $job = $this->jobClass ?: SendEmailJob::class;
+
+            dispatch(new $job($this->email))
+                ->onConnection($this->connection)
+                ->onQueue($this->queue)
+                ->delay($this->delay);
+
+            return $this->email;
         }
 
         return $this->email;

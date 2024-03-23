@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
 use Stackkit\LaravelDatabaseEmails\SendEmailJob;
+use Workbench\App\Jobs\CustomSendEmailJob;
 
 class QueuedEmailsTest extends TestCase
 {
@@ -104,5 +105,15 @@ class QueuedEmailsTest extends TestCase
         $job->handle();
 
         $this->assertTrue($email->isSent());
+    }
+
+    #[Test]
+    public function developers_can_choose_their_own_job()
+    {
+        Queue::fake();
+
+        $email = $this->queueEmail(jobClass: CustomSendEmailJob::class);
+
+        Queue::assertPushed(fn (CustomSendEmailJob $job) => $job->email->id === $email->id);
     }
 }

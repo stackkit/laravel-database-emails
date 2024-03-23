@@ -6,7 +6,7 @@
 
 # Introduction
 
-This package allows you to store and send e-mails using a database. 
+This package allows you to store and send e-mails using the database. 
 
 # Requirements
 
@@ -16,34 +16,26 @@ This package requires Laravel 10 or 11.
 
 Require the package using composer.
 
-```bash
+```shell
 composer require stackkit/laravel-database-emails
 ```
 
 Publish the configuration files.
 
-```bash
+```shell
 php artisan vendor:publish --tag=database-emails-config
 php artisan vendor:publish --tag=database-emails-migrations
 ```
 
 Create the database table required for this package.
 
-```bash
+```shell
 php artisan migrate
 ```
 
 Add the e-mail cronjob to your scheduler
 
 ```php
-<?php
-
-/**
- * Define the application's command schedule.
- *
- * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
- * @return void
- */
 protected function schedule(Schedule $schedule)
 {
      $schedule->command('email:send')->everyMinute()->withoutOverlapping(5);
@@ -58,8 +50,6 @@ protected function schedule(Schedule $schedule)
 E-mails are composed the same way mailables are created.
 
 ```php
-<?php
-
 use Stackkit\LaravelDatabaseEmails\Email;
 use Illuminate\Mail\Mailables\Content;
 use Stackkit\LaravelDatabaseEmails\Attachment;
@@ -85,19 +75,14 @@ Email::compose()
 ### Sending emails to users in your application
 
 ```php
-<?php
 Email::compose()
     ->user($user)
     ->send();
 ```
 
-By default, the `name` column will be used to set the recipient's name. If you wish to use another column, you should implement the `preferredEmailName` method in your model.
+By default, the `name` column will be used to set the recipient's name. If you wish to use something different, you should implement the `preferredEmailName` method in your model.
 
 ```php
-<?php
-
-use Illuminate\Database\Eloquent\Model;
-
 class User extends Model
 {
     public function preferredEmailName(): string
@@ -107,13 +92,9 @@ class User extends Model
 }
 ```
 
-By default, the `email` column will be used to set the recipient's e-mail address. If you wish to use another column, you should implement the `preferredEmailAddress` method in your model.
+By default, the `email` column will be used to set the recipient's e-mail address. If you wish to use something different, you should implement the `preferredEmailAddress` method in your model.
 
 ```php
-<?php
-
-use Illuminate\Database\Eloquent\Model;
-
 class User extends Model
 {
     public function preferredEmailAddress(): string
@@ -123,14 +104,9 @@ class User extends Model
 }
 ```
 
-By default, the app locale will be used to set the recipient's locale. If you wish to use another column, you should implement the `preferredEmailLocale` method in your model.
+By default, the app locale will be used. If you wish to use something different, you should implement the `preferredEmailLocale` method in your model.
 
 ```php
-<?php
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Translation\HasLocalePreference;
-
 class User extends Model implements HasLocalePreference
 {
     public function preferredLocale(): string
@@ -145,10 +121,6 @@ class User extends Model implements HasLocalePreference
 You may also pass a mailable to the e-mail composer.
 
 ```php
-<?php
-
-use Stackkit\LaravelDatabaseEmails\Email;
-
 Email::compose()
     ->mailable(new OrderShipped())
     ->send();
@@ -156,16 +128,11 @@ Email::compose()
 
 ### Attachments
 
-To start attaching files to your e-mails, you may use the `attach` method like you normally would in Laravel.
+To start attaching files to your e-mails, you may use the `attachments` method like you normally would in Laravel.
 However, you will have to use this package's `Attachment` class.
 
 
 ```php
-<?php
-
-use Stackkit\LaravelDatabaseEmails\Email;
-use Stackkit\LaravelDatabaseEmails\Attachment;
-
 Email::compose()
     ->attachments([
         Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
@@ -175,19 +142,16 @@ Email::compose()
     ->send();
 ```
 
-<small>
-Note: `fromData()` and `fromStorage()` are not supported as the work with raw data.
-</small>
+> [!NOTE]
+> `Attachment::fromData()` and `Attachment::fromStorage()` are not supported as they work with raw data.
 
 ### Attaching models to e-mails
 
-You may attach models to your e-mails.
+You may attach a model to an e-mail. This can be useful to attach a user or another model that belongs to the e-mail.
 
 ```php
-
 Email::compose()
     ->model(User::find(1));
-
 ```
 
 ### Scheduling
@@ -195,64 +159,65 @@ Email::compose()
 You may schedule an e-mail by calling `later` instead of `send`. You must provide a Carbon instance or a strtotime valid date.
 
 ```php
-<?php
-
-use Stackkit\LaravelDatabaseEmails\Email;
-
 Email::compose()
     ->later('+2 hours');
 ```
 
 ### Queueing e-mails
 
-**Important**: When queueing mail using the `queue` function, it is no longer necessary to schedule the `email:send` command. Please make sure it is removed from `app/Console/Kernel.php`.
+> [!IMPORTANT]
+> When queueing mail using the `queue` function, it is no longer necessary to schedule the `email:send` command.
+
+```php
+Email::compose()->queue();
+
+// On a specific connection
+Email::compose()->queue(connection: 'sqs');
+
+// On a specific queue
+Email::compose()->queue(queue: 'email-queue');
+
+// Delay (send mail in 10 minutes)
+Email::compose()->queue(delay: now()->addMinutes(10));
+```
+
+If you need more flexibility, you may also pass your own job class:
+
+```php
+Email::compose()->queue(jobClass: CustomSendEmailJob::class);
+```
+
+It could look like this:
 
 ```php
 <?php
 
-use Stackkit\LaravelDatabaseEmails\Email;
+namespace App\Jobs;
 
-Email::compose()
-    ->queue();
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Stackkit\LaravelDatabaseEmails\SendEmailJob;
 
-// on a specific connection
-Email::compose()
-    ->queue('sqs');
-
-// on a specific queue
-Email::compose()
-    ->queue(null, 'email-queue');
-
-// timeout (send mail in 10 minutes)
-Email::compose()
-    ->queue(null, null, now()->addMinutes(10));
-```
-
-If you need more flexibility over how to queued mails are retried, please implement your own email job.
-
-Within the job you can send the mail like this:
-
-```php
-use Stackkit\LaravelDatabaseEmails\Sender;
-
-(new Sender)->send($email);
+class CustomSendEmailJob extends SendEmailJob implements ShouldQueue
+{
+    // Define custom retries, backoff, etc...
+}
 ```
 
 ### Test mode
 
 When enabled, all newly created e-mails will be sent to the specified test e-mail address. This is turned off by default.
 
-```
-DATABASE_EMAILS_TESTING_ENABLED=true
-DATABASE_EMAILS_TESTING_EMAIL=your-test-recipient@example.com
+```dotenv
+DB_EMAILS_TESTING_ENABLED=true
+DB_EMAILS_TESTING_EMAIL=your-test-recipient@example.com
 ```
 
 ### E-mails to send per minute
 
 To configure how many e-mails should be sent each command.
 
-```
-DATABASE_EMAILS_LIMIT=20
+```dotenv
+DB_EMAILS_LIMIT=20
 ```
 
 ### Send e-mails immediately
@@ -261,8 +226,8 @@ Useful during development when Laravel Scheduler is not running
 
 To enable, set the following environment variable:
 
-```
-DATABASE_EMAILS_IMMEDIATELY=true
+```dotenv
+DB_EMAILS_IMMEDIATELY=true
 ```
 
 ### Pruning models
@@ -272,7 +237,7 @@ use Stackkit\LaravelDatabaseEmails\Email;
 
 $schedule->command('model:prune', [
     '--model' => [Email::class],
-])->everyMinute();
+])->daily();
 ```
 
 By default, e-mails are pruned when they are older than 6 months.

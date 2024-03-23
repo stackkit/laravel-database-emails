@@ -26,6 +26,6 @@ class SendEmailJob implements ShouldQueue
 
     public function handle(): void
     {
-        (new Sender())->send($this->email);
+        $this->email->send();
     }
 }

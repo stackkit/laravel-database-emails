@@ -132,8 +132,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return $this->createEmail($overwrite)->later($scheduledFor);
     }
 
-    public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [])
+    public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [], ?string $jobClass = null)
     {
-        return $this->createEmail($overwrite)->queue($connection, $queue, $delay);
+        return $this->createEmail($overwrite)->queue($connection, $queue, $delay, $jobClass);
     }
 }

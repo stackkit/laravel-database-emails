@@ -13,7 +13,9 @@ class CreateNewTable extends Migration
      */
     public function up()
     {
-        Schema::rename('emails', 'emails_old');
+        if (Schema::hasTable('emails')) {
+            Schema::rename('emails', 'emails_old');
+        }
 
         Schema::create('emails', function (Blueprint $table) {
             $table->increments('id');

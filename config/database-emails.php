@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'attempts' => 3,
+    'attempts' => env('DB_EMAILS_ATTEMPTS', 3),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,9 +28,9 @@ return [
 
     'testing' => [
 
-        'email' => env('DATABASE_EMAILS_TESTING_EMAIL'),
+        'email' => env('DB_EMAILS_TESTING_EMAIL'),
 
-        'enabled' => env('DATABASE_EMAILS_TESTING_ENABLED', false),
+        'enabled' => env('DB_EMAILS_TESTING_ENABLED', false),
 
     ],
 
@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'limit' => env('DATABASE_EMAILS_LIMIT', 20),
+    'limit' => env('DB_EMAILS_LIMIT', 20),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,5 +58,5 @@ return [
     |
     */
 
-    'immediately' => env('DATABASE_EMAILS_IMMEDIATELY', false),
+    'immediately' => env('DB_EMAILS_IMMEDIATELY', false),
 ];
