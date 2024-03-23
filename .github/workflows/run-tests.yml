@@ -62,7 +62,7 @@ jobs:
     needs: access_check
     strategy:
       matrix:
-        db: [ 'mysql', 'sqlite' ]
+        db: [ 'mysql', 'sqlite', 'pgsql' ]
         payload:
           - { laravel: '11.*', php: '8.3', 'testbench': '9.*', collision: '8.*' }
           - { laravel: '11.*', php: '8.2', 'testbench': '9.*', collision: '8.*' }
