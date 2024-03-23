@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateEmailsTable extends Migration
+class CreateNewTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,26 +14,30 @@ class CreateEmailsTable extends Migration
     public function up()
     {
         if (Schema::hasTable('emails')) {
-            return;
+            Schema::rename('emails', 'emails_old');
         }
 
         Schema::create('emails', function (Blueprint $table) {
             $table->increments('id');
             $table->string('label')->nullable();
-            $table->binary('recipient');
-            $table->binary('cc')->nullable();
-            $table->binary('bcc')->nullable();
-            $table->binary('subject');
-            $table->string('view', 255);
-            $table->binary('variables')->nullable();
-            $table->binary('body');
+            $table->json('recipient');
+            $table->json('cc')->nullable();
+            $table->json('bcc')->nullable();
+            $table->string('subject');
+            $table->string('view');
+            $table->json('variables')->nullable();
+            $table->text('body');
             $table->integer('attempts')->default(0);
             $table->boolean('sending')->default(0);
             $table->boolean('failed')->default(0);
             $table->text('error')->nullable();
-            $table->boolean('encrypted')->default(0);
+            $table->json('attachments')->nullable();
+            $table->json('from')->nullable();
+            $table->nullableMorphs('model');
+            $table->json('reply_to')->nullable();
+            $table->timestamp('queued_at')->nullable();
             $table->timestamp('scheduled_at')->nullable();
-            $table->timestamp('sent_at')->nullable();
+            $table->timestamp('sent_at')->nullable()->index();
             $table->timestamp('delivered_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

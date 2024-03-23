@@ -3,32 +3,35 @@
 namespace Tests;
 
 use Carbon\Carbon;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
+use Stackkit\LaravelDatabaseEmails\Attachment;
 
 class DatabaseInteractionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function label_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['label' => 'welcome-email']);
 
         $this->assertEquals('welcome-email', DB::table('emails')->find(1)->label);
-        $this->assertEquals('welcome-email', $email->getLabel());
+        $this->assertEquals('welcome-email', $email->label);
     }
 
-    /** @test */
+    #[Test]
     public function recipient_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['recipient' => 'john@doe.com']);
 
-        $this->assertEquals('john@doe.com', $email->getRecipient());
+        $this->assertEquals(['john@doe.com' => null], $email->recipient);
     }
 
-    /** @test */
+    #[Test]
     public function cc_and_bcc_should_be_saved_correctly()
     {
         $email = $this->sendEmail([
-            'cc'  => $cc = [
+            'cc' => $cc = [
                 'john@doe.com',
             ],
             'bcc' => $bcc = [
@@ -36,76 +39,54 @@ class DatabaseInteractionTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(json_encode($cc), DB::table('emails')->find(1)->cc);
-        $this->assertTrue($email->hasCc());
-        $this->assertEquals(['john@doe.com'], $email->getCc());
-        $this->assertEquals(json_encode($bcc), DB::table('emails')->find(1)->bcc);
-        $this->assertTrue($email->hasBcc());
-        $this->assertEquals(['jane@doe.com'], $email->getBcc());
+        $this->assertEquals(['john@doe.com' => null], $email->cc);
+        $this->assertEquals(['jane@doe.com' => null], $email->bcc);
     }
 
-    /** @test */
+    #[Test]
     public function reply_to_should_be_saved_correctly()
     {
         $email = $this->sendEmail([
-            'reply_to' => $replyTo = [
+            'reply_to' => [
                 'john@doe.com',
             ],
         ]);
 
-        $this->assertEquals(json_encode($replyTo), DB::table('emails')->find(1)->reply_to);
-        $this->assertTrue($email->hasReplyTo());
-        $this->assertEquals(['john@doe.com'], $email->getReplyTo());
+        $this->assertEquals(['john@doe.com' => null], $email->reply_to);
     }
 
-    /** @test */
+    #[Test]
     public function subject_should_be_saved_correclty()
     {
         $email = $this->sendEmail(['subject' => 'test subject']);
 
         $this->assertEquals('test subject', DB::table('emails')->find(1)->subject);
-        $this->assertEquals('test subject', $email->getSubject());
+        $this->assertEquals('test subject', $email->subject);
     }
 
-    /** @test */
+    #[Test]
     public function view_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['view' => 'tests::dummy']);
 
         $this->assertEquals('tests::dummy', DB::table('emails')->find(1)->view);
-        $this->assertEquals('tests::dummy', $email->getView());
+        $this->assertEquals('tests::dummy', $email->view);
     }
 
-    /** @test */
-    public function encrypted_should_be_saved_correctly()
-    {
-        $email = $this->sendEmail();
-
-        $this->assertEquals(0, DB::table('emails')->find(1)->encrypted);
-        $this->assertFalse($email->isEncrypted());
-
-        $this->app['config']['laravel-database-emails.encrypt'] = true;
-
-        $email = $this->sendEmail();
-
-        $this->assertEquals(1, DB::table('emails')->find(2)->encrypted);
-        $this->assertTrue($email->isEncrypted());
-    }
-
-    /** @test */
+    #[Test]
     public function scheduled_date_should_be_saved_correctly()
     {
         $email = $this->sendEmail();
         $this->assertNull(DB::table('emails')->find(1)->scheduled_at);
-        $this->assertNull($email->getScheduledDate());
+        $this->assertNull($email->scheduled_at);
 
         Carbon::setTestNow(Carbon::create(2019, 1, 1, 1, 2, 3));
         $email = $this->scheduleEmail('+2 weeks');
         $this->assertNotNull(DB::table('emails')->find(2)->scheduled_at);
-        $this->assertEquals('2019-01-15 01:02:03', $email->getScheduledDate());
+        $this->assertEquals('2019-01-15 01:02:03', $email->scheduled_at);
     }
 
-    /** @test */
+    #[Test]
     public function the_body_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'Jane Doe']]);
@@ -113,44 +94,44 @@ class DatabaseInteractionTest extends TestCase
         $expectedBody = "Name: Jane Doe\n";
 
         $this->assertSame($expectedBody, DB::table('emails')->find(1)->body);
-        $this->assertSame($expectedBody, $email->getBody());
+        $this->assertSame($expectedBody, $email->body);
     }
 
-    /** @test */
+    #[Test]
     public function from_should_be_saved_correctly()
     {
         $email = $this->composeEmail()->send();
 
-        $this->assertFalse($email->hasFrom());
-        $this->assertEquals(config('mail.from.address'), $email->getFromAddress());
-        $this->assertEquals(config('mail.from.name'), $email->getFromName());
+        $this->assertEquals($email->from['address'], $email->from['address']);
+        $this->assertEquals($email->from['name'], $email->from['name']);
 
-        $email = $this->composeEmail()->from('marick@dolphiq.nl', 'Marick')->send();
+        $email = $this->composeEmail([
+            'from' => new Address('marick@dolphiq.nl', 'Marick'),
+        ])->send();
 
-        $this->assertTrue($email->hasFrom());
-        $this->assertEquals('marick@dolphiq.nl', $email->getFromAddress());
-        $this->assertEquals('Marick', $email->getFromName());
+        $this->assertTrue((bool) $email->from);
+        $this->assertEquals('marick@dolphiq.nl', $email->from['address']);
+        $this->assertEquals('Marick', $email->from['name']);
     }
 
-    /** @test */
+    #[Test]
     public function variables_should_be_saved_correctly()
     {
         $email = $this->sendEmail(['variables' => ['name' => 'John Doe']]);
 
-        $this->assertEquals(json_encode(['name' => 'John Doe'], 1), DB::table('emails')->find(1)->variables);
-        $this->assertEquals(['name' => 'John Doe'], $email->getVariables());
+        $this->assertEquals(['name' => 'John Doe'], $email->variables);
     }
 
-    /** @test */
+    #[Test]
     public function the_sent_date_should_be_null()
     {
         $email = $this->sendEmail();
 
         $this->assertNull(DB::table('emails')->find(1)->sent_at);
-        $this->assertNull($email->getSendDate());
+        $this->assertNull($email->sent_at);
     }
 
-    /** @test */
+    #[Test]
     public function failed_should_be_zero()
     {
         $email = $this->sendEmail();
@@ -159,16 +140,16 @@ class DatabaseInteractionTest extends TestCase
         $this->assertFalse($email->hasFailed());
     }
 
-    /** @test */
+    #[Test]
     public function attempts_should_be_zero()
     {
         $email = $this->sendEmail();
 
         $this->assertEquals(0, DB::table('emails')->find(1)->attempts);
-        $this->assertEquals(0, $email->getAttempts());
+        $this->assertEquals(0, $email->attempts);
     }
 
-    /** @test */
+    #[Test]
     public function the_scheduled_date_should_be_saved_correctly()
     {
         Carbon::setTestNow(Carbon::now());
@@ -177,62 +158,55 @@ class DatabaseInteractionTest extends TestCase
 
         $email = $this->scheduleEmail('+2 weeks');
 
-        $this->assertTrue($email->isScheduled());
-        $this->assertEquals($scheduledFor, $email->getScheduledDate());
+        $this->assertEquals($scheduledFor, $email->scheduled_at);
     }
 
-    /** @test */
+    #[Test]
     public function recipient_should_be_swapped_for_test_address_when_in_testing_mode()
     {
-        $this->app['config']->set('laravel-database-emails.testing.enabled', function () {
+        $this->app['config']->set('database-emails.testing.enabled', function () {
             return true;
         });
-        $this->app['config']->set('laravel-database-emails.testing.email', 'test@address.com');
+        $this->app['config']->set('database-emails.testing.email', 'test@address.com');
 
         $email = $this->sendEmail(['recipient' => 'jane@doe.com']);
 
-        $this->assertEquals('test@address.com', $email->getRecipient());
+        $this->assertEquals(['test@address.com' => null], $email->recipient);
     }
 
-    /** @test */
+    #[Test]
     public function attachments_should_be_saved_correctly()
     {
         $email = $this->composeEmail()
-            ->attach(__DIR__ . '/files/pdf-sample.pdf')
-            ->send();
-
-        $this->assertCount(1, $email->getAttachments());
-
-        $attachment = $email->getAttachments()[0];
-
-        $this->assertEquals('attachment', $attachment['type']);
-        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $attachment['attachment']['file']);
-
-        $email = $this->composeEmail()
-            ->attach(__DIR__ . '/files/pdf-sample.pdf')
-            ->attach(__DIR__ . '/files/pdf-sample-2.pdf')
-            ->send();
-
-        $this->assertCount(2, $email->getAttachments());
-
-        $this->assertEquals(__DIR__ . '/files/pdf-sample.pdf', $email->getAttachments()[0]['attachment']['file']);
-        $this->assertEquals(__DIR__ . '/files/pdf-sample-2.pdf', $email->getAttachments()[1]['attachment']['file']);
-    }
-
-    /** @test */
-    public function in_memory_attachments_should_be_saved_correctly()
-    {
-        $rawData = file_get_contents(__DIR__ . '/files/pdf-sample.pdf');
-
-        $email = $this->composeEmail()
-            ->attachData($rawData, 'generated.pdf', [
-                'mime' => 'application/pdf',
+            ->attachments([
+                Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
+                Attachment::fromPath(__DIR__.'/files/pdf-sample2.pdf'),
+                Attachment::fromStorageDisk('my-custom-disk', 'pdf-sample-2.pdf'),
             ])
             ->send();
 
-        $this->assertCount(1, $email->getAttachments());
+        $this->assertCount(3, $email->attachments);
 
-        $this->assertEquals('rawAttachment', $email->getAttachments()[0]['type']);
-        $this->assertEquals(md5($rawData), md5($email->getAttachments()[0]['attachment']['data']));
+        $this->assertEquals(
+            [
+                'path' => __DIR__.'/files/pdf-sample.pdf',
+                'disk' => null,
+                'as' => null,
+                'mime' => null,
+            ],
+            $email->attachments[0]
+        );
+    }
+
+    #[Test]
+    public function in_memory_attachments_are_not_supported()
+    {
+        $this->expectExceptionMessage('Raw attachments are not supported in the database email driver.');
+
+        $this->composeEmail()
+            ->attachments([
+                Attachment::fromData(fn () => file_get_contents(__DIR__.'/files/pdf-sample.pdf'), 'pdf-sample'),
+            ])
+            ->send();
     }
 }

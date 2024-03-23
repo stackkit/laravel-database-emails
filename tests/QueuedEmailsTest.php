@@ -2,34 +2,35 @@
 
 namespace Tests;
 
-use Illuminate\Support\Facades\Queue;
-use Stackkit\LaravelDatabaseEmails\SendEmailJob;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
+use Stackkit\LaravelDatabaseEmails\SendEmailJob;
+use Workbench\App\Jobs\CustomSendEmailJob;
 
 class QueuedEmailsTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    /** @test */
+    #[Test]
     public function queueing_an_email_will_leave_sending_on_false()
     {
+        Queue::fake();
+
         $email = $this->queueEmail();
 
         $this->assertEquals(0, $email->sending);
     }
 
-    /** @test */
+    #[Test]
     public function queueing_an_email_will_set_the_queued_at_column()
     {
+        Queue::fake();
+
         $email = $this->queueEmail();
 
         $this->assertNotNull($email->queued_at);
     }
 
-    /** @test */
+    #[Test]
     public function queueing_an_email_will_dispatch_a_job()
     {
         Queue::fake();
@@ -41,7 +42,7 @@ class QueuedEmailsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function emails_can_be_queued_on_a_specific_connection()
     {
         Queue::fake();
@@ -53,7 +54,7 @@ class QueuedEmailsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function emails_can_be_queued_on_a_specific_queue()
     {
         Queue::fake();
@@ -65,7 +66,7 @@ class QueuedEmailsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function emails_can_be_queued_with_a_delay()
     {
         Queue::fake();
@@ -79,7 +80,7 @@ class QueuedEmailsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function the_send_email_job_will_call_send_on_the_email_instance()
     {
         Queue::fake();
@@ -93,7 +94,7 @@ class QueuedEmailsTest extends TestCase
         $job->handle();
     }
 
-    /** @test */
+    #[Test]
     public function the_mail_will_be_marked_as_sent_when_job_is_finished()
     {
         Queue::fake();
@@ -104,5 +105,15 @@ class QueuedEmailsTest extends TestCase
         $job->handle();
 
         $this->assertTrue($email->isSent());
+    }
+
+    #[Test]
+    public function developers_can_choose_their_own_job()
+    {
+        Queue::fake();
+
+        $email = $this->queueEmail(jobClass: CustomSendEmailJob::class);
+
+        Queue::assertPushed(fn (CustomSendEmailJob $job) => $job->email->id === $email->id);
     }
 }

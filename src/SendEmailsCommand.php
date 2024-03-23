@@ -4,96 +4,42 @@ declare(strict_types=1);
 
 namespace Stackkit\LaravelDatabaseEmails;
 
-use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Collection;
+use Throwable;
 
 class SendEmailsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'email:send';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Send all queued e-mails';
 
-    /**
-     * The e-mail repository.
-     *
-     * @var Store
-     */
-    protected $store;
-
-    /**
-     * Create a new SendEmailsCommand instance.
-     *
-     * @param Store $store
-     */
-    public function __construct(Store $store)
+    public function handle(Store $store): void
     {
-        parent::__construct();
-
-        $this->store = $store;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle(): void
-    {
-        $emails = $this->store->getQueue();
+        $emails = $store->getQueue();
 
         if ($emails->isEmpty()) {
-            $this->line('There is nothing to send.');
+            $this->components->info('There is nothing to send.');
 
             return;
         }
 
-        $progress = $this->output->createProgressBar($emails->count());
+        $this->components->info('Sending '.count($emails).' e-mail(s).');
 
         foreach ($emails as $email) {
-            $progress->advance();
+            $recipients = implode(', ', array_keys($email->recipient));
+            $line = str($email->subject)->limit(40).' - '.str($recipients)->limit(40);
 
-            try {
+            rescue(function () use ($email, $line) {
                 $email->send();
-            } catch (Exception $e) {
+
+                $this->components->twoColumnDetail($line, '<fg=green;options=bold>DONE</>');
+            }, function (Throwable $e) use ($email, $line) {
                 $email->markAsFailed($e);
-            }
+
+                $this->components->twoColumnDetail($line, '<fg=red;options=bold>FAIL</>');
+            });
         }
 
-        $progress->finish();
-
-        $this->result($emails);
-    }
-
-    /**
-     * Output a table with the cronjob result.
-     *
-     * @param Collection $emails
-     * @return void
-     */
-    protected function result(Collection $emails): void
-    {
-        $headers = ['ID', 'Recipient', 'Subject', 'Status'];
-
-        $this->line("\n");
-
-        $this->table($headers, $emails->map(function (Email $email) {
-            return [
-                $email->getId(),
-                $email->getRecipientsAsString(),
-                $email->getSubject(),
-                $email->hasFailed() ? 'Failed' : 'OK',
-            ];
-        }));
+        $this->newLine();
     }
 }

@@ -2,11 +2,19 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Orchestra\Testbench\Concerns\WithWorkbench;
 use Stackkit\LaravelDatabaseEmails\Email;
+use Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $invalid;
+
+    use LazilyRefreshDatabase;
+    use WithWorkbench;
 
     public function setUp(): void
     {
@@ -24,52 +32,57 @@ class TestCase extends \Orchestra\Testbench\TestCase
             },
         ];
 
-        view()->addNamespace('tests', __DIR__ . '/views');
+        view()->addNamespace('tests', __DIR__.'/views');
 
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         Email::truncate();
     }
 
-    /**
-     * Get package providers.  At a minimum this is the package being tested, but also
-     * would include packages upon which our package depends, e.g. Cartalyst/Sentry
-     * In a normal app environment these would be added to the 'providers' array in
-     * the config/app.php file.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     *
-     * @return array
-     */
     protected function getPackageProviders($app)
     {
         return [
-            \Stackkit\LaravelDatabaseEmails\LaravelDatabaseEmailsServiceProvider::class,
+            LaravelDatabaseEmailsServiceProvider::class,
         ];
     }
 
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('laravel-database-emails.attempts', 3);
-        $app['config']->set('laravel-database-emails.testing.enabled', false);
-        $app['config']->set('laravel-database-emails.testing.email', 'test@email.com');
+        $app['config']->set('database-emails.attempts', 3);
+        $app['config']->set('database-emails.testing.enabled', false);
+        $app['config']->set('database-emails.testing.email', 'test@email.com');
+
+        $app['config']->set('filesystems.disks.my-custom-disk', [
+            'driver' => 'local',
+            'root' => __DIR__.'/../workbench/storage/app/public',
+        ]);
 
         $app['config']->set('database.default', 'testbench');
+        $driver = env('DB_DRIVER', 'sqlite');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => getenv('CI_DB_DRIVER'),
-            'host'     => getenv('CI_DB_HOST'),
-            'port'     => getenv('CI_DB_PORT'),
-            'database' => getenv('CI_DB_DATABASE'),
-            'username' => getenv('CI_DB_USERNAME'),
-            'password' => getenv('CI_DB_PASSWORD'),
-            'prefix'   => '',
-            'strict' => true,
+            'driver' => $driver,
+            ...match ($driver) {
+                'sqlite' => [
+                    'database' => ':memory:',
+                ],
+                'mysql' => [
+                    'host' => '127.0.0.1',
+                    'port' => 3307,
+                ],
+                'pgsql' => [
+                    'host' => '127.0.0.1',
+                    'port' => 5432,
+                ],
+            },
+            'database' => 'test',
+            'username' => 'test',
+            'password' => 'test',
         ]);
 
         $app['config']->set('mail.driver', 'log');
@@ -78,25 +91,30 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function createEmail($overwrite = [])
     {
         $params = array_merge([
-            'label'     => 'welcome',
+            'label' => 'welcome',
             'recipient' => 'john@doe.com',
-            'cc'        => null,
-            'bcc'       => null,
-            'reply_to'  => null,
-            'subject'   => 'test',
-            'view'      => 'tests::dummy',
+            'cc' => null,
+            'bcc' => null,
+            'reply_to' => null,
+            'subject' => 'test',
+            'view' => 'tests::dummy',
             'variables' => ['name' => 'John Doe'],
+            'from' => null,
         ], $overwrite);
 
         return Email::compose()
             ->label($params['label'])
-            ->recipient($params['recipient'])
-            ->cc($params['cc'])
-            ->bcc($params['bcc'])
-            ->replyTo($params['reply_to'])
-            ->subject($params['subject'])
-            ->view($params['view'])
-            ->variables($params['variables']);
+            ->envelope(fn (Envelope $envelope) => $envelope
+                ->to($params['recipient'])
+                ->when($params['cc'], fn ($envelope) => $envelope->cc($params['cc']))
+                ->when($params['bcc'], fn ($envelope) => $envelope->bcc($params['bcc']))
+                ->when($params['reply_to'], fn ($envelope) => $envelope->replyTo($params['reply_to']))
+                ->when($params['from'], fn (Envelope $envelope) => $envelope->from($params['from']))
+                ->subject($params['subject']))
+            ->content(fn (Content $content) => $content
+                ->view($params['view'])
+                ->with($params['variables'])
+            );
     }
 
     public function composeEmail($overwrite = [])
@@ -111,11 +129,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     public function scheduleEmail($scheduledFor, $overwrite = [])
     {
-        return $this->createEmail($overwrite)->schedule($scheduledFor);
+        return $this->createEmail($overwrite)->later($scheduledFor);
     }
 
-    public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [])
+    public function queueEmail($connection = null, $queue = null, $delay = null, $overwrite = [], ?string $jobClass = null)
     {
-        return $this->createEmail($overwrite)->queue($connection, $queue, $delay);
+        return $this->createEmail($overwrite)->queue($connection, $queue, $delay, $jobClass);
     }
 }

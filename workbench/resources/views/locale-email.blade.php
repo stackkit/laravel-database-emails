@@ -1,0 +1,2 @@
+{{ trans('workbench::messages.greeting') }}
+
