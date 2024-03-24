@@ -106,7 +106,7 @@ class MailableReaderTest extends TestCase
 
         $this->assertTrue((bool) $email->from);
         $this->assertEquals('marick@dolphiq.nl', $email->from['address']);
-        $this->assertEquals(null, $email->from['name']);
+        $this->assertEquals('Laravel', $email->from['name']);
 
         $email = Email::compose()->mailable(
             ($this->mailable())
