@@ -86,6 +86,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
         ]);
 
         $app['config']->set('mail.driver', 'log');
+
+        $app['config']->set('mail.from.name', 'Laravel');
     }
 
     public function createEmail($overwrite = [])
