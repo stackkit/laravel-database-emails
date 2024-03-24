@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 7.0.0 - 2024-03-24
+
+**Added**
+
+- Laravel 10 and 11 support
+- Customizable job class for queueing
+- Index on emails table to improve performance
+- Added support for SQLite and PostgreSQL
+
+**Changed**
+
+- Email::compose() has changed. See UPGRADING.md
+- Old email table is incompatible - new table will be created
+
+**Removed**
+
+- Support for Laravel 6, 7, 8 and 9
+- Email encyption
+
 ## 6.3.0 - 2023-12-30
 
 **Added**
