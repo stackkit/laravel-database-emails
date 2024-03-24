@@ -152,12 +152,14 @@ class EmailComposer
             (new MailableReader())->read($this);
         }
 
-        if (! $this->email->from) {
-            $this->email->from = [
-                'address' => config('mail.from.address'),
-                'name' => config('mail.from.name'),
-            ];
+        if (! is_array($this->email->from)) {
+            $this->email->from = [];
         }
+
+        $this->email->from = [
+            'name' => $this->email->from['name'] ?? config('mail.from.name'),
+            'address' => $this->email->from['address'] ?? config('mail.from.address'),
+        ];
 
         $this->email->save();
 

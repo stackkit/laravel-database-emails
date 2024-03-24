@@ -68,7 +68,7 @@ class SenderTest extends TestCase
         $this->artisan('email:send');
         $from = reset($this->sent)->from;
         $this->assertEquals('marick@dolphiq.nl', key($from));
-        $this->assertEquals(null, $from[key($from)]);
+        $this->assertEquals('From CI test', $from[key($from)]);
     }
 
     #[Test]
