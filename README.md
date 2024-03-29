@@ -1,7 +1,7 @@
 <p align="center">
 <img src="https://github.com/stackkit/laravel-database-emails/workflows/Run%20tests/badge.svg?branch=master" alt="Build Status">
 <a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/license.svg" alt="License"></a>
+<a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/downloads.svg" alt="License"></a>
 </p>
 
 # Introduction
@@ -133,6 +133,8 @@ However, you will have to use this package's `Attachment` class.
 
 
 ```php
+use Stackkit\LaravelDatabaseEmails\Attachment;
+
 Email::compose()
     ->attachments([
         Attachment::fromPath(__DIR__.'/files/pdf-sample.pdf'),
