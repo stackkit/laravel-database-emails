@@ -1,8 +1,6 @@
-<p align="center">
 [![Run tests](https://github.com/stackkit/laravel-database-emails/actions/workflows/run-tests.yml/badge.svg)](https://github.com/stackkit/laravel-database-emails/actions/workflows/run-tests.yml)
-<a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/stackkit/laravel-database-emails"><img src="https://poser.pugx.org/stackkit/laravel-database-emails/downloads.svg" alt="License"></a>
-</p>
+[![Latest Version on Packagist](https://poser.pugx.org/stackkit/laravel-database-emails/v/stable.svg)](https://packagist.org/packages/stackkit/laravel-database-emails)
+[![Total Downloads](https://poser.pugx.org/stackkit/laravel-database-emails/downloads.svg)](https://packagist.org/packages/stackkit/laravel-database-emails)
 
 # Introduction
 
