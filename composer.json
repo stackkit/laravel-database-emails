@@ -49,6 +49,7 @@
             "composer update laravel/framework:10.* orchestra/testbench:8.* nunomaduro/collision:7.* --with-all-dependencies"
         ],
         "test": [
+            "testbench workbench:create-sqlite-db",
             "testbench package:test"
         ],
         "post-autoload-dump": [

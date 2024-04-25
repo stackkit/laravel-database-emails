@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Orchestra\Testbench\Concerns\WithWorkbench;
@@ -13,7 +13,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $invalid;
 
-    use LazilyRefreshDatabase;
+    use RefreshDatabase;
     use WithWorkbench;
 
     public function setUp(): void
@@ -69,20 +69,23 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => $driver,
             ...match ($driver) {
                 'sqlite' => [
-                    'database' => ':memory:',
+                    'database' => database_path('database.sqlite'),
                 ],
                 'mysql' => [
                     'host' => '127.0.0.1',
                     'port' => 3307,
+                    'database' => 'test',
+                    'username' => 'test',
+                    'password' => 'test',
                 ],
                 'pgsql' => [
                     'host' => '127.0.0.1',
                     'port' => 5432,
+                    'database' => 'test',
+                    'username' => 'test',
+                    'password' => 'test',
                 ],
             },
-            'database' => 'test',
-            'username' => 'test',
-            'password' => 'test',
         ]);
 
         $app['config']->set('mail.driver', 'log');
