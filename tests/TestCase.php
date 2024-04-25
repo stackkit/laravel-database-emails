@@ -69,7 +69,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => $driver,
             ...match ($driver) {
                 'sqlite' => [
-                    'database' => ':memory:',
+                    'database' => database_path('database.sqlite'),
                 ],
                 'mysql' => [
                     'host' => '127.0.0.1',
