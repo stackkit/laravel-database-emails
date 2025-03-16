@@ -48,7 +48,7 @@ class EnvelopeTest extends TestCase
         $email = Email::compose()
             ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
-            ->content(fn (Content $content) => $content->view('welcome'))
+            ->content(fn (Content $content) => $content->view('tests::welcome'))
             ->send();
 
         $this->assertEquals(
@@ -70,7 +70,7 @@ class EnvelopeTest extends TestCase
         $email = Email::compose()
             ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
-            ->content(fn (Content $content) => $content->view('welcome'))
+            ->content(fn (Content $content) => $content->view('tests::welcome'))
             ->send();
 
         $this->assertEquals(
@@ -92,7 +92,7 @@ class EnvelopeTest extends TestCase
         $email = Email::compose()
             ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
-            ->content(fn (Content $content) => $content->view('welcome'))
+            ->content(fn (Content $content) => $content->view('tests::welcome'))
             ->send();
 
         $this->assertEquals(
