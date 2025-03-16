@@ -19,13 +19,13 @@ class EnvelopeTest extends TestCase
     {
         $email = Email::compose()
             ->envelope(
-                (new Envelope())
+                (new Envelope)
                     ->subject('Hey')
                     ->from('asdf@gmail.com')
                     ->to(['johndoe@example.com', 'janedoe@example.com'])
             )
             ->content(
-                (new Content())
+                (new Content)
                     ->view('tests::dummy')
                     ->with(['name' => 'John Doe'])
             )
@@ -40,7 +40,7 @@ class EnvelopeTest extends TestCase
     #[Test]
     public function test_it_can_pass_user_models()
     {
-        $user = (new User())->forceFill([
+        $user = (new User)->forceFill([
             'email' => 'johndoe@example.com',
             'name' => 'J. Doe',
         ]);
@@ -48,7 +48,7 @@ class EnvelopeTest extends TestCase
         $email = Email::compose()
             ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
-            ->content(fn (Content $content) => $content->view('welcome'))
+            ->content(fn (Content $content) => $content->view('tests::welcome'))
             ->send();
 
         $this->assertEquals(
@@ -62,7 +62,7 @@ class EnvelopeTest extends TestCase
     #[Test]
     public function users_can_have_a_preferred_email()
     {
-        $user = (new UserWithPreferredEmail())->forceFill([
+        $user = (new UserWithPreferredEmail)->forceFill([
             'email' => 'johndoe@example.com',
             'name' => 'J. Doe',
         ]);
@@ -70,7 +70,7 @@ class EnvelopeTest extends TestCase
         $email = Email::compose()
             ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
-            ->content(fn (Content $content) => $content->view('welcome'))
+            ->content(fn (Content $content) => $content->view('tests::welcome'))
             ->send();
 
         $this->assertEquals(
@@ -84,7 +84,7 @@ class EnvelopeTest extends TestCase
     #[Test]
     public function users_can_have_a_preferred_name()
     {
-        $user = (new UserWithPreferredName())->forceFill([
+        $user = (new UserWithPreferredName)->forceFill([
             'email' => 'johndoe@example.com',
             'name' => 'J. Doe',
         ]);
@@ -92,7 +92,7 @@ class EnvelopeTest extends TestCase
         $email = Email::compose()
             ->user($user)
             ->envelope(fn (Envelope $envelope) => $envelope->subject('Hey'))
-            ->content(fn (Content $content) => $content->view('welcome'))
+            ->content(fn (Content $content) => $content->view('tests::welcome'))
             ->send();
 
         $this->assertEquals(
@@ -106,7 +106,7 @@ class EnvelopeTest extends TestCase
     #[Test]
     public function users_can_have_a_preferred_locale()
     {
-        $nonLocaleUser = (new User())->forceFill([
+        $nonLocaleUser = (new User)->forceFill([
             'email' => 'johndoe@example.com',
             'name' => 'J. Doe',
         ]);
@@ -117,7 +117,7 @@ class EnvelopeTest extends TestCase
             ->content(fn (Content $content) => $content->view('locale-email'))
             ->send();
 
-        $localeUser = (new UserWithPreferredLocale())->forceFill([
+        $localeUser = (new UserWithPreferredLocale)->forceFill([
             'email' => 'johndoe@example.com',
             'name' => 'J. Doe',
         ]);

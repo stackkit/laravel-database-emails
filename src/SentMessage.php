@@ -29,7 +29,7 @@ class SentMessage
 
     public static function createFromSymfonyMailer(Email $email): SentMessage
     {
-        $sentMessage = new self();
+        $sentMessage = new self;
 
         foreach ($email->getFrom() as $address) {
             $sentMessage->from[$address->getAddress()] = $address->getName();

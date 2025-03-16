@@ -14,7 +14,7 @@ class MailableReaderTest extends TestCase
 {
     private function mailable(): Mailable
     {
-        return new TestMailable();
+        return new TestMailable;
     }
 
     #[Test]

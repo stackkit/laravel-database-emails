@@ -57,7 +57,7 @@ class Email extends Model
 
     public static function compose(): EmailComposer
     {
-        return new EmailComposer(new static());
+        return new EmailComposer(new static);
     }
 
     public function isSent(): bool
@@ -99,7 +99,7 @@ class Email extends Model
 
     public function send(): void
     {
-        (new Sender())->send($this);
+        (new Sender)->send($this);
     }
 
     public static function pruneWhen(Closure $closure): void
