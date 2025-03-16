@@ -17,7 +17,7 @@ class SenderTest extends TestCase
     /** @var array<SentMessage> */
     public $sent = [];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

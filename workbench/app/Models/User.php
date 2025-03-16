@@ -6,6 +6,4 @@ namespace Workbench\App\Models;
 
 use Illuminate\Foundation\Auth\User as UserAlias;
 
-class User extends UserAlias
-{
-}
+class User extends UserAlias {}

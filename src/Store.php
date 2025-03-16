@@ -17,7 +17,7 @@ class Store
      */
     public function getQueue(): LazyCollection
     {
-        $query = new Email();
+        $query = new Email;
 
         return Email::query()
             ->whereNull('deleted_at')
