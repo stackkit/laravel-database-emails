@@ -16,7 +16,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     use RefreshDatabase;
     use WithWorkbench;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,10 +26,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
             1,
             1.0,
             'test',
-            new \stdClass(),
+            new \stdClass,
             (object) [],
-            function () {
-            },
+            function () {},
         ];
 
         view()->addNamespace('tests', __DIR__.'/views');

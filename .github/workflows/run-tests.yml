@@ -66,9 +66,9 @@ jobs:
         payload:
           - { laravel: '11.*', php: '8.3', 'testbench': '9.*', collision: '8.*' }
           - { laravel: '11.*', php: '8.2', 'testbench': '9.*', collision: '8.*' }
-          - { laravel: '10.*', php: '8.3', 'testbench': '8.*', collision: '7.*' }
-          - { laravel: '10.*', php: '8.2', 'testbench': '8.*', collision: '7.*' }
-          - { laravel: '10.*', php: '8.1', 'testbench': '8.*', collision: '7.*' }
+          - { laravel: '12.*', php: '8.2', 'testbench': '10.*', collision: '8.*' }
+          - { laravel: '12.*', php: '8.3', 'testbench': '10.*', collision: '8.*' }
+          - { laravel: '12.*', php: '8.4', 'testbench': '10.*', collision: '8.*' }
 
     name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }} - DB ${{ matrix.db }}
 

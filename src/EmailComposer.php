@@ -45,7 +45,7 @@ class EmailComposer
     public function envelope(null|Envelope|Closure $envelope = null): self
     {
         if ($envelope instanceof Closure) {
-            $this->envelope = $envelope($this->envelope ?: new Envelope());
+            $this->envelope = $envelope($this->envelope ?: new Envelope);
 
             return $this;
         }
@@ -58,7 +58,7 @@ class EmailComposer
     public function content(null|Content|Closure $content = null): self
     {
         if ($content instanceof Closure) {
-            $this->content = $content($this->content ?: new Content());
+            $this->content = $content($this->content ?: new Content);
 
             return $this;
         }
@@ -141,7 +141,7 @@ class EmailComposer
     {
         $this->mailable = $mailable;
 
-        (new MailableReader())->read($this);
+        (new MailableReader)->read($this);
 
         return $this;
     }
@@ -149,7 +149,7 @@ class EmailComposer
     public function send(): Email
     {
         if ($this->envelope && $this->content) {
-            (new MailableReader())->read($this);
+            (new MailableReader)->read($this);
         }
 
         if (! is_array($this->email->from)) {

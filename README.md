@@ -8,7 +8,7 @@ This package allows you to store and send e-mails using the database.
 
 # Requirements
 
-This package requires Laravel 10 or 11.
+This package requires Laravel 11 or 12.
 
 # Installation
 
