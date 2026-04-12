@@ -1,9 +1,5 @@
 {
-  "db": [
-    { "driver": "mysql", "version": "8.4", "label": "mysql 8.4" },
-    { "driver": "sqlite", "label": "sqlite" },
-    { "driver": "pgsql", "version": "16", "label": "pgsql 16" }
-  ],
+  "db": ["mysql", "sqlite", "pgsql"],
   "payload": [
     { "laravel": "12.*", "php": "8.2", "testbench": "10.*", "collision": "8.*" },
     { "laravel": "12.*", "php": "8.3", "testbench": "10.*", "collision": "8.*" },
