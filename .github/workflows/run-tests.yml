@@ -82,7 +82,7 @@ jobs:
         db: ${{ fromJson(needs.load-matrix.outputs.db) }}
         payload: ${{ fromJson(needs.load-matrix.outputs.payload) }}
 
-    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }} - DB ${{ matrix.db.version != '' && format('{0} {1}', matrix.db.driver, matrix.db.version) || matrix.db.driver }}
+    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }} - DB ${{ matrix.db.label }}
 
     steps:
       - name: Checkout code
