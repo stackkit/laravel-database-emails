@@ -82,7 +82,7 @@ jobs:
         db: ${{ fromJson(needs.load-matrix.outputs.db) }}
         payload: ${{ fromJson(needs.load-matrix.outputs.payload) }}
 
-    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }} - DB ${{ matrix.db }}
+    name: PHP ${{ matrix.payload.php }} - Laravel ${{ matrix.payload.laravel }} - DB ${{ matrix.db.version != '' && format('{0} {1}', matrix.db.driver, matrix.db.version) || matrix.db.driver }}
 
     steps:
       - name: Checkout code
@@ -99,15 +99,15 @@ jobs:
 
       - name: Set up MySQL and PostgreSQL
         run: |
-            if [ "${{ matrix.db }}" != "sqlite" ]; then
-                MYSQL_PORT=3307 POSTGRES_PORT=5432 docker compose up ${{ matrix.db }} -d
+            if [ "${{ matrix.db.driver }}" != "sqlite" ]; then
+                MYSQL_PORT=3307 POSTGRES_PORT=5432 docker compose up ${{ matrix.db.driver }} -d
             fi
 
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.payload.laravel }}" "orchestra/testbench:${{ matrix.payload.testbench }}" "nunomaduro/collision:${{ matrix.payload.collision }}" --no-interaction --no-update
           composer update --prefer-stable --prefer-dist --no-interaction
-          if [ "${{ matrix.db }}" = "mysql" ]; then
+          if [ "${{ matrix.db.driver }}" = "mysql" ]; then
             while ! mysqladmin ping --host=127.0.0.1 --user=test --port=3307 --password=test --silent; do
               echo "Waiting for MySQL..."
               sleep 1
@@ -117,5 +117,5 @@ jobs:
           fi
       - name: Execute tests
         env:
-          DB_DRIVER: ${{ matrix.db }}
+          DB_DRIVER: ${{ matrix.db.driver }}
         run: composer test
