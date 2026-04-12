@@ -4,7 +4,9 @@
     { "laravel": "12.*", "php": "8.2", "testbench": "10.*", "collision": "8.*" },
     { "laravel": "12.*", "php": "8.3", "testbench": "10.*", "collision": "8.*" },
     { "laravel": "12.*", "php": "8.4", "testbench": "10.*", "collision": "8.*" },
+    { "laravel": "12.*", "php": "8.5", "testbench": "10.*", "collision": "8.*" },
     { "laravel": "13.*", "php": "8.3", "testbench": "11.*", "collision": "8.*" },
-    { "laravel": "13.*", "php": "8.4", "testbench": "11.*", "collision": "8.*" }
+    { "laravel": "13.*", "php": "8.4", "testbench": "11.*", "collision": "8.*" },
+    { "laravel": "13.*", "php": "8.5", "testbench": "11.*", "collision": "8.*" }
   ]
 }
