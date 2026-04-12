@@ -116,6 +116,4 @@ jobs:
             echo "Not waiting for MySQL."
           fi
       - name: Execute tests
-        env:
-          DB_DRIVER: ${{ matrix.db.driver }}
-        run: composer test
+        run: DB_DRIVER=${{ matrix.db.driver }} composer test
